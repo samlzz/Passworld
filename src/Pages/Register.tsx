@@ -4,25 +4,26 @@ import { Link } from 'react-router-dom';
 import { BegginForms } from '../Components/Forms';
 
 // Début du style -------------->
-const LoginContainers = styled.div`
+const RegisterContainers = styled.div`
     position: relative;
 `;
-const RegisterLink = styled(Link)`
+const LoginLink = styled(Link)`
     z-index: 1;
     color: ${(props) => props.theme.primary};
     font-weight: 500;
     text-decoration-color: ${(props) => props.theme.background};
+    font-size: 1.4vw;
     position: absolute;
-    top: 77%;
-    left: 43%;
+    top: 81%;
+    left: 42%;
 `;
 // Fin du style --------------//
 
-export function LogIn() {
+export function Register() {
     return (
-        <LoginContainers>
-            <BegginForms title="Login" noAccount={false} />
-            <RegisterLink to="/register">Don't have an account ?</RegisterLink>
-        </LoginContainers>
+        <RegisterContainers>
+            <BegginForms title="Register" noAccount />
+            <LoginLink to="/">Already have an account ?</LoginLink>
+        </RegisterContainers>
     );
 }
