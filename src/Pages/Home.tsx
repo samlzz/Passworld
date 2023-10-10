@@ -154,14 +154,19 @@ export function Home({ isRendered }: HomeProps) {
                     whoIsClick={(folderName) => {
                         setFolderOpen(folderName);
                     }}
+                    IsSelect={folderOpen === 'All passwords'}
                 />
-                <FolderOfTab
-                    title="Devops"
-                    allPassw={mdpDevExemples}
-                    whoIsClick={(folderName) => {
-                        setFolderOpen(folderName);
-                    }}
-                />
+                {categExemple.map((categorie, i) => (
+                    <FolderOfTab
+                        key={`${categorie[0].categName}-${i}`}
+                        title={categorie[0].categName}
+                        allPassw={categorie}
+                        whoIsClick={(folderName) => {
+                            setFolderOpen(folderName);
+                        }}
+                        IsSelect={folderOpen === categorie[0].categName}
+                    />
+                ))}
             </TabContainer>
             <ProfilButton>My account</ProfilButton>
             <SearchBar placeholder={`Search in ${folderOpen.toLowerCase()}`} />

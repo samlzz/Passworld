@@ -19,9 +19,15 @@ const StyledEdit = styled.button`
     align-self: start;
     margin: 1vh 0.6vw 0 0; //haut droite bas gauche
 `;
-const StyledIco = styled.button`
+const StyledLogo = styled.button`
     justify-self: center;
     margin-top: -2vh;
+`;
+const LogoImg = styled.img`
+    width: 6vw;
+`;
+const IcoImg = styled.img`
+    width: 2.2vw;
 `;
 const StyledTitle = styled.button`
     justify-self: start;
@@ -43,19 +49,23 @@ const MdpWshow = styled.div`
     align-items: center;
     padding-left: 0.8vw;
 `;
+const StyledMdp = styled.button`
+    font-size: 1.3vw;
+`;
 const StyledShow = styled.button``;
 const StyledGenerate = styled.button`
     background-color: ${({ theme }) => theme.selected};
     border-radius: 20vw;
-    height: 3.2vh;
+    height: 3vh;
     align-items: center;
-    padding-left: 0.8vw;
+    padding-left: 0.5vw;
+    font-size: 0.6vw;
 `;
 const StyledDelete = styled.button`
     justify-self: end;
     align-self: end;
     background-color: ${({ theme }) => theme.tercary};
-    margin: 0 1vw 1vh 0; //haut droite bas gauche
+    margin: 0 0.5vw 1.2vh 0; //haut droite bas gauche
 `;
 // Fin du style --------------//
 
@@ -73,23 +83,23 @@ export function PasswCard({ aPassw }: PasswCardProps) {
     return (
         <CardDiv>
             <StyledEdit>
-                <img src={editIco} alt="edit" />
+                <IcoImg src={editIco} alt="edit" />
             </StyledEdit>
-            <StyledIco>
-                <img src={img} alt={`Icon of ${site}`} />
-            </StyledIco>
+            <StyledLogo>
+                <LogoImg src={img} alt={`Icon of ${site}`} />
+            </StyledLogo>
             <StyledTitle> {site} </StyledTitle>
             <MdpContainer>
                 <MdpWshow>
-                    <p>*******</p>
+                    <StyledMdp> ******* </StyledMdp>
                     <StyledShow>
                         <img src={eysClose} alt="show button" />
                     </StyledShow>
                 </MdpWshow>
-                <StyledGenerate>generate</StyledGenerate>
+                <StyledGenerate> generate </StyledGenerate>
             </MdpContainer>
             <StyledDelete>
-                <img src={suprIco} alt="delete" />
+                <IcoImg src={suprIco} alt="delete" />
             </StyledDelete>
         </CardDiv>
     );

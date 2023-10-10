@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { useState } from 'react';
 import clickedFleche from '../assets/Polygon.svg';
 import fleche from '../assets/Polygon _.svg';
 
@@ -73,28 +72,33 @@ interface FolderOfTabProps {
     title: string;
     allPassw: Array<APasswType>;
     whoIsClick: (isIt: string) => void;
+    IsSelect: boolean;
 }
 
-export function FolderOfTab({ title, allPassw, whoIsClick }: FolderOfTabProps) {
-    const [isClicked, setIsClicked] = useState(false);
+export function FolderOfTab({
+    title,
+    allPassw,
+    whoIsClick,
+    IsSelect,
+}: FolderOfTabProps) {
+    // const [isClicked, setIsClicked] = useState(false);
     return (
         <>
             <ElemPassw
                 onMouseDown={() => {
-                    setIsClicked(!isClicked);
-                    whoIsClick(title);
-                }}
-                onBlur={() => {
-                    setIsClicked(false);
-                    whoIsClick('');
+                    if (IsSelect) {
+                        whoIsClick('');
+                    } else {
+                        whoIsClick(title);
+                    }
                 }}
                 $isFolder
-                $isClick={isClicked}
+                $isClick={IsSelect}
             >
-                <LitleLogo src={isClicked ? clickedFleche : fleche} $isFlech />
+                <LitleLogo src={IsSelect ? clickedFleche : fleche} $isFlech />
                 <FolderName> {title} </FolderName>
             </ElemPassw>
-            {isClicked &&
+            {IsSelect &&
                 allPassw.map((mdp) => <ElemOfTab key={mdp.id} aPassw={mdp} />)}
         </>
     );
