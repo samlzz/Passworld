@@ -8,6 +8,8 @@ import logo from '../assets/logoPW/logoPassWorld.png';
 import { LogoPW } from '../Utils/styles/globalStyle';
 import { SearchBar } from '../Components/SearchBar';
 
+import { APasswType, HomeProps } from '../Utils/type';
+
 // Début du style -------------->
 const PageHome = styled.div`
     width: 100wh;
@@ -46,19 +48,6 @@ const CardContainer = styled.div`
     flex-wrap: wrap;
 `;
 // Fin du style --------------//
-
-interface HomeProps {
-    isRendered: (isIt: boolean) => void;
-}
-interface APasswType {
-    categName: string;
-    id: number;
-    site: string;
-    ico: string;
-    mdp?: string;
-    liens?: string;
-    userID?: string;
-}
 
 const researchRes: APasswType[] = [];
 const mdpExemples = [

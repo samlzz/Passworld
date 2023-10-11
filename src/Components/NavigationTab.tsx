@@ -2,13 +2,13 @@ import styled from 'styled-components';
 import clickedFleche from '../assets/Polygon.svg';
 import fleche from '../assets/Polygon _.svg';
 
-interface LitleLogoProps {
-    $isFlech?: boolean;
-}
-interface ElemProps {
-    $isFolder?: boolean;
-    $isClick?: boolean;
-}
+import {
+    ElemProps,
+    LitleLogoProps,
+    ElemOfTabProps,
+    FolderOfTabProps,
+} from '../Utils/type';
+
 // Début du style -------------->
 const ElemPassw = styled.button<ElemProps>`
     //? cancel buttun style
@@ -50,17 +50,6 @@ const FolderName = styled.p`
     margin-left: 1vw;
 `;
 // Fin du style --------------//
-interface APasswType {
-    categName: string;
-    id: number;
-    site: string;
-    ico: string;
-    mdp?: string;
-    userID?: string;
-}
-interface ElemOfTabProps {
-    aPassw: APasswType;
-}
 
 export function ElemOfTab({ aPassw }: ElemOfTabProps) {
     return (
@@ -69,13 +58,6 @@ export function ElemOfTab({ aPassw }: ElemOfTabProps) {
             <p> {aPassw.site} </p>
         </ElemPassw>
     );
-}
-
-interface FolderOfTabProps {
-    title: string;
-    allPassw: Array<APasswType>;
-    whoIsClick: (isIt: string) => void;
-    IsSelect: boolean;
 }
 
 export function FolderOfTab({

@@ -1,5 +1,6 @@
-import { ReactNode } from 'react';
 import { ThemeProvider } from 'styled-components';
+
+import { ColorProviderProps } from '../type';
 
 const colors = {
     background: '#1E2938',
@@ -11,11 +12,6 @@ const colors = {
     tercary: '#182035',
     selected: '#293556',
 };
-
-interface ColorProviderProps {
-    children: ReactNode;
-    isHomeRendered?: boolean;
-}
 
 export function ColorProvider({
     children,

@@ -3,6 +3,8 @@ import styled from 'styled-components';
 
 import searchIco from '../assets/Search.svg';
 
+import { SearchBarProps, APasswType } from '../Utils/type';
+
 // Début du style -------------->
 const StyledSearchBar = styled.input`
     position: absolute;
@@ -19,20 +21,7 @@ const StyledSearchBar = styled.input`
     background-position: 100% 50%;
 `;
 // Fin du style --------------//
-interface APasswType {
-    categName: string;
-    id: number;
-    site: string;
-    ico: string;
-    mdp?: string;
-    liens?: string;
-    userID?: string;
-}
-interface SearchBarProps {
-    openFolder: string;
-    allPassw: APasswType[];
-    searchResult: (result: Array<APasswType>, searchProceed: boolean) => void;
-}
+
 export function SearchBar({
     openFolder,
     allPassw,

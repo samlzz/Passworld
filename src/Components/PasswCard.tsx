@@ -4,6 +4,8 @@ import eysClose from '../assets/Icones/PasswCard/oeuil_fermer.svg';
 import suprIco from '../assets/Icones/PasswCard/suppr.svg';
 import editIco from '../assets/Icones/PasswCard/edit.svg';
 
+import { PasswCardProps } from '../Utils/type';
+
 // Début du style -------------->
 const CardDiv = styled.div`
     background-color: ${({ theme }) => theme.tercary};
@@ -80,17 +82,6 @@ const StyledDelete = styled.button`
 `;
 // Fin du style --------------//
 
-interface APasswType {
-    categName: string;
-    id: number;
-    site: string;
-    ico: string;
-    mdp?: string;
-    userID?: string;
-}
-interface PasswCardProps {
-    aPassw: APasswType;
-}
 export function PasswCard({ aPassw }: PasswCardProps) {
     const { site, ico, userID = '' } = aPassw;
     return (

@@ -1,9 +1,7 @@
 import styled from 'styled-components';
 import submitLogo from '../assets/logoPW/SubmitLogo.png';
 
-type ForRegisterProps = {
-    forRegister?: boolean;
-};
+import { ForRegisterProps, FormsProps } from '../Utils/type';
 
 // Début du style -------------->
 const PageParent = styled.div`
@@ -62,11 +60,6 @@ const StyledSubmit = styled.input<ForRegisterProps>`
     z-index: 2;
 `;
 // Fin du style --------------//
-
-interface FormsProps {
-    title: string;
-    noAccount: boolean;
-}
 
 export function BegginForms({ title, noAccount }: FormsProps) {
     return (
