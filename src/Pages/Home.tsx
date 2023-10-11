@@ -3,10 +3,10 @@ import styled from 'styled-components';
 
 import { FolderOfTab } from '../Components/NavigationTab';
 import pp from '../assets/ProfilePic.png';
-import searchIco from '../assets/Search.svg';
 import { PasswCard } from '../Components/PasswCard';
 import logo from '../assets/logoPW/logoPassWorld.png';
 import { LogoPW } from '../Utils/styles/globalStyle';
+import { SearchBar } from '../Components/SearchBar';
 
 // Début du style -------------->
 const PageHome = styled.div`
@@ -38,20 +38,7 @@ const ProfilButton = styled.button`
     background-size: 25% 80%;
     background-position: 90% 50%;
 `;
-const SearchBar = styled.input`
-    position: absolute;
-    top: 13vh;
-    right: 4vw;
-    height: 4vh;
-    width: 68vw;
-    border-radius: 10vw;
-    padding-left: 1.2vw;
-    background-color: ${({ theme }) => theme.secondary};
-    background-image: url(${searchIco});
-    background-repeat: no-repeat;
-    background-size: 7% 70%;
-    background-position: 100% 50%;
-`;
+
 const CardContainer = styled.div`
     margin-top: 5vh;
     margin-left: 25vw;
@@ -60,44 +47,64 @@ const CardContainer = styled.div`
 `;
 // Fin du style --------------//
 
+interface HomeProps {
+    isRendered: (isIt: boolean) => void;
+}
+interface APasswType {
+    categName: string;
+    id: number;
+    site: string;
+    ico: string;
+    mdp?: string;
+    liens?: string;
+    userID?: string;
+}
+
+const researchRes: APasswType[] = [];
 const mdpExemples = [
     {
         categName: 'All passwords',
         id: 0,
         site: 'Youtube',
-        img: './src/assets/logoPW/SubmitLogo.png',
+        ico: './src/assets/logoPW/SubmitLogo.png',
+        userID: 'nliziard@icloud.com',
     },
     {
         categName: 'All passwords',
         id: 1,
         site: 'Google',
-        img: './src/assets/logoPW/SubmitLogo.png',
+        ico: './src/assets/logoPW/SubmitLogo.png',
+        userID: 'sliziard@icloud.com',
     },
     {
         categName: 'All passwords',
         id: 2,
         site: 'GitHub',
-        img: './src/assets/logoPW/SubmitLogo.png',
+        ico: './src/assets/logoPW/SubmitLogo.png',
+        userID: 'sliziard@icloud.com',
     },
     {
         categName: 'All passwords',
         id: 3,
         site: 'Figma',
-        img: './src/assets/logoPW/SubmitLogo.png',
+        ico: './src/assets/logoPW/SubmitLogo.png',
+        userID: 'sliziard@icloud.com',
     },
 ];
 const mdpDevExemples = [
     {
         categName: 'Devops',
-        id: 0,
+        id: 2,
         site: 'GitHub',
-        img: './src/assets/logoPW/SubmitLogo.png',
+        ico: './src/assets/logoPW/SubmitLogo.png',
+        userID: 'sliziard@icloud.com',
     },
     {
         categName: 'Devops',
-        id: 1,
+        id: 3,
         site: 'Figma',
-        img: './src/assets/logoPW/SubmitLogo.png',
+        ico: './src/assets/logoPW/SubmitLogo.png',
+        userID: 'sliziard@icloud.com',
     },
 ];
 const mdpLoisirsExemples = [
@@ -105,80 +112,131 @@ const mdpLoisirsExemples = [
         categName: 'Loisirs',
         id: 0,
         site: 'Youtube',
-        img: './src/assets/logoPW/SubmitLogo.png',
+        ico: './src/assets/logoPW/SubmitLogo.png',
+        userID: 'sliziard@icloud.com',
     },
     {
         categName: 'Loisirs',
         id: 1,
         site: 'Google',
-        img: './src/assets/logoPW/SubmitLogo.png',
+        ico: './src/assets/logoPW/SubmitLogo.png',
+        userID: 'sliziard@icloud.com',
     },
 ];
-const categExemple = [mdpDevExemples, mdpLoisirsExemples];
+const categExemple = [
+    researchRes,
+    mdpExemples,
+    mdpDevExemples,
+    mdpLoisirsExemples,
+];
 
-/* interface NavigationProps {
-    allPassw: Array<object>;
-    categ: Array<Array<object>>;
-} */
-interface HomeProps {
-    isRendered: (isIt: boolean) => void;
+function generateHexKey(nbChar: number) {
+    const history = [];
+    let hexKey = '';
+    const characters = '0123456789abcdef';
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < nbChar; i += 1) {
+        hexKey += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+        );
+    }
+    history.push(hexKey);
+    return hexKey;
+}
+function renderOpFoldCard(
+    folderOpen: string,
+    folderList: Array<Array<APasswType>>,
+    isSearch: boolean
+) {
+    //* Check si le dossier ouvert fait partie des categ
+    const nbCateg = folderList.length;
+    let cardContent = <p />;
+    if (isSearch) {
+        cardContent = (
+            <CardContainer>
+                {folderList[0].map((passw) => (
+                    <PasswCard key={generateHexKey(8)} aPassw={passw} />
+                ))}
+            </CardContainer>
+        );
+    } else {
+        for (let i = 0; i < nbCateg; i += 1) {
+            if (i !== 0) {
+                if (folderOpen === folderList[i][0]?.categName) {
+                    cardContent = (
+                        <CardContainer>
+                            {folderList[i].map((passw) => (
+                                <PasswCard
+                                    key={generateHexKey(8)}
+                                    aPassw={passw}
+                                />
+                            ))}
+                        </CardContainer>
+                    );
+                }
+            }
+        }
+    }
+    return cardContent;
+}
+function getCategByName(categName: string, ArrayOfArray: Array<APasswType[]>) {
+    for (let i = 0; i < ArrayOfArray.length; i += 1) {
+        const categ = ArrayOfArray[i];
+        if (i !== 0) {
+            if (categ[0].categName === categName) {
+                return ArrayOfArray[i];
+            }
+        }
+    }
+    return [];
 }
 
 export function Home({ isRendered }: HomeProps) {
+    const [isSearching, setIsSearching] = useState(false);
     const [folderOpen, setFolderOpen] = useState('');
+    const [listfolderList, setFolderList] = useState(categExemple);
     useEffect(() => {
         isRendered(true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const nbCateg = categExemple.length;
-    //* Check si le dossier ouvert fait partie des categ
-    let cardContent = <p />;
-    for (let i = 0; i < nbCateg; i += 1) {
-        if (folderOpen === categExemple[i][0].categName) {
-            cardContent = (
-                <CardContainer>
-                    {categExemple[i].map((passw) => (
-                        <PasswCard key={passw.id} aPassw={passw} />
-                    ))}
-                </CardContainer>
-            );
-        }
-    }
     return (
         <PageHome>
             <TabContainer>
                 <LogoPW src={logo} alt="Logo of PassWorld" />
-                <FolderOfTab
-                    title="All passwords"
-                    allPassw={mdpExemples}
-                    whoIsClick={(folderName) => {
-                        setFolderOpen(folderName);
-                    }}
-                    IsSelect={folderOpen === 'All passwords'}
-                />
-                {categExemple.map((categorie, i) => (
-                    <FolderOfTab
-                        key={`${categorie[0].categName}-${i}`}
-                        title={categorie[0].categName}
-                        allPassw={categorie}
-                        whoIsClick={(folderName) => {
-                            setFolderOpen(folderName);
-                        }}
-                        IsSelect={folderOpen === categorie[0].categName}
-                    />
-                ))}
+                {listfolderList.map((categorie, i) =>
+                    i !== 0 ? (
+                        <FolderOfTab
+                            key={generateHexKey(8)}
+                            title={categorie[0]?.categName}
+                            allPassw={categorie}
+                            whoIsClick={(folderName) =>
+                                setFolderOpen(folderName)
+                            }
+                            IsSelect={folderOpen === categorie[0]?.categName}
+                        />
+                    ) : (
+                        <></>
+                    )
+                )}
             </TabContainer>
             <ProfilButton>My account</ProfilButton>
-            <SearchBar placeholder={`Search in ${folderOpen.toLowerCase()}`} />
-            {folderOpen === 'All passwords' ? (
-                <CardContainer>
-                    {mdpExemples.map((passw) => (
-                        <PasswCard key={passw.id} aPassw={passw} />
-                    ))}
-                </CardContainer>
-            ) : (
-                cardContent
-            )}
+            <SearchBar
+                allPassw={getCategByName(folderOpen, listfolderList)} // todo
+                openFolder={folderOpen}
+                searchResult={(result, searchProceed) => {
+                    if (searchProceed) {
+                        setIsSearching(true);
+                    } else {
+                        setIsSearching(false);
+                    }
+                    setFolderList((prevArray) => {
+                        const updatedArray = [...prevArray];
+                        updatedArray[0] = result;
+                        return updatedArray;
+                    });
+                }}
+            />
+            {renderOpFoldCard(folderOpen, listfolderList, isSearching)}
         </PageHome>
     );
 }

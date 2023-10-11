@@ -8,8 +8,8 @@ import editIco from '../assets/Icones/PasswCard/edit.svg';
 const CardDiv = styled.div`
     background-color: ${({ theme }) => theme.tercary};
     display: grid;
-    height: 33vh;
-    width: 16vw;
+    height: 34vh;
+    width: 17vw;
     border-radius: 2vw;
     margin-left: 4vw;
     overflow: hidden;
@@ -17,11 +17,12 @@ const CardDiv = styled.div`
 const StyledEdit = styled.button`
     justify-self: end;
     align-self: start;
-    margin: 1vh 0.6vw 0 0; //haut droite bas gauche
+    margin: 1vh 0.7vw 0 0; //haut droite bas gauche
 `;
 const StyledLogo = styled.button`
     justify-self: center;
-    margin-top: -2vh;
+    align-self: start;
+    margin-top: -5vh;
 `;
 const LogoImg = styled.img`
     width: 6vw;
@@ -31,13 +32,13 @@ const IcoImg = styled.img`
 `;
 const StyledTitle = styled.button`
     justify-self: start;
-    margin: 1vh 0 0 0.8vw; //haut droite bas gauche
+    margin: 0 0 0.5vh 0.8vw; //haut droite bas gauche
     font-size: 1.4vw;
 `;
 const MdpContainer = styled.div`
     display: flex;
     flex-direction: row;
-    margin: 1vh 0 0 2vw; //haut droite bas gauche
+    margin: 0.5vh 0 0 2vw; //haut droite bas gauche
     gap: 0.3vw;
 `;
 const MdpWshow = styled.div`
@@ -49,8 +50,18 @@ const MdpWshow = styled.div`
     align-items: center;
     padding-left: 0.8vw;
 `;
-const StyledMdp = styled.button`
-    font-size: 1.3vw;
+const EmailContainer = styled.div`
+    display: flex;
+    align-items: center;
+    background-color: ${({ theme }) => theme.selected};
+    border-radius: 20vw;
+    height: 3.2vh;
+    margin: 1vh 0 0 2vw; // haut droite bas gauche
+    width: 80%;
+    padding-left: 0.2vw;
+`;
+const StyledAttrib = styled.button`
+    font-size: 1.1vw;
 `;
 const StyledShow = styled.button``;
 const StyledGenerate = styled.button`
@@ -59,13 +70,13 @@ const StyledGenerate = styled.button`
     height: 3vh;
     align-items: center;
     padding-left: 0.5vw;
-    font-size: 0.6vw;
+    font-size: 0.7vw;
 `;
 const StyledDelete = styled.button`
     justify-self: end;
     align-self: end;
     background-color: ${({ theme }) => theme.tercary};
-    margin: 0 0.5vw 1.2vh 0; //haut droite bas gauche
+    margin: 0 0.8vw 1.6vh 0; //haut droite bas gauche
 `;
 // Fin du style --------------//
 
@@ -73,25 +84,34 @@ interface APasswType {
     categName: string;
     id: number;
     site: string;
-    img: string;
+    ico: string;
+    mdp?: string;
+    userID?: string;
 }
 interface PasswCardProps {
     aPassw: APasswType;
 }
 export function PasswCard({ aPassw }: PasswCardProps) {
-    const { site, img } = aPassw;
+    const { site, ico, userID = '' } = aPassw;
     return (
         <CardDiv>
             <StyledEdit>
                 <IcoImg src={editIco} alt="edit" />
             </StyledEdit>
             <StyledLogo>
-                <LogoImg src={img} alt={`Icon of ${site}`} />
+                <LogoImg src={ico} alt={`Icon of ${site}`} />
             </StyledLogo>
             <StyledTitle> {site} </StyledTitle>
+            {userID === '' ? (
+                <></>
+            ) : (
+                <EmailContainer>
+                    <StyledAttrib> {userID} </StyledAttrib>
+                </EmailContainer>
+            )}
             <MdpContainer>
                 <MdpWshow>
-                    <StyledMdp> ******* </StyledMdp>
+                    <StyledAttrib> ********* </StyledAttrib>
                     <StyledShow>
                         <img src={eysClose} alt="show button" />
                     </StyledShow>

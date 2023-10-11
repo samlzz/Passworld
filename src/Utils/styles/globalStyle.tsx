@@ -13,7 +13,7 @@ export const LogoPW = styled.img`
 
 export const GlobalStyle = createGlobalStyle`
 * {
-    font-family: font-family: 'Trebuchet MS', Helvetica, sans-serif;
+    font-family: 'Trebuchet MS', Helvetica, sans-serif;
 }
 body, html {
     margin: 0;

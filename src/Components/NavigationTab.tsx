@@ -51,9 +51,12 @@ const FolderName = styled.p`
 `;
 // Fin du style --------------//
 interface APasswType {
+    categName: string;
     id: number;
     site: string;
-    img: string;
+    ico: string;
+    mdp?: string;
+    userID?: string;
 }
 interface ElemOfTabProps {
     aPassw: APasswType;
@@ -62,7 +65,7 @@ interface ElemOfTabProps {
 export function ElemOfTab({ aPassw }: ElemOfTabProps) {
     return (
         <ElemPassw>
-            <LitleLogo src={aPassw.img} />
+            <LitleLogo src={aPassw.ico} />
             <p> {aPassw.site} </p>
         </ElemPassw>
     );
