@@ -7,9 +7,11 @@ const colors = {
     darkBackground: '#111727',
     primary: '#453AE4',
     secondary: '#81858D',
+    darkSecondary: '#282F3D',
     white: '#FFFFFFCC',
     placeHolder: '#C3C3C3',
     tercary: '#182035',
+    darkTercary: '#141B2F',
     selected: '#293556',
 };
 

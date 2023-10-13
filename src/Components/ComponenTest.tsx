@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-import searchIco from '../assets/Search.svg';
+import searchIco from '../assets/svgShape/Search.svg';
 
 // Début du style -------------->
 const StyledSearchBar = styled.input`

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import clickedFleche from '../assets/Polygon.svg';
-import fleche from '../assets/Polygon _.svg';
+import clickedFleche from '../assets/svgShape/Polygon.svg';
+import fleche from '../assets/svgShape/Polygon _.svg';
 
 import {
     ElemProps,
@@ -55,7 +55,7 @@ export function ElemOfTab({ aPassw }: ElemOfTabProps) {
     return (
         <ElemPassw>
             <LitleLogo src={aPassw.ico} />
-            <p> {aPassw.site} </p>
+            <p> {aPassw.titre} </p>
         </ElemPassw>
     );
 }

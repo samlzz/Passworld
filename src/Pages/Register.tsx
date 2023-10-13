@@ -11,7 +11,7 @@ const LoginLink = styled(Link)`
     z-index: 1;
     color: ${(props) => props.theme.primary};
     font-weight: 500;
-    text-decoration-color: ${(props) => props.theme.background};
+    text-decoration: none;
     font-size: 1.4vw;
     position: absolute;
     top: 81%;

@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 export interface APasswType {
     categName: string;
     id: number;
-    site: string;
+    titre: string;
     ico: string;
     mdp?: string;
     liens?: string;
@@ -51,10 +51,24 @@ export interface FolderOfTabProps {
 // ? Password Card:
 export interface PasswCardProps {
     aPassw: APasswType;
+    copyIsSucces: (isCopied: boolean) => void;
 }
 // ? Search Bar:
 export interface SearchBarProps {
     openFolder: string;
     allPassw: APasswType[];
     searchResult: (result: Array<APasswType>, searchProceed: boolean) => void;
+}
+// ? Password:
+export interface ContainerProps {
+    $id?: boolean;
+    $link?: boolean;
+}
+export interface CreatePswProps {
+    closed: (toDo: boolean) => void;
+    arrOfArr: Array<APasswType[]>;
+}
+// ? Material UI:
+export interface SelectBoxProps {
+    categArray: Array<string>;
 }

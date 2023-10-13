@@ -11,7 +11,7 @@ const RegisterLink = styled(Link)`
     z-index: 1;
     color: ${(props) => props.theme.primary};
     font-weight: 500;
-    text-decoration-color: ${(props) => props.theme.background};
+    text-decoration: none;
     position: absolute;
     top: 77%;
     left: 43%;

@@ -29,6 +29,7 @@ input, button{
 }
 button{
     background: none;
+    cursor: pointer;
 }
 
 //? Changement de la couleur des textes dans les input vides
@@ -36,7 +37,7 @@ button{
     ::placeholder {
         color: ${({ theme }) =>
             theme.placeHolder}; /* Choisissez votre couleur */
-        opacity: 1; /* Firefox support, important de le définir pour assurer une couleur cohérente */
+        opacity: 1;
     }
 
     //* Pour Internet Explorer 10-11 

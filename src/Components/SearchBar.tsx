@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
-import searchIco from '../assets/Search.svg';
+import searchIco from '../assets/svgShape/Search.svg';
 
 import { SearchBarProps, APasswType } from '../Utils/type';
 
@@ -39,7 +39,7 @@ export function SearchBar({
         // const splitContent = searchContent.match(/\$L: (\w+)/); // ? ve
         // const contentToCheck = splitContent ? splitContent[1] : searchContent;
         allPassw.forEach((passw) => {
-            const siteName = passw.site.toLowerCase();
+            const siteName = passw.titre.toLowerCase();
             const siteEmail = passw?.userID?.toLowerCase();
             const lowSearched = searchContent
                 ? searchContent.toLowerCase()
@@ -53,7 +53,6 @@ export function SearchBar({
             }
         });
         if (searchContent === '') {
-            console.log('is none');
             searchProceed = false;
         }
         searchResult(result, searchProceed);
@@ -62,6 +61,7 @@ export function SearchBar({
         return (
             <StyledSearchBar
                 value=""
+                readOnly
                 placeholder={`Search in ${openFolder.toLowerCase()}`}
             />
         );

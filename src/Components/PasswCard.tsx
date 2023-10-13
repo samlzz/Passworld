@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import styled from 'styled-components';
 
 import eysClose from '../assets/Icones/PasswCard/oeuil_fermer.svg';
@@ -82,27 +84,43 @@ const StyledDelete = styled.button`
 `;
 // Fin du style --------------//
 
-export function PasswCard({ aPassw }: PasswCardProps) {
-    const { site, ico, userID = '' } = aPassw;
+export function PasswCard({ aPassw, copyIsSucces }: PasswCardProps) {
+    const [isCopied, setIsCopied] = useState(false);
+    const { titre, ico, userID = '' } = aPassw;
+    if (isCopied) {
+        copyIsSucces(isCopied);
+    }
     return (
         <CardDiv>
             <StyledEdit>
                 <IcoImg src={editIco} alt="edit" />
             </StyledEdit>
             <StyledLogo>
-                <LogoImg src={ico} alt={`Icon of ${site}`} />
+                <LogoImg src={ico} alt={`Icon of ${titre}`} />
             </StyledLogo>
-            <StyledTitle> {site} </StyledTitle>
+            <CopyToClipboard text={titre} onCopy={() => setIsCopied(true)}>
+                <StyledTitle> {titre} </StyledTitle>
+            </CopyToClipboard>
             {userID === '' ? (
                 <></>
             ) : (
                 <EmailContainer>
-                    <StyledAttrib> {userID} </StyledAttrib>
+                    <CopyToClipboard
+                        text={userID}
+                        onCopy={() => setIsCopied(true)}
+                    >
+                        <StyledAttrib>{userID}</StyledAttrib>
+                    </CopyToClipboard>
                 </EmailContainer>
             )}
             <MdpContainer>
                 <MdpWshow>
-                    <StyledAttrib> ********* </StyledAttrib>
+                    <CopyToClipboard
+                        text="motDePasse"
+                        onCopy={() => setIsCopied(true)}
+                    >
+                        <StyledAttrib>*********</StyledAttrib>
+                    </CopyToClipboard>
                     <StyledShow>
                         <img src={eysClose} alt="show button" />
                     </StyledShow>
