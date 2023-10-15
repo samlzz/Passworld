@@ -54,7 +54,7 @@ const FolderName = styled.p`
 export function ElemOfTab({ aPassw }: ElemOfTabProps) {
     return (
         <ElemPassw>
-            <LitleLogo src={aPassw.ico} />
+            <LitleLogo src={aPassw.icoLink} />
             <p> {aPassw.titre} </p>
         </ElemPassw>
     );

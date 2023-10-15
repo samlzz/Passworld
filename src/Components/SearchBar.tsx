@@ -6,7 +6,8 @@ import searchIco from '../assets/svgShape/Search.svg';
 import { SearchBarProps, APasswType } from '../Utils/type';
 
 // Début du style -------------->
-const StyledSearchBar = styled.input`
+const StyledSearchBar = styled.input(
+    ({ theme }) => `
     position: absolute;
     top: 13vh;
     right: 4vw;
@@ -14,12 +15,13 @@ const StyledSearchBar = styled.input`
     width: 68vw;
     border-radius: 10vw;
     padding-left: 1.2vw;
-    background-color: ${({ theme }) => theme.secondary};
+    background-color: ${theme.secondary};
     background-image: url(${searchIco});
     background-repeat: no-repeat;
     background-size: 7% 70%;
     background-position: 100% 50%;
-`;
+`
+);
 // Fin du style --------------//
 
 export function SearchBar({
@@ -40,7 +42,7 @@ export function SearchBar({
         // const contentToCheck = splitContent ? splitContent[1] : searchContent;
         allPassw.forEach((passw) => {
             const siteName = passw.titre.toLowerCase();
-            const siteEmail = passw?.userID?.toLowerCase();
+            const siteEmail = passw?.identifier?.toLowerCase();
             const lowSearched = searchContent
                 ? searchContent.toLowerCase()
                 : '';

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import styled from 'styled-components';
 
@@ -7,6 +7,7 @@ import suprIco from '../assets/Icones/PasswCard/suppr.svg';
 import editIco from '../assets/Icones/PasswCard/edit.svg';
 
 import { PasswCardProps } from '../Utils/type';
+import { CreatePassw } from './Password';
 
 // Début du style -------------->
 const CardDiv = styled.div`
@@ -84,32 +85,34 @@ const StyledDelete = styled.button`
 `;
 // Fin du style --------------//
 
-export function PasswCard({ aPassw, copyIsSucces }: PasswCardProps) {
+export function PasswCard({ aPassw, copyIsSucces, toDelete }: PasswCardProps) {
     const [isCopied, setIsCopied] = useState(false);
-    const { titre, ico, userID = '' } = aPassw;
-    if (isCopied) {
-        copyIsSucces(isCopied);
-    }
+    const { titre, icoLink, identifier, categName, id } = aPassw;
+    useEffect(() => {
+        if (isCopied) {
+            copyIsSucces(isCopied);
+        }
+    }, [isCopied]);
     return (
         <CardDiv>
-            <StyledEdit>
+            <StyledEdit onClick={<CreatePassw />}>
                 <IcoImg src={editIco} alt="edit" />
             </StyledEdit>
             <StyledLogo>
-                <LogoImg src={ico} alt={`Icon of ${titre}`} />
+                <LogoImg src={icoLink} alt={`Icon of ${titre}`} />
             </StyledLogo>
             <CopyToClipboard text={titre} onCopy={() => setIsCopied(true)}>
                 <StyledTitle> {titre} </StyledTitle>
             </CopyToClipboard>
-            {userID === '' ? (
+            {identifier === '' ? (
                 <></>
             ) : (
                 <EmailContainer>
                     <CopyToClipboard
-                        text={userID}
+                        text={identifier}
                         onCopy={() => setIsCopied(true)}
                     >
-                        <StyledAttrib>{userID}</StyledAttrib>
+                        <StyledAttrib>{identifier}</StyledAttrib>
                     </CopyToClipboard>
                 </EmailContainer>
             )}
@@ -127,7 +130,11 @@ export function PasswCard({ aPassw, copyIsSucces }: PasswCardProps) {
                 </MdpWshow>
                 <StyledGenerate> generate </StyledGenerate>
             </MdpContainer>
-            <StyledDelete>
+            <StyledDelete
+                onClick={
+                    toDelete ? () => toDelete(categName, id, titre) : undefined
+                }
+            >
                 <IcoImg src={suprIco} alt="delete" />
             </StyledDelete>
         </CardDiv>

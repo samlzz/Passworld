@@ -1,14 +1,15 @@
 import { ReactNode } from 'react';
 
 //* Global Interfaces:
+
 export interface APasswType {
     categName: string;
     id: number;
     titre: string;
-    ico: string;
+    siteAddress?: string;
+    identifier?: string;
     mdp?: string;
-    liens?: string;
-    userID?: string;
+    icoLink: string;
 }
 export interface ColorProviderProps {
     children: ReactNode;
@@ -52,6 +53,7 @@ export interface FolderOfTabProps {
 export interface PasswCardProps {
     aPassw: APasswType;
     copyIsSucces: (isCopied: boolean) => void;
+    toDelete?: (categName: string, id: number, titre: string) => void;
 }
 // ? Search Bar:
 export interface SearchBarProps {
@@ -66,9 +68,11 @@ export interface ContainerProps {
 }
 export interface CreatePswProps {
     closed: (toDo: boolean) => void;
+    newPassw: (newPsw: APasswType, categName: string) => void;
     arrOfArr: Array<APasswType[]>;
 }
 // ? Material UI:
 export interface SelectBoxProps {
     categArray: Array<string>;
+    returnCateg: (categ: string) => void;
 }
