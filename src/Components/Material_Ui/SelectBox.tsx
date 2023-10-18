@@ -28,7 +28,7 @@ const StyledButton = styled('button')(
     }
     &.${selectClasses.expanded} {
       &::after {
-        content: '▴';
+      content: '▴';
       }
     }
     &::after {
@@ -125,16 +125,36 @@ const CustomSelect = React.forwardRef(function CustomSelect<
         React.RefAttributes<HTMLButtonElement>
 ) => JSX.Element;
 
-export default function SelectBox({ categArray, returnCateg }: SelectBoxProps) {
+export default function SelectBox({
+    categArray,
+    isCategPopup,
+    returnCateg,
+    isCategMenu,
+    getAnchor,
+}: SelectBoxProps) {
     const [value, setValue] = React.useState<number>(0);
+    const [categMenu, setcategMenu] = React.useState(false);
+    const [isOpen, setIsOpen] = React.useState(true);
     React.useEffect(() => {
         returnCateg(categArray[value / 10]);
     }, [value]);
+    React.useEffect(() => {
+        isCategMenu(categMenu);
+    }, [categMenu]);
+    React.useEffect(() => {
+        if (isCategPopup && categMenu) {
+            setcategMenu(false);
+        }
+        if (isCategPopup === false) {
+            setIsOpen(false);
+        }
+    }, [isCategPopup]);
     return (
         <CustomSelect
             value={value}
-            onChange={(_, newValue) => setValue(newValue)}
+            onChange={(_, newValue: number) => setValue(newValue)}
             name="selectCateg"
+            disabled={categMenu}
         >
             {categArray.map((CategName, i) => (
                 <StyledOption
@@ -145,7 +165,16 @@ export default function SelectBox({ categArray, returnCateg }: SelectBoxProps) {
                     {CategName}
                 </StyledOption>
             ))}
-            <AddCategory type="button">add +</AddCategory>
+            <AddCategory
+                type="button"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    getAnchor(e.currentTarget);
+                    setcategMenu(!categMenu);
+                }}
+            >
+                add +
+            </AddCategory>
         </CustomSelect>
     );
 }

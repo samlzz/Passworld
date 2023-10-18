@@ -7,6 +7,7 @@ import ico from '../assets/logoPW/SubmitLogo.png';
 
 import { APasswType, ContainerProps, CreatePswProps } from '../Utils/type';
 import SelectBox from './Material_Ui/SelectBox';
+import { AddCategPopup, GenerPopup } from './Material_Ui/PopUp';
 
 // Début du style -------------->
 const Backgrnd = styled.button`
@@ -17,6 +18,7 @@ const Backgrnd = styled.button`
     left: 0;
     background-color: ${({ theme }) => theme.darkBackground};
     opacity: 0.8;
+    cursor: default;
 `;
 const PasswDiv = styled.div`
     background-color: ${({ theme }) => theme.tercary};
@@ -80,14 +82,6 @@ const MdpContainer = styled.div`
     flex-direction: row;
     gap: 1vw;
 `;
-const StyledGenerate = styled.button`
-    background-color: ${({ theme }) => theme.selected};
-    border-radius: 0.9vw;
-    height: 2.7vw;
-    padding-left: 0.5vw;
-    font-size: 1.1vw;
-    margin-top: -3.7vw;
-`;
 const ValidButton = styled.button`
     position: absolute;
     bottom: 1.8vw;
@@ -97,6 +91,20 @@ const ValidImg = styled.img`
     width: 4vw;u
 `;
 // Fin du style --------------//
+function generateMdp(nbChar: number) {
+    const history = [];
+    let hexKey = '';
+    const characters = '0123456789abcdefghijklmnopqrstuvwxyz#&@/:!?%*£${}';
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < nbChar; i += 1) {
+        hexKey += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+        );
+    }
+    history.push(hexKey);
+    return hexKey;
+}
 
 export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
     const initPassw = {
@@ -109,6 +117,9 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
         icoLink: './src/assets/logoPW/SubmitLogo.png',
     };
     const [aPassword, setPassword] = useState<APasswType>(initPassw);
+    const [isCategMenu, setIsMenu] = useState(false);
+    const [isValidCateg, setIsCategValid] = useState(false);
+    const [anchor, setAnchor] = useState<HTMLElement | null>(null);
     function makeCategArr(listfolderList: Array<APasswType[]>) {
         const CategArr: Array<string> = [];
         listfolderList.forEach((categ, i) => {
@@ -118,6 +129,20 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
         });
         return CategArr;
     }
+    const addNewCateg = (LatestCateg: string) => {
+        const nexCateg = [
+            {
+                categName: LatestCateg,
+                id: 0,
+                titre: 'Test',
+                siteAddress: 'www.test/unpeuplus/long.com',
+                identifier: 'moyentest@icloud.com',
+                icoLink: './src/assets/logoPW/SubmitLogo.png',
+                mdp: 'motDePasseDeTest',
+            },
+        ];
+        arrOfArr.push(nexCateg);
+    };
     const { titre, siteAddress, identifier, mdp, categName } = aPassword;
     return (
         <>
@@ -148,6 +173,9 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
                                 categName: categChoosen,
                             }))
                         }
+                        isCategMenu={(resp) => setIsMenu(resp)}
+                        getAnchor={(anch) => setAnchor(anch)}
+                        isCategPopup={isValidCateg}
                     />
                 </NameAndCateg>
                 <StyledContainer
@@ -183,7 +211,15 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
                             }))
                         }
                     />
-                    <StyledGenerate> generate </StyledGenerate>
+                    <GenerPopup
+                        valuStrong={(val: number) => {
+                            const hash = generateMdp(val);
+                            setPassword((prevState) => ({
+                                ...prevState,
+                                mdp: hash,
+                            }));
+                        }}
+                    />
                 </MdpContainer>
                 <ValidButton
                     onClick={() => {
@@ -194,6 +230,16 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
                     <ValidImg src={check} alt="valid" />
                 </ValidButton>
             </PasswDiv>
+            {isCategMenu ? (
+                <AddCategPopup
+                    anchor={anchor}
+                    open={isCategMenu}
+                    isPopup={(resp) => setIsCategValid(resp)}
+                    getNewCateg={(NouvCateg) => addNewCateg(NouvCateg)}
+                />
+            ) : (
+                <></>
+            )}
         </>
     );
 }

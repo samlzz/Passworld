@@ -193,6 +193,7 @@ function renderOpFoldCard(
                         key={generateHexKey(8)}
                         aPassw={passw}
                         copyIsSucces={(isCopied) => setIsCopy(isCopied)}
+                        listFolderList={folderList}
                     />
                 ))}
             </CardContainer>
@@ -210,6 +211,7 @@ function renderOpFoldCard(
                                     copyIsSucces={(isCopied) =>
                                         setIsCopy(isCopied)
                                     }
+                                    listFolderList={folderList}
                                     toDelete={(categOf, id, titre) =>
                                         setFolderList((prevState) => {
                                             const updatedState = [...prevState];

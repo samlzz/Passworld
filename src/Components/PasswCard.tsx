@@ -54,6 +54,8 @@ const MdpWshow = styled.div`
     height: 3.2vh;
     align-items: center;
     padding-left: 0.8vw;
+    width: 10vw;
+    position: relative;
 `;
 const EmailContainer = styled.div`
     display: flex;
@@ -68,14 +70,9 @@ const EmailContainer = styled.div`
 const StyledAttrib = styled.button`
     font-size: 1.1vw;
 `;
-const StyledShow = styled.button``;
-const StyledGenerate = styled.button`
-    background-color: ${({ theme }) => theme.selected};
-    border-radius: 20vw;
-    height: 3vh;
-    align-items: center;
-    padding-left: 0.5vw;
-    font-size: 0.7vw;
+const StyledShow = styled.button`
+    position: absolute;
+    right: 0.5vw;
 `;
 const StyledDelete = styled.button`
     justify-self: end;
@@ -85,8 +82,14 @@ const StyledDelete = styled.button`
 `;
 // Fin du style --------------//
 
-export function PasswCard({ aPassw, copyIsSucces, toDelete }: PasswCardProps) {
+export function PasswCard({
+    aPassw,
+    copyIsSucces,
+    toDelete,
+    listFolderList,
+}: PasswCardProps) {
     const [isCopied, setIsCopied] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
     const { titre, icoLink, identifier, categName, id } = aPassw;
     useEffect(() => {
         if (isCopied) {
@@ -95,9 +98,21 @@ export function PasswCard({ aPassw, copyIsSucces, toDelete }: PasswCardProps) {
     }, [isCopied]);
     return (
         <CardDiv>
-            <StyledEdit onClick={<CreatePassw />}>
+            <StyledEdit onClick={() => setIsEdit(true)}>
                 <IcoImg src={editIco} alt="edit" />
             </StyledEdit>
+            {isEdit ? (
+                <CreatePassw
+                    newPassw={(newPssw, nameCateg) => {
+                        console.log(newPssw);
+                        console.log(nameCateg);
+                    }}
+                    closed={(toClose) => console.log(!toClose)}
+                    arrOfArr={listFolderList}
+                />
+            ) : (
+                <></>
+            )}
             <StyledLogo>
                 <LogoImg src={icoLink} alt={`Icon of ${titre}`} />
             </StyledLogo>
@@ -122,13 +137,12 @@ export function PasswCard({ aPassw, copyIsSucces, toDelete }: PasswCardProps) {
                         text="motDePasse"
                         onCopy={() => setIsCopied(true)}
                     >
-                        <StyledAttrib>*********</StyledAttrib>
+                        <StyledAttrib>***************</StyledAttrib>
                     </CopyToClipboard>
                     <StyledShow>
                         <img src={eysClose} alt="show button" />
                     </StyledShow>
                 </MdpWshow>
-                <StyledGenerate> generate </StyledGenerate>
             </MdpContainer>
             <StyledDelete
                 onClick={

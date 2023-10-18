@@ -6,9 +6,9 @@ export interface APasswType {
     categName: string;
     id: number;
     titre: string;
-    siteAddress?: string;
-    identifier?: string;
-    mdp?: string;
+    siteAddress: string;
+    identifier: string;
+    mdp: string;
     icoLink: string;
 }
 export interface ColorProviderProps {
@@ -54,6 +54,7 @@ export interface PasswCardProps {
     aPassw: APasswType;
     copyIsSucces: (isCopied: boolean) => void;
     toDelete?: (categName: string, id: number, titre: string) => void;
+    listFolderList: APasswType[][];
 }
 // ? Search Bar:
 export interface SearchBarProps {
@@ -74,5 +75,20 @@ export interface CreatePswProps {
 // ? Material UI:
 export interface SelectBoxProps {
     categArray: Array<string>;
+    isCategPopup: boolean;
     returnCateg: (categ: string) => void;
+    isCategMenu: (isIt: boolean) => void;
+    getAnchor: (anchor: HTMLElement) => void;
+}
+export interface GenerPopupProps {
+    valuStrong: (val: number) => void;
+}
+export interface CategPopupProps {
+    anchor: HTMLElement | null;
+    open: boolean;
+    isPopup: (isIt: boolean) => void;
+    getNewCateg: (newCateg: string) => void;
+}
+export interface MenuContainProps {
+    $isItClick: boolean;
 }
