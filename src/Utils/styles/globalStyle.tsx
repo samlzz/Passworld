@@ -1,4 +1,5 @@
 import styled, { createGlobalStyle } from 'styled-components';
+import { GlobStyleProps } from '../type';
 
 export const LogoPW = styled.img`
     width: 18vw;
@@ -11,42 +12,54 @@ export const LogoPW = styled.img`
     `}
 `;
 
-export const GlobalStyle = createGlobalStyle`
-* {
-    font-family: 'Trebuchet MS', Helvetica, sans-serif;
-}
-body, html {
-    margin: 0;
-    padding: 0;
-    background-color: ${({ theme }) => theme.background};
-}
-h1, h2, h3, h4, h5, h6, p, a, button, span, input{
-    color: ${({ theme }) => theme.white}
-}
-input, button{
-    border: none;
-    outline: none;
-}
-button{
-    background: none;
-    cursor: pointer;
-}
-
-//? Changement de la couleur des textes dans les input vides
-    //* Pour la plupart des navigateurs modernes 
-    ::placeholder {
-        color: ${({ theme }) =>
-            theme.placeHolder}; /* Choisissez votre couleur */
-        opacity: 1;
+export const GlobalStyle = createGlobalStyle`${({ theme }: GlobStyleProps) => `
+    * {
+        font-family: 'Trebuchet MS', Helvetica, sans-serif;
+    }
+    body, html {
+        margin: 0;
+        padding: 0;
+        background-color: ${theme.background};
+    }
+    h1, h2, h3, h4, h5, h6, p, a, button, span, input{
+        color: ${theme.white}
+    }
+    input, button{
+        border: none;
+        outline: none;
+    }
+    button{
+        background: none;
+        cursor: pointer;
     }
 
-    //* Pour Internet Explorer 10-11 
-    :-ms-input-placeholder {
-        color: ${({ theme }) => theme.placeHolder};
-    }
+    //? Changement de la couleur des textes dans les input vides
+        //* Pour la plupart des navigateurs modernes 
+        ::placeholder {
+            color: ${theme.placeHolder}; /* Choisissez votre couleur */
+            opacity: 1;
+        }
 
-    //* Pour Safari et Chrome, versions plus anciennes 
-    ::-webkit-input-placeholder {
-        color: ${({ theme }) => theme.placeHolder};
-    }
+        //* Pour Internet Explorer 10-11 
+        :-ms-input-placeholder {
+            color: ${theme.placeHolder};
+        }
+
+        //* Pour Safari et Chrome, versions plus anciennes 
+        ::-webkit-input-placeholder {
+            color: ${theme.placeHolder};
+        }
+    //? Enlever les barres de défilements
+        //* Pour les navigateurs basés sur Webkit (comme Chrome, Safari):
+        ::-webkit-scrollbar {
+            width: 0px; /* Pour les barres de défilement vertical */
+            height: 0px; /* Pour les barres de défilement horizontal */
+            background: transparent; /* Rendre les barres invisibles */
+        }
+
+        //* Pour Firefox:
+        * {
+            scrollbar-width: none;
+        }
+    `}
 `;

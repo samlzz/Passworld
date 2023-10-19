@@ -169,15 +169,21 @@ const StyledInput = styled.input`
         opacity: 0.6;
     }
     height: 2vw;
+    width: 13vw;
+    font-size: 1.3vw;
     padding-left: 0.4vw;
 `;
 const StyledTitle = styled.span`
     background-color: ${({ theme }) => theme.selected};
     border-radius: 0.4vw;
     height: 2.3vw;
+    width: 13vw;
     padding-left: 0.6vw;
-    padding-top: 0.45vw;
     cursor: default;
+    font-size: 1.3vw;
+    display: flex;
+    align-items: center;
+    font-weight: 560;
 `;
 const MenuCategCont = styled.div`
     margin: 0 0 10vw 6.5vw;
@@ -195,7 +201,7 @@ const StyledValid = styled.img`
     width: 1.7vw;
     position: absolute;
     right: 1.3vw;
-    top: 4.98vw;
+    top: 4.6vw;
     border-radius: 1vw;
 `;
 
@@ -212,7 +218,9 @@ export function AddCategPopup({
     }, [popupIdValid]);
     const handleValidClick = () => {
         setPopupValid(true);
-        getNewCateg(newCateg);
+        if (newCateg) {
+            getNewCateg(newCateg);
+        }
     };
     return (
         <ClickAwayListener onClickAway={() => setPopupValid(true)}>

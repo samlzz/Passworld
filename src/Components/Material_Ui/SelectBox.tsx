@@ -52,6 +52,13 @@ const StyledListbox = styled('ul')(
     padding-bottom: 2.5vw;
     position: relative;
     width: 12vw;
+    // Masquer la barre de défilement pour les navigateurs Webkit (Chrome, Safari, etc.)
+    "&::-webkit-scrollbar": {
+      width: "0px",
+      background: "transparent",
+    },
+    // Masquer la barre de défilement pour Firefox
+    scrollbarWidth: "none",
   `
 );
 
@@ -86,6 +93,9 @@ const AddCategory = styled.button(
     opacity: 0.8;
     background: ${theme.selected};
     border-radius: 0.3vw;
+    width: 3.9vw;
+    height: 1.6vw;
+    font-size: 1vw;
 `
 );
 
@@ -134,7 +144,6 @@ export default function SelectBox({
 }: SelectBoxProps) {
     const [value, setValue] = React.useState<number>(0);
     const [categMenu, setcategMenu] = React.useState(false);
-    const [isOpen, setIsOpen] = React.useState(true);
     React.useEffect(() => {
         returnCateg(categArray[value / 10]);
     }, [value]);
@@ -144,9 +153,6 @@ export default function SelectBox({
     React.useEffect(() => {
         if (isCategPopup && categMenu) {
             setcategMenu(false);
-        }
-        if (isCategPopup === false) {
-            setIsOpen(false);
         }
     }, [isCategPopup]);
     return (

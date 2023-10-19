@@ -1,9 +1,9 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import cross from '../assets/Icones/crossWhite.svg';
 import check from '../assets/Icones/Valid.svg';
-import ico from '../assets/logoPW/SubmitLogo.png';
+import ico from '../assets/logoPW/defaultIcoDark.png';
 
 import { APasswType, ContainerProps, CreatePswProps } from '../Utils/type';
 import SelectBox from './Material_Ui/SelectBox';
@@ -44,7 +44,7 @@ const StyledLogo = styled.button`
     margin-top: -5vw;
 `;
 const IcoImg = styled.img`
-    width: 12vw;
+    width: 13.8vw;
 `;
 const NameAndCateg = styled.div`
     display: flex;
@@ -88,7 +88,10 @@ const ValidButton = styled.button`
     right: 2vw;
 `;
 const ValidImg = styled.img`
-    width: 4vw;u
+    width: 4vw;
+`;
+const HiddenInput = styled.input`
+    display: none;
 `;
 // Fin du style --------------//
 function generateMdp(nbChar: number) {
@@ -120,10 +123,13 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
     const [isCategMenu, setIsMenu] = useState(false);
     const [isValidCateg, setIsCategValid] = useState(false);
     const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+
+    const icoInputRef = useRef<HTMLInputElement | null>(null);
+
     function makeCategArr(listfolderList: Array<APasswType[]>) {
         const CategArr: Array<string> = [];
         listfolderList.forEach((categ, i) => {
-            if (i !== 0) {
+            if (i !== 0 && categ.length > 0) {
                 CategArr.push(categ[0].categName);
             }
         });
@@ -143,6 +149,26 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
         ];
         arrOfArr.push(nexCateg);
     };
+    const setIcoByUser = () => {
+        if (icoInputRef.current) {
+            icoInputRef.current.click();
+        }
+    };
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                setPassword((prevPass) => ({
+                    ...prevPass,
+                    icoLink: event.target?.result as string,
+                }));
+            };
+
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    };
+
     const { titre, siteAddress, identifier, mdp, categName } = aPassword;
     return (
         <>
@@ -151,9 +177,18 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
                 <CrossButton onClick={() => closed(true)}>
                     <CrossImg src={cross} alt="cross" />
                 </CrossButton>
-                <StyledLogo>
-                    <IcoImg src={ico} alt="Icon" />
+                <StyledLogo onClick={setIcoByUser}>
+                    <IcoImg
+                        src={aPassword.icoLink === '' ? ico : aPassword.icoLink}
+                        alt="Icon"
+                    />
                 </StyledLogo>
+                <HiddenInput
+                    type="file"
+                    accept=".png, .jpg, .jpeg"
+                    ref={icoInputRef}
+                    onChange={handleFileChange}
+                />
                 <NameAndCateg>
                     <StyledTitle
                         placeholder="Set name..."

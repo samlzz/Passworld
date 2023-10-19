@@ -9,6 +9,7 @@ import { CreatePassw } from '../Components/Password';
 import pp from '../assets/Icones/ProfilePic.png';
 import logo from '../assets/logoPW/logoPassWorld.png';
 import plus from '../assets/svgShape/plusButton.svg';
+import defaultIco from '../assets/logoPW/defaultIcoDark.png';
 
 import { APasswType, HomeProps } from '../Utils/type';
 
@@ -82,7 +83,7 @@ const mdpExemples = [
         titre: 'Youtube',
         siteAddress: 'www.Youtube.com',
         identifier: 'sliziard@icloud.com',
-        icoLink: './src/assets/logoPW/SubmitLogo.png',
+        icoLink: defaultIco,
         mdp: 'motdePasse',
     },
     {
@@ -91,7 +92,7 @@ const mdpExemples = [
         titre: 'Google',
         siteAddress: 'www.Google.com',
         identifier: 'sliziard@icloud.com',
-        icoLink: './src/assets/logoPW/SubmitLogo.png',
+        icoLink: defaultIco,
         mdp: 'motdePasse',
     },
     {
@@ -100,7 +101,7 @@ const mdpExemples = [
         titre: 'GitHub',
         siteAddress: 'www.GitHub.com',
         identifier: 'sliziard@icloud.com',
-        icoLink: './src/assets/logoPW/SubmitLogo.png',
+        icoLink: defaultIco,
         mdp: 'motdePasse',
     },
     {
@@ -109,7 +110,7 @@ const mdpExemples = [
         titre: 'Figma',
         siteAddress: 'www.Figma.com',
         identifier: 'sliziard@icloud.com',
-        icoLink: './src/assets/logoPW/SubmitLogo.png',
+        icoLink: defaultIco,
         mdp: 'motdePasse',
     },
 ];
@@ -120,7 +121,7 @@ const mdpDevExemples = [
         titre: 'GitHub',
         siteAddress: 'www.GitHub.com',
         identifier: 'sliziard@icloud.com',
-        icoLink: './src/assets/logoPW/SubmitLogo.png',
+        icoLink: defaultIco,
         mdp: 'motdePasse',
     },
     {
@@ -129,7 +130,7 @@ const mdpDevExemples = [
         titre: 'Figma',
         siteAddress: 'www.Figma.com',
         identifier: 'sliziard@icloud.com',
-        icoLink: './src/assets/logoPW/SubmitLogo.png',
+        icoLink: defaultIco,
         mdp: 'motdePasse',
     },
 ];
@@ -140,7 +141,7 @@ const mdpLoisirsExemples = [
         titre: 'Youtube',
         siteAddress: 'www.Youtube.com',
         identifier: 'sliziard@icloud.com',
-        icoLink: './src/assets/logoPW/SubmitLogo.png',
+        icoLink: defaultIco,
         mdp: 'motdePasse',
     },
     {
@@ -149,7 +150,7 @@ const mdpLoisirsExemples = [
         titre: 'Google',
         siteAddress: 'www.Google.com',
         identifier: 'sliziard@icloud.com',
-        icoLink: './src/assets/logoPW/SubmitLogo.png',
+        icoLink: defaultIco,
         mdp: 'motdePasse',
     },
 ];

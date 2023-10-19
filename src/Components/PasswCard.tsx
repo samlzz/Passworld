@@ -13,21 +13,22 @@ import { CreatePassw } from './Password';
 const CardDiv = styled.div`
     background-color: ${({ theme }) => theme.tercary};
     display: grid;
-    height: 34vh;
+    height: 17.7vw;
     width: 17vw;
     border-radius: 2vw;
     margin-left: 4vw;
     overflow: hidden;
+    padding-top: 1.3vw;
 `;
 const StyledEdit = styled.button`
     justify-self: end;
     align-self: start;
-    margin: 1vh 0.7vw 0 0; //haut droite bas gauche
+    margin: 1vw 0.7vw 0 0; //haut droite bas gauche
 `;
 const StyledLogo = styled.button`
     justify-self: center;
     align-self: start;
-    margin-top: -5vh;
+    margin-top: -6vh;
 `;
 const LogoImg = styled.img`
     width: 6vw;
