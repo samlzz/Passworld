@@ -89,13 +89,20 @@ export interface CreatePswProps {
     newPassw: (newPsw: APasswType, categName: string) => void;
     arrOfArr: Array<APasswType[]>;
 }
+export interface EditPswProps {
+    closed: (toDo: boolean) => void;
+    newPassw?: (newPsw: APasswType, categName: string) => void;
+    passw: APasswType;
+    arrOfArr: Array<APasswType[]>;
+}
 // ? Material UI:
 export interface SelectBoxProps {
     categArray: Array<string>;
-    isCategPopup: boolean;
+    notAddCateg: boolean;
     returnCateg: (categ: string) => void;
-    isCategMenu: (isIt: boolean) => void;
-    getAnchor: (anchor: HTMLElement) => void;
+    isCategPopup?: boolean;
+    isCategMenu?: (isIt: boolean) => void;
+    getAnchor?: (anchor: HTMLElement) => void;
 }
 export interface GenerPopupProps {
     valuStrong: (val: number) => void;

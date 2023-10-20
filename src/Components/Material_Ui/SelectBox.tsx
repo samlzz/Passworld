@@ -3,7 +3,9 @@ import { Select, SelectProps, selectClasses } from '@mui/base/Select';
 import { Option, optionClasses } from '@mui/base/Option';
 import { Popper } from '@mui/base/Popper';
 import styled from 'styled-components';
+
 import { SelectBoxProps } from '../../Utils/type';
+import { StyleContext } from '../../Utils/contexte';
 
 const StyledButton = styled('button')(
     ({ theme }) => `
@@ -49,16 +51,9 @@ const StyledListbox = styled('ul')(
     color: ${theme.white};
     box-shadow: 0px 4px 6px ${theme.darkBackground};
     border-radius: 0.8vw;
-    padding-bottom: 2.5vw;
+    ${theme.selectWBut ? `padding-bottom: 2.5vw;` : `padding-bottom: 0vw;`}
     position: relative;
     width: 12vw;
-    // Masquer la barre de défilement pour les navigateurs Webkit (Chrome, Safari, etc.)
-    "&::-webkit-scrollbar": {
-      width: "0px",
-      background: "transparent",
-    },
-    // Masquer la barre de défilement pour Firefox
-    scrollbarWidth: "none",
   `
 );
 
@@ -138,17 +133,29 @@ const CustomSelect = React.forwardRef(function CustomSelect<
 export default function SelectBox({
     categArray,
     isCategPopup,
+    notAddCateg,
     returnCateg,
     isCategMenu,
     getAnchor,
 }: SelectBoxProps) {
     const [value, setValue] = React.useState<number>(0);
     const [categMenu, setcategMenu] = React.useState(false);
+    const { setIsButtun } = React.useContext(StyleContext);
     React.useEffect(() => {
-        returnCateg(categArray[value / 10]);
+        setIsButtun(!notAddCateg);
+        console.log(categMenu);
+    }, []);
+    React.useEffect(() => {
+        //* export la categorie quand il change et que notAddCateg est true
+        if (!notAddCateg) {
+            returnCateg(categArray[value / 10]);
+        }
     }, [value]);
     React.useEffect(() => {
-        isCategMenu(categMenu);
+        //* export categMenu quand il change et que notAddCateg est true
+        if (!notAddCateg) {
+            isCategMenu(categMenu);
+        }
     }, [categMenu]);
     React.useEffect(() => {
         if (isCategPopup && categMenu) {
@@ -171,16 +178,20 @@ export default function SelectBox({
                     {CategName}
                 </StyledOption>
             ))}
-            <AddCategory
-                type="button"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    getAnchor(e.currentTarget);
-                    setcategMenu(!categMenu);
-                }}
-            >
-                add +
-            </AddCategory>
+            {notAddCateg ? (
+                <></>
+            ) : (
+                <AddCategory
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        getAnchor(e.currentTarget);
+                        setcategMenu(!categMenu);
+                    }}
+                >
+                    add +
+                </AddCategory>
+            )}
         </CustomSelect>
     );
 }

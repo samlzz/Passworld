@@ -1,6 +1,8 @@
 import { ThemeProvider } from 'styled-components';
 
+import { useContext } from 'react';
 import { ColorProviderProps } from '../type';
+import { StyleContext } from '../contexte';
 
 const colors = {
     background: '#1E2938',
@@ -21,10 +23,11 @@ export function ColorProvider({
     children,
     isHomeRendered,
 }: ColorProviderProps) {
-    //---------
+    const { selectWBut } = useContext(StyleContext);
     const theme = {
         ...colors,
         isHomeRendered,
+        selectWBut,
     };
     return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

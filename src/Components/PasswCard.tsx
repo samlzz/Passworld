@@ -7,7 +7,7 @@ import suprIco from '../assets/Icones/PasswCard/suppr.svg';
 import editIco from '../assets/Icones/PasswCard/edit.svg';
 
 import { PasswCardProps } from '../Utils/type';
-import { CreatePassw } from './Password';
+import { EditPassw } from './Password';
 
 // Début du style -------------->
 const CardDiv = styled.div`
@@ -98,60 +98,61 @@ export function PasswCard({
         }
     }, [isCopied]);
     return (
-        <CardDiv>
-            <StyledEdit onClick={() => setIsEdit(true)}>
-                <IcoImg src={editIco} alt="edit" />
-            </StyledEdit>
+        <>
             {isEdit ? (
-                <CreatePassw
-                    newPassw={(newPssw, nameCateg) => {
-                        console.log(newPssw);
-                        console.log(nameCateg);
-                    }}
-                    closed={(toClose) => console.log(!toClose)}
+                <EditPassw
+                    closed={(toClose) => setIsEdit(!toClose)}
                     arrOfArr={listFolderList}
+                    passw={aPassw}
                 />
             ) : (
                 <></>
             )}
-            <StyledLogo>
-                <LogoImg src={icoLink} alt={`Icon of ${titre}`} />
-            </StyledLogo>
-            <CopyToClipboard text={titre} onCopy={() => setIsCopied(true)}>
-                <StyledTitle> {titre} </StyledTitle>
-            </CopyToClipboard>
-            {identifier === '' ? (
-                <></>
-            ) : (
-                <EmailContainer>
-                    <CopyToClipboard
-                        text={identifier}
-                        onCopy={() => setIsCopied(true)}
-                    >
-                        <StyledAttrib>{identifier}</StyledAttrib>
-                    </CopyToClipboard>
-                </EmailContainer>
-            )}
-            <MdpContainer>
-                <MdpWshow>
-                    <CopyToClipboard
-                        text="motDePasse"
-                        onCopy={() => setIsCopied(true)}
-                    >
-                        <StyledAttrib>***************</StyledAttrib>
-                    </CopyToClipboard>
-                    <StyledShow>
-                        <img src={eysClose} alt="show button" />
-                    </StyledShow>
-                </MdpWshow>
-            </MdpContainer>
-            <StyledDelete
-                onClick={
-                    toDelete ? () => toDelete(categName, id, titre) : undefined
-                }
-            >
-                <IcoImg src={suprIco} alt="delete" />
-            </StyledDelete>
-        </CardDiv>
+            <CardDiv>
+                <StyledEdit onClick={() => setIsEdit(true)}>
+                    <IcoImg src={editIco} alt="edit" />
+                </StyledEdit>
+                <StyledLogo>
+                    <LogoImg src={icoLink} alt={`Icon of ${titre}`} />
+                </StyledLogo>
+                <CopyToClipboard text={titre} onCopy={() => setIsCopied(true)}>
+                    <StyledTitle> {titre} </StyledTitle>
+                </CopyToClipboard>
+                {identifier === '' ? (
+                    <></>
+                ) : (
+                    <EmailContainer>
+                        <CopyToClipboard
+                            text={identifier}
+                            onCopy={() => setIsCopied(true)}
+                        >
+                            <StyledAttrib>{identifier}</StyledAttrib>
+                        </CopyToClipboard>
+                    </EmailContainer>
+                )}
+                <MdpContainer>
+                    <MdpWshow>
+                        <CopyToClipboard
+                            text="motDePasse"
+                            onCopy={() => setIsCopied(true)}
+                        >
+                            <StyledAttrib>***************</StyledAttrib>
+                        </CopyToClipboard>
+                        <StyledShow>
+                            <img src={eysClose} alt="show button" />
+                        </StyledShow>
+                    </MdpWshow>
+                </MdpContainer>
+                <StyledDelete
+                    onClick={
+                        toDelete
+                            ? () => toDelete(categName, id, titre)
+                            : undefined
+                    }
+                >
+                    <IcoImg src={suprIco} alt="delete" />
+                </StyledDelete>
+            </CardDiv>
+        </>
     );
 }
