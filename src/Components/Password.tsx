@@ -19,17 +19,23 @@ const Backgrnd = styled.button`
     background-color: ${({ theme }) => theme.darkBackground};
     opacity: 0.8;
     cursor: default;
+    z-index: 1;
 `;
-const PasswDiv = styled.div`
-    background-color: ${({ theme }) => theme.tercary};
+const PasswDiv = styled.div<{ $edit?: boolean }>(
+    ({ theme, $edit }) => `
+    background-color: ${theme.tercary};
     width: 38.4vw;
     height: 43vw;
-    margin: -8vw 0 0 29.5vw; //haut droite bas gauche
+    ${
+        $edit ? `margin: -13vw 0 0 2.5vw;` : ` margin: -10vw 0 0 29.5vw;`
+    }  //haut droite bas gauche
     border-radius: 5vw;
     overflow: hidden;
     display: grid;
     position: absolute;
-`;
+    z-index: 1;
+`
+);
 const CrossButton = styled.button`
     width: 5vw;
     margin: 1vw 0 0 2.5vw; //haut droite bas gauche
@@ -109,17 +115,28 @@ function generateMdp(nbChar: number) {
     return hexKey;
 }
 
-export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
-    const initPassw = {
+function getInitPassw(passw?: APasswType): APasswType {
+    if (passw && passw.titre) {
+        return passw;
+    }
+    return {
         categName: '',
         id: 0,
         titre: '',
         siteAddress: '',
         identifier: '',
         mdp: '',
-        icoLink: './src/assets/logoPW/SubmitLogo.png',
+        icoLink: './src/assets/logoPW/defaultIcoDark.png',
     };
-    const [aPassword, setPassword] = useState<APasswType>(initPassw);
+}
+export function CreatePassw({
+    newPassw,
+    closed,
+    arrOfArr,
+    aPassw,
+    isEdit = false,
+}: CreatePswProps) {
+    const [aPassword, setPassword] = useState<APasswType>(getInitPassw(aPassw));
     const [isCategMenu, setIsMenu] = useState(false);
     const [isValidCateg, setIsCategValid] = useState(false);
     const [anchor, setAnchor] = useState<HTMLElement | null>(null);
@@ -173,7 +190,7 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
     return (
         <>
             <Backgrnd onClick={() => closed(true)} />
-            <PasswDiv>
+            <PasswDiv $edit={isEdit}>
                 <CrossButton onClick={() => closed(true)}>
                     <CrossImg src={cross} alt="cross" />
                 </CrossButton>
@@ -278,3 +295,137 @@ export function CreatePassw({ newPassw, closed, arrOfArr }: CreatePswProps) {
         </>
     );
 }
+
+// export function EditPassw({ closed, passw, arrOfArr }: EditPswProps) {
+//     const [aPassword, setPassword] = useState<APasswType>(passw);
+//     const [isCategMenu, setIsMenu] = useState(false);
+//     const [isValidCateg, setIsCategValid] = useState(false);
+//     const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+//     const icoInputRef = useRef<HTMLInputElement | null>(null);
+
+//     function makeCategArr(listfolderList: Array<APasswType[]>) {
+//         const CategArr: Array<string> = [];
+//         listfolderList.forEach((categ, i) => {
+//             if (i !== 0 && categ.length > 0) {
+//                 CategArr.push(categ[0].categName);
+//             }
+//         });
+//         return CategArr;
+//     }
+//     const setIcoByUser = () => {
+//         if (icoInputRef.current) {
+//             icoInputRef.current.click();
+//         }
+//     };
+//     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//         if (e.target.files && e.target.files[0]) {
+//             const reader = new FileReader();
+
+//             reader.onload = (event) => {
+//                 setPassword((prevPass) => ({
+//                     ...prevPass,
+//                     icoLink: event.target?.result as string,
+//                 }));
+//             };
+
+//             reader.readAsDataURL(e.target.files[0]);
+//         }
+//     };
+
+//     const { titre, siteAddress, identifier, mdp } = aPassword;
+//     return (
+//         <>
+//             <Backgrnd onClick={() => closed(true)} />
+//             <PasswDiv>
+//                 <CrossButton onClick={() => closed(true)}>
+//                     <CrossImg src={cross} alt="cross" />
+//                 </CrossButton>
+//                 <StyledLogo onClick={setIcoByUser}>
+//                     <IcoImg
+//                         src={aPassword.icoLink === '' ? ico : aPassword.icoLink}
+//                         alt="Icon"
+//                     />
+//                 </StyledLogo>
+//                 <HiddenInput
+//                     type="file"
+//                     accept=".png, .jpg, .jpeg"
+//                     ref={icoInputRef}
+//                     onChange={handleFileChange}
+//                 />
+//                 <NameAndCateg>
+//                     <StyledTitle
+//                         value={titre}
+//                         onChange={(e) =>
+//                             setPassword((prevState) => ({
+//                                 ...prevState,
+//                                 titre: e.target.value,
+//                             }))
+//                         }
+//                     />
+//                     <SelectBox
+//                         categArray={makeCategArr(arrOfArr)}
+//                         returnCateg={(categChoosen) =>
+//                             setPassword((prevState) => ({
+//                                 ...prevState,
+//                                 categName: categChoosen,
+//                             }))
+//                         }
+//                         isCategMenu={(resp) => setIsMenu(resp)}
+//                         getAnchor={(anch) => setAnchor(anch)}
+//                         isCategPopup={isValidCateg}
+//                     />
+//                 </NameAndCateg>
+//                 <StyledContainer
+//                     $link
+//                     placeholder="Set site adress..."
+//                     value={siteAddress}
+//                     onChange={(e) =>
+//                         setPassword((prevState) => ({
+//                             ...prevState,
+//                             siteAddress: e.target.value,
+//                         }))
+//                     }
+//                 />
+//                 <StyledContainer
+//                     $id
+//                     placeholder="Enter identifier..."
+//                     value={identifier}
+//                     onChange={(e) =>
+//                         setPassword((prevState) => ({
+//                             ...prevState,
+//                             identifier: e.target.value,
+//                         }))
+//                     }
+//                 />
+//                 <MdpContainer>
+//                     <StyledContainer
+//                         placeholder="Enter password..."
+//                         value={mdp}
+//                         onChange={(e) =>
+//                             setPassword((prevState) => ({
+//                                 ...prevState,
+//                                 mdp: e.target.value,
+//                             }))
+//                         }
+//                     />
+//                     <GenerPopup
+//                         valuStrong={(val: number) => {
+//                             const hash = generateMdp(val);
+//                             setPassword((prevState) => ({
+//                                 ...prevState,
+//                                 mdp: hash,
+//                             }));
+//                         }}
+//                     />
+//                 </MdpContainer>
+//                 <ValidButton
+//                     onClick={() => {
+//                         closed(true);
+//                     }}
+//                 >
+//                     <ValidImg src={check} alt="valid" />
+//                 </ValidButton>
+//             </PasswDiv>
+//         </>
+//     );
+// }

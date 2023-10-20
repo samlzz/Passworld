@@ -113,6 +113,9 @@ const StyledGenerate = styled.button`
 const StyledLegend = styled.span`
     font-size: 1.1vw;
 `;
+const StyledPopup = styled(Popup)`
+    z-index: 2;
+`;
 
 export function GenerPopup({ valuStrong }: GenerPopupProps) {
     const [anchor, setAnchor] = React.useState<HTMLButtonElement | null>(null);
@@ -129,7 +132,7 @@ export function GenerPopup({ valuStrong }: GenerPopupProps) {
                     generate
                 </StyledGenerate>
 
-                <Popup
+                <StyledPopup
                     anchor={anchor}
                     placement="top"
                     open={open}
@@ -155,7 +158,7 @@ export function GenerPopup({ valuStrong }: GenerPopupProps) {
                             </PopupBody>
                         </PopAnimation>
                     )}
-                </Popup>
+                </StyledPopup>
             </PopUpContainer>
         </ClickAwayListener>
     );
@@ -185,9 +188,12 @@ const StyledTitle = styled.span`
     align-items: center;
     font-weight: 560;
 `;
-const MenuCategCont = styled.div`
-    margin: 0 0 10vw 6.5vw;
-    background-color: ${({ theme }) => theme.darkTercary};
+const MenuCategCont = styled.div<{ $forTab: boolean }>(
+    ({ theme, $forTab }) => `
+    ${
+        $forTab ? `margin: 0 0 -2vw 1vw;` : `margin: 0 0 10vw 6.5vw;`
+    } // haut doite bas gauche
+    background-color: ${theme.darkTercary};
     height: 8vw;
     display: flex;
     flex-direction: column;
@@ -195,8 +201,9 @@ const MenuCategCont = styled.div`
     padding: 1vw;
     border-radius: 1vw;
     position: relative;
-    box-shadow: 0px 4px 6px ${({ theme }) => theme.darkBackground};
-`;
+    box-shadow: 0px 4px 6px ${theme.darkBackground};
+`
+);
 const StyledValid = styled.img`
     width: 1.7vw;
     position: absolute;
@@ -204,34 +211,42 @@ const StyledValid = styled.img`
     top: 4.6vw;
     border-radius: 1vw;
 `;
+const StyledPopper = styled(Popper)`
+    z-index: 2;
+`;
 
 export function AddCategPopup({
     anchor,
     open,
     isPopup,
     getNewCateg,
+    forTab = false,
 }: CategPopupProps) {
-    const [popupIdValid, setPopupValid] = React.useState(false);
+    const [popupIsValid, setPopupValid] = React.useState(false);
     const [newCateg, setNewCateg] = React.useState('');
-    React.useEffect(() => {
-        isPopup(popupIdValid);
-    }, [popupIdValid]);
+
     const handleValidClick = () => {
         setPopupValid(true);
         if (newCateg) {
             getNewCateg(newCateg);
         }
+        isPopup(popupIsValid);
     };
+    const handleCickAway = () => {
+        setPopupValid(true);
+        isPopup(popupIsValid);
+    };
+
     return (
-        <ClickAwayListener onClickAway={() => setPopupValid(true)}>
+        <ClickAwayListener onClickAway={handleCickAway}>
             <PopupContainerCateg>
-                <Popper
+                <StyledPopper
                     id={open ? 'simple-popper' : undefined}
                     open={open}
                     anchorEl={anchor}
                     placement="right"
                 >
-                    <MenuCategCont>
+                    <MenuCategCont $forTab={forTab}>
                         <StyledTitle>Add a category:</StyledTitle>
                         <StyledInput
                             placeholder="new category..."
@@ -242,7 +257,7 @@ export function AddCategPopup({
                             <StyledValid src={validIco} alt="Submit" />
                         </button>
                     </MenuCategCont>
-                </Popper>
+                </StyledPopper>
             </PopupContainerCateg>
         </ClickAwayListener>
     );

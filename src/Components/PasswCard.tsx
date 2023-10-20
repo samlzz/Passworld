@@ -25,7 +25,7 @@ const StyledEdit = styled.button`
     align-self: start;
     margin: 1vw 0.7vw 0 0; //haut droite bas gauche
 `;
-const StyledLogo = styled.button`
+const StyledLogo = styled.a`
     justify-self: center;
     align-self: start;
     margin-top: -6vh;
@@ -91,30 +91,52 @@ export function PasswCard({
 }: PasswCardProps) {
     const [isCopied, setIsCopied] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
-    const { titre, icoLink, identifier, categName, id } = aPassw;
+    const [locPassw, setLocPassw] = useState(aPassw);
+    const { titre, icoLink, identifier, categName, id } = locPassw;
+
     useEffect(() => {
         if (isCopied) {
             copyIsSucces(isCopied);
         }
     }, [isCopied]);
+
+    function getAdress() {
+        if (/^www\./.test(locPassw.siteAddress)) {
+            return `https://${locPassw.siteAddress}`;
+        }
+        if (/^https:\/\//.test(locPassw.siteAddress)) {
+            return locPassw.siteAddress;
+        }
+        return 'http://localhost:5173/home';
+    }
     return (
         <CardDiv>
             <StyledEdit onClick={() => setIsEdit(true)}>
                 <IcoImg src={editIco} alt="edit" />
             </StyledEdit>
+            {
+                // todo: EditPasw pos absolu
+            }
             {isEdit ? (
                 <CreatePassw
-                    newPassw={(newPssw, nameCateg) => {
-                        console.log(newPssw);
-                        console.log(nameCateg);
+                    newPassw={(newPssw) => {
+                        setLocPassw(newPssw);
                     }}
-                    closed={(toClose) => console.log(!toClose)}
+                    closed={(toClose) => setIsEdit(!toClose)}
                     arrOfArr={listFolderList}
+                    aPassw={locPassw}
+                    isEdit
                 />
             ) : (
                 <></>
             )}
-            <StyledLogo>
+            <StyledLogo
+                href={getAdress()}
+                target={
+                    getAdress() === 'http://localhost:5173/home' ? '' : '_blank'
+                }
+                rel="noopener noreferrer"
+            >
                 <LogoImg src={icoLink} alt={`Icon of ${titre}`} />
             </StyledLogo>
             <CopyToClipboard text={titre} onCopy={() => setIsCopied(true)}>

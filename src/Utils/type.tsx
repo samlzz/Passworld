@@ -88,6 +88,8 @@ export interface CreatePswProps {
     closed: (toDo: boolean) => void;
     newPassw: (newPsw: APasswType, categName: string) => void;
     arrOfArr: Array<APasswType[]>;
+    aPassw?: APasswType | undefined;
+    isEdit?: boolean;
 }
 // ? Material UI:
 export interface SelectBoxProps {
@@ -105,6 +107,7 @@ export interface CategPopupProps {
     open: boolean;
     isPopup: (isIt: boolean) => void;
     getNewCateg: (newCateg: string) => void;
+    forTab?: boolean;
 }
 export interface MenuContainProps {
     $isItClick: boolean;

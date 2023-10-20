@@ -8,10 +8,12 @@ import { PasswCard } from '../Components/PasswCard';
 import { CreatePassw } from '../Components/Password';
 import pp from '../assets/Icones/ProfilePic.png';
 import logo from '../assets/logoPW/logoPassWorld.png';
-import plus from '../assets/svgShape/plusButton.svg';
+import plusButt from '../assets/svgShape/plusButton.svg';
 import defaultIco from '../assets/logoPW/defaultIcoDark.png';
+import plus from '../assets/svgShape/+PlusIco.png';
 
 import { APasswType, HomeProps } from '../Utils/type';
+import { AddCategPopup } from '../Components/Material_Ui/PopUp';
 
 // Début du style -------------->
 const PageHome = styled.div`
@@ -71,6 +73,20 @@ const CopySucces = styled.span`
     padding: 1vw 0 0 1.4vw; //haut droite bas gauche
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
     opacity: 0.9;
+`;
+const AddCategButt = styled.button`
+    display: flex;
+    align-items: center;
+    gap: 0.7vw;
+    background: ${({ theme }) => theme.tercary};
+    border-radius: 2vw;
+    height: 2vw;
+    padding-left: 1vw;
+    margin-left: 12.7vw;
+    font-size: 1.1vw;
+`;
+const AddCategImg = styled.img`
+    width: 1.2vw;
 `;
 // Fin du style --------------//
 
@@ -282,6 +298,21 @@ function addPassw(
         });
     });
 }
+const addNewCateg = (LatestCateg: string, arrOfArr: APasswType[][]) => {
+    const nexCateg = [
+        {
+            categName: LatestCateg,
+            id: 0,
+            titre: 'Test',
+            siteAddress: 'www.test/unpeuplus/long.com',
+            identifier: 'moyentest@icloud.com',
+            icoLink: './src/assets/logoPW/SubmitLogo.png',
+            mdp: 'motDePasseDeTest',
+        },
+    ];
+    arrOfArr.push(nexCateg);
+    return arrOfArr;
+};
 // * End Functions ===========//
 
 export function Home({ isRendered }: HomeProps) {
@@ -290,6 +321,9 @@ export function Home({ isRendered }: HomeProps) {
     const [isSearching, setIsSearching] = useState(false);
     const [isCopy, setIsCopy] = useState(false);
     const [isCreate, setIsCreate] = useState(false);
+    const [isAddCateg, setIsAddCateg] = useState(false);
+    const [plusAnchor, setPlusAnchor] = useState<HTMLElement | null>(null);
+
     useEffect(() => {
         isRendered(true);
     }, []);
@@ -308,10 +342,40 @@ export function Home({ isRendered }: HomeProps) {
             setFolderOpen('');
         }
     }, [listfolderList]);
+
+    const handleIsAddCateg = () => {
+        if (plusAnchor) {
+            setIsAddCateg(!isAddCateg);
+        }
+    };
     return (
         <PageHome>
             <TabContainer>
                 <LogoPW src={logo} alt="Logo of PassWorld" />
+                <AddCategButt
+                    type="button"
+                    onClick={(e) => setPlusAnchor(e.currentTarget)}
+                    onMouseDown={handleIsAddCateg}
+                >
+                    <p> Add Category </p>
+                    <AddCategImg src={plus} alt="Add Category" />
+                </AddCategButt>
+                {isAddCateg ? (
+                    <AddCategPopup
+                        anchor={plusAnchor}
+                        open={isAddCateg}
+                        getNewCateg={(NouvCateg) =>
+                            setFolderList(
+                                addNewCateg(NouvCateg, listfolderList)
+                            )
+                        }
+                        isPopup={(isValid) => setIsAddCateg(!isValid)}
+                        forTab
+                    />
+                ) : (
+                    <></>
+                )}
+
                 {listfolderList.map((categorie, i) =>
                     i !== 0 && categorie.length > 0 ? (
                         <FolderOfTab
@@ -328,6 +392,7 @@ export function Home({ isRendered }: HomeProps) {
                     )
                 )}
             </TabContainer>
+
             <ProfilButton>My account</ProfilButton>
             <SearchBar
                 allPassw={getCategByName(folderOpen, listfolderList)} // todo
@@ -352,9 +417,11 @@ export function Home({ isRendered }: HomeProps) {
                 setIsCopy,
                 setFolderList
             )}
+
             <AddPassw onClick={() => setIsCreate(true)}>
-                <AddShape src={plus} alt="plus button" />
+                <AddShape src={plusButt} alt="plus button" />
             </AddPassw>
+
             {isCopy ? <CopySucces>Copied to clipboard</CopySucces> : null}
             {isCreate ? (
                 <CreatePassw
