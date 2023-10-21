@@ -4,6 +4,8 @@ import { useRef, useState } from 'react';
 import cross from '../assets/Icones/crossWhite.svg';
 import check from '../assets/Icones/Valid.svg';
 import ico from '../assets/logoPW/defaultIcoDark.png';
+import eysClose from '../assets/Icones/PasswCard/oeuil_fermer.svg';
+import eysOpen from '../assets/Icones/PasswCard/eye-solid (1).svg';
 
 import { APasswType, ContainerProps, CreatePswProps } from '../Utils/type';
 import SelectBox from './Material_Ui/SelectBox';
@@ -19,21 +21,18 @@ const Backgrnd = styled.button`
     background-color: ${({ theme }) => theme.darkBackground};
     opacity: 0.8;
     cursor: default;
-    z-index: 1;
 `;
-const PasswDiv = styled.div<{ $edit?: boolean }>(
-    ({ theme, $edit }) => `
+const PasswDiv = styled.div(
+    ({ theme }) => `
     background-color: ${theme.tercary};
     width: 38.4vw;
     height: 43vw;
-    ${
-        $edit ? `margin: -13vw 0 0 2.5vw;` : ` margin: -10vw 0 0 29.5vw;`
-    }  //haut droite bas gauche
+    margin: -1vw 0 0 29.5vw;//haut droite bas gauche
     border-radius: 5vw;
     overflow: hidden;
     display: grid;
     position: absolute;
-    z-index: 1;
+    top: 6vw;
 `
 );
 const CrossButton = styled.button`
@@ -87,6 +86,15 @@ const MdpContainer = styled.div`
     display: flex;
     flex-direction: row;
     gap: 1vw;
+    position: relative;
+`;
+const StyledShow = styled.button`
+    position: absolute;
+    right: 14.7vw;
+    bottom: 6.3vw;
+`;
+const ShowImg = styled.img`
+    width: 1.2vw;
 `;
 const ValidButton = styled.button`
     position: absolute;
@@ -98,6 +106,16 @@ const ValidImg = styled.img`
 `;
 const HiddenInput = styled.input`
     display: none;
+`;
+const PageContainer = styled.div`
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
 `;
 // Fin du style --------------//
 function generateMdp(nbChar: number) {
@@ -134,9 +152,10 @@ export function CreatePassw({
     closed,
     arrOfArr,
     aPassw,
-    isEdit = false,
 }: CreatePswProps) {
     const [aPassword, setPassword] = useState<APasswType>(getInitPassw(aPassw));
+    const [isHide, setIsHide] = useState(false);
+    const [hidenMdpVal, setHidenMdpVal] = useState('');
     const [isCategMenu, setIsMenu] = useState(false);
     const [isValidCateg, setIsCategValid] = useState(false);
     const [anchor, setAnchor] = useState<HTMLElement | null>(null);
@@ -185,12 +204,44 @@ export function CreatePassw({
             reader.readAsDataURL(e.target.files[0]);
         }
     };
+    const handleGetLetter = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword((prevState) => {
+            if (e.target.value.length < prevState.mdp.length) {
+                return {
+                    ...prevState,
+                    mdp: prevState.mdp.slice(0, -1),
+                };
+            }
+            const lastLetter = e.target.value[e.target.value.length - 1];
+            return {
+                ...prevState,
+                mdp: prevState.mdp + lastLetter,
+            };
+        });
+        const hidenVal = '*'.repeat(e.target.value.length);
+        setHidenMdpVal(hidenVal);
+        console.log(aPassword.mdp);
+    };
+    const handleShowMdp = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword((prevState) => ({
+            ...prevState,
+            mdp: e.target.value,
+        }));
+        const hidenVal = '*'.repeat(e.target.value.length);
+        setHidenMdpVal(hidenVal);
+        console.log(aPassword.mdp);
+    };
+    const handleIsHide = () => {
+        setIsHide((prev) => !prev);
+        const hidenVal = '*'.repeat(aPassword.mdp.length);
+        setHidenMdpVal(hidenVal);
+    };
 
     const { titre, siteAddress, identifier, mdp, categName } = aPassword;
     return (
-        <>
+        <PageContainer>
             <Backgrnd onClick={() => closed(true)} />
-            <PasswDiv $edit={isEdit}>
+            <PasswDiv>
                 <CrossButton onClick={() => closed(true)}>
                     <CrossImg src={cross} alt="cross" />
                 </CrossButton>
@@ -255,14 +306,12 @@ export function CreatePassw({
                 <MdpContainer>
                     <StyledContainer
                         placeholder="Enter password..."
-                        value={mdp}
-                        onChange={(e) =>
-                            setPassword((prevState) => ({
-                                ...prevState,
-                                mdp: e.target.value,
-                            }))
-                        }
+                        value={isHide ? hidenMdpVal : mdp}
+                        onChange={isHide ? handleGetLetter : handleShowMdp}
                     />
+                    <StyledShow onClick={handleIsHide}>
+                        <ShowImg src={isHide ? eysOpen : eysClose} alt="show" />
+                    </StyledShow>
                     <GenerPopup
                         valuStrong={(val: number) => {
                             const hash = generateMdp(val);
@@ -292,140 +341,6 @@ export function CreatePassw({
             ) : (
                 <></>
             )}
-        </>
+        </PageContainer>
     );
 }
-
-// export function EditPassw({ closed, passw, arrOfArr }: EditPswProps) {
-//     const [aPassword, setPassword] = useState<APasswType>(passw);
-//     const [isCategMenu, setIsMenu] = useState(false);
-//     const [isValidCateg, setIsCategValid] = useState(false);
-//     const [anchor, setAnchor] = useState<HTMLElement | null>(null);
-//     const icoInputRef = useRef<HTMLInputElement | null>(null);
-
-//     function makeCategArr(listfolderList: Array<APasswType[]>) {
-//         const CategArr: Array<string> = [];
-//         listfolderList.forEach((categ, i) => {
-//             if (i !== 0 && categ.length > 0) {
-//                 CategArr.push(categ[0].categName);
-//             }
-//         });
-//         return CategArr;
-//     }
-//     const setIcoByUser = () => {
-//         if (icoInputRef.current) {
-//             icoInputRef.current.click();
-//         }
-//     };
-//     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//         if (e.target.files && e.target.files[0]) {
-//             const reader = new FileReader();
-
-//             reader.onload = (event) => {
-//                 setPassword((prevPass) => ({
-//                     ...prevPass,
-//                     icoLink: event.target?.result as string,
-//                 }));
-//             };
-
-//             reader.readAsDataURL(e.target.files[0]);
-//         }
-//     };
-
-//     const { titre, siteAddress, identifier, mdp } = aPassword;
-//     return (
-//         <>
-//             <Backgrnd onClick={() => closed(true)} />
-//             <PasswDiv>
-//                 <CrossButton onClick={() => closed(true)}>
-//                     <CrossImg src={cross} alt="cross" />
-//                 </CrossButton>
-//                 <StyledLogo onClick={setIcoByUser}>
-//                     <IcoImg
-//                         src={aPassword.icoLink === '' ? ico : aPassword.icoLink}
-//                         alt="Icon"
-//                     />
-//                 </StyledLogo>
-//                 <HiddenInput
-//                     type="file"
-//                     accept=".png, .jpg, .jpeg"
-//                     ref={icoInputRef}
-//                     onChange={handleFileChange}
-//                 />
-//                 <NameAndCateg>
-//                     <StyledTitle
-//                         value={titre}
-//                         onChange={(e) =>
-//                             setPassword((prevState) => ({
-//                                 ...prevState,
-//                                 titre: e.target.value,
-//                             }))
-//                         }
-//                     />
-//                     <SelectBox
-//                         categArray={makeCategArr(arrOfArr)}
-//                         returnCateg={(categChoosen) =>
-//                             setPassword((prevState) => ({
-//                                 ...prevState,
-//                                 categName: categChoosen,
-//                             }))
-//                         }
-//                         isCategMenu={(resp) => setIsMenu(resp)}
-//                         getAnchor={(anch) => setAnchor(anch)}
-//                         isCategPopup={isValidCateg}
-//                     />
-//                 </NameAndCateg>
-//                 <StyledContainer
-//                     $link
-//                     placeholder="Set site adress..."
-//                     value={siteAddress}
-//                     onChange={(e) =>
-//                         setPassword((prevState) => ({
-//                             ...prevState,
-//                             siteAddress: e.target.value,
-//                         }))
-//                     }
-//                 />
-//                 <StyledContainer
-//                     $id
-//                     placeholder="Enter identifier..."
-//                     value={identifier}
-//                     onChange={(e) =>
-//                         setPassword((prevState) => ({
-//                             ...prevState,
-//                             identifier: e.target.value,
-//                         }))
-//                     }
-//                 />
-//                 <MdpContainer>
-//                     <StyledContainer
-//                         placeholder="Enter password..."
-//                         value={mdp}
-//                         onChange={(e) =>
-//                             setPassword((prevState) => ({
-//                                 ...prevState,
-//                                 mdp: e.target.value,
-//                             }))
-//                         }
-//                     />
-//                     <GenerPopup
-//                         valuStrong={(val: number) => {
-//                             const hash = generateMdp(val);
-//                             setPassword((prevState) => ({
-//                                 ...prevState,
-//                                 mdp: hash,
-//                             }));
-//                         }}
-//                     />
-//                 </MdpContainer>
-//                 <ValidButton
-//                     onClick={() => {
-//                         closed(true);
-//                     }}
-//                 >
-//                     <ValidImg src={check} alt="valid" />
-//                 </ValidButton>
-//             </PasswDiv>
-//         </>
-//     );
-// }

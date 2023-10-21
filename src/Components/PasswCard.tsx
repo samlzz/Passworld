@@ -46,6 +46,7 @@ const MdpContainer = styled.div`
     flex-direction: row;
     margin: 0.5vh 0 0 2vw; //haut droite bas gauche
     gap: 0.3vw;
+    z-index: 0;
 `;
 const MdpWshow = styled.div`
     display: flex;
@@ -57,6 +58,7 @@ const MdpWshow = styled.div`
     padding-left: 0.8vw;
     width: 10vw;
     position: relative;
+    z-index: 0;
 `;
 const EmailContainer = styled.div`
     display: flex;
@@ -92,6 +94,7 @@ export function PasswCard({
     const [isCopied, setIsCopied] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [locPassw, setLocPassw] = useState(aPassw);
+    const [hidenmdp, setHidenmdp] = useState('**************');
     const { titre, icoLink, identifier, categName, id } = locPassw;
 
     useEffect(() => {
@@ -99,6 +102,12 @@ export function PasswCard({
             copyIsSucces(isCopied);
         }
     }, [isCopied]);
+
+    const handleShowMdp = () => {
+        setHidenmdp((prev) =>
+            prev === '**************' ? locPassw.mdp : '**************'
+        );
+    };
 
     function getAdress() {
         if (/^www\./.test(locPassw.siteAddress)) {
@@ -115,7 +124,7 @@ export function PasswCard({
                 <IcoImg src={editIco} alt="edit" />
             </StyledEdit>
             {
-                // todo: EditPasw pos absolu
+                // todo: Passer au premier plan
             }
             {isEdit ? (
                 <CreatePassw
@@ -125,7 +134,6 @@ export function PasswCard({
                     closed={(toClose) => setIsEdit(!toClose)}
                     arrOfArr={listFolderList}
                     aPassw={locPassw}
-                    isEdit
                 />
             ) : (
                 <></>
@@ -160,9 +168,9 @@ export function PasswCard({
                         text="motDePasse"
                         onCopy={() => setIsCopied(true)}
                     >
-                        <StyledAttrib>***************</StyledAttrib>
+                        <StyledAttrib>{hidenmdp}</StyledAttrib>
                     </CopyToClipboard>
-                    <StyledShow>
+                    <StyledShow onClick={handleShowMdp}>
                         <img src={eysClose} alt="show button" />
                     </StyledShow>
                 </MdpWshow>

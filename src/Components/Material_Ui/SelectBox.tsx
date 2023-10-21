@@ -83,7 +83,7 @@ const StyledOption = styled(Option)`
 `;
 
 const StyledPopper = styled(Popper)`
-    z-index: 1;
+    z-index: 3;
 ` as typeof Popper;
 const AddCategory = styled.button(
     ({ theme }) => `
