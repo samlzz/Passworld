@@ -53,6 +53,9 @@ export interface ForRegisterProps {
 export interface LitleLogoProps {
     $isFlech?: boolean;
 }
+export interface FoldDivProps {
+    $isClick?: boolean;
+}
 export interface ElemProps {
     $isFolder?: boolean;
     $isClick?: boolean;
@@ -65,6 +68,7 @@ export interface FolderOfTabProps {
     allPassw: Array<APasswType>;
     whoIsClick: (isIt: string) => void;
     IsSelect: boolean;
+    isDeleted: () => void;
 }
 // ? Password Card:
 export interface PasswCardProps {
@@ -83,6 +87,9 @@ export interface SearchBarProps {
 export interface ContainerProps {
     $id?: boolean;
     $link?: boolean;
+}
+export interface ShowPswProps {
+    $isEdit?: boolean;
 }
 export interface CreatePswProps {
     closed: (toDo: boolean) => void;

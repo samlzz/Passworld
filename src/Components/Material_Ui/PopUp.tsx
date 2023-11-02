@@ -237,6 +237,13 @@ export function AddCategPopup({
         isPopup(popupIsValid);
     };
 
+    const validRef = React.useRef(null);
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            validRef.current.click();
+        }
+    };
+
     return (
         <ClickAwayListener onClickAway={handleCickAway}>
             <PopupContainerCateg>
@@ -252,8 +259,13 @@ export function AddCategPopup({
                             placeholder="new category..."
                             value={newCateg}
                             onChange={(e) => setNewCateg(e.target.value)}
+                            onKeyDown={handleKeyDown}
                         />
-                        <button type="button" onClick={handleValidClick}>
+                        <button
+                            ref={validRef}
+                            type="button"
+                            onClick={handleValidClick}
+                        >
                             <StyledValid src={validIco} alt="Submit" />
                         </button>
                     </MenuCategCont>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { LogoPW } from '../Utils/styles/globalStyle';
 import { FolderOfTab } from '../Components/NavigationTab';
 import { SearchBar } from '../Components/SearchBar';
 import { PasswCard } from '../Components/PasswCard';
@@ -20,15 +19,24 @@ const PageHome = styled.div`
     width: 100wh;
     height: 100vh;
     display: flex;
+    margin: 0;
 `;
 const TabContainer = styled.div`
     background-color: ${({ theme }) => theme.darkBackground};
-    height: 130vh;
     width: 23vw;
     z-index: 0;
     position: absolute;
     top: 0;
+    bottom: 0;
+    height: 150%;
 `;
+const LogoPassWorld = styled.img`
+    width: 18vw;
+    margin-top: 3vh;
+    margin-left: 2vh;
+    z-index: 100;
+`;
+
 const ProfilButton = styled.button`
     position: absolute;
     top: 3vh;
@@ -318,6 +326,9 @@ const addNewCateg = (LatestCateg: string, arrOfArr: APasswType[][]) => {
 export function Home({ isRendered }: HomeProps) {
     const [listfolderList, setFolderList] = useState(categExemple);
     const [folderOpen, setFolderOpen] = useState('');
+    const [deletedFolders, setDeletedFolders] = useState<Set<number>>(
+        new Set()
+    );
     const [isSearching, setIsSearching] = useState(false);
     const [isCopy, setIsCopy] = useState(false);
     const [isCreate, setIsCreate] = useState(false);
@@ -348,10 +359,20 @@ export function Home({ isRendered }: HomeProps) {
             setIsAddCateg(!isAddCateg);
         }
     };
+    const handleFolderDeleted = (index: number) => {
+        console.log('test');
+        setDeletedFolders((prevDeletedFolders) => {
+            const newDeletedFolders = new Set(prevDeletedFolders);
+            newDeletedFolders.add(index);
+            return newDeletedFolders;
+        });
+        // todo: suprimer la categ dans base de donnée
+    };
+
     return (
         <PageHome>
             <TabContainer>
-                <LogoPW src={logo} alt="Logo of PassWorld" />
+                <LogoPassWorld src={logo} alt="Logo of PassWorld" />
                 <AddCategButt
                     type="button"
                     onClick={(e) => setPlusAnchor(e.currentTarget)}
@@ -372,12 +393,12 @@ export function Home({ isRendered }: HomeProps) {
                         isPopup={(isValid) => setIsAddCateg(!isValid)}
                         forTab
                     />
-                ) : (
-                    <></>
-                )}
+                ) : null}
 
                 {listfolderList.map((categorie, i) =>
-                    i !== 0 && categorie.length > 0 ? (
+                    i !== 0 &&
+                    categorie.length > 0 &&
+                    !deletedFolders.has(i) ? (
                         <FolderOfTab
                             key={generateHexKey(8)}
                             title={categorie[0]?.categName}
@@ -386,10 +407,9 @@ export function Home({ isRendered }: HomeProps) {
                                 setFolderOpen(folderName);
                             }}
                             IsSelect={folderOpen === categorie[0]?.categName}
+                            isDeleted={() => handleFolderDeleted(i)}
                         />
-                    ) : (
-                        <></>
-                    )
+                    ) : null
                 )}
             </TabContainer>
 

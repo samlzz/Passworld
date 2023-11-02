@@ -19,6 +19,7 @@ const CardDiv = styled.div`
     margin-left: 4vw;
     overflow: hidden;
     padding-top: 1.3vw;
+    margin-bottom: 2.4vw;
 `;
 const StyledEdit = styled.button`
     justify-self: end;
@@ -108,7 +109,6 @@ export function PasswCard({
             prev === '**************' ? locPassw.mdp : '**************'
         );
     };
-
     function getAdress() {
         if (/^www\./.test(locPassw.siteAddress)) {
             return `https://${locPassw.siteAddress}`;
@@ -118,14 +118,12 @@ export function PasswCard({
         }
         return 'http://localhost:5173/home';
     }
+
     return (
         <CardDiv>
             <StyledEdit onClick={() => setIsEdit(true)}>
                 <IcoImg src={editIco} alt="edit" />
             </StyledEdit>
-            {
-                // todo: Passer au premier plan
-            }
             {isEdit ? (
                 <CreatePassw
                     newPassw={(newPssw) => {
@@ -134,6 +132,7 @@ export function PasswCard({
                     closed={(toClose) => setIsEdit(!toClose)}
                     arrOfArr={listFolderList}
                     aPassw={locPassw}
+                    isEdit
                 />
             ) : (
                 <></>

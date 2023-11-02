@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 
 import cross from '../assets/Icones/crossWhite.svg';
 import check from '../assets/Icones/Valid.svg';
@@ -7,7 +8,12 @@ import ico from '../assets/logoPW/defaultIcoDark.png';
 import eysClose from '../assets/Icones/PasswCard/oeuil_fermer.svg';
 import eysOpen from '../assets/Icones/PasswCard/eye-solid (1).svg';
 
-import { APasswType, ContainerProps, CreatePswProps } from '../Utils/type';
+import {
+    APasswType,
+    ContainerProps,
+    CreatePswProps,
+    ShowPswProps,
+} from '../Utils/type';
 import SelectBox from './Material_Ui/SelectBox';
 import { AddCategPopup, GenerPopup } from './Material_Ui/PopUp';
 
@@ -88,11 +94,13 @@ const MdpContainer = styled.div`
     gap: 1vw;
     position: relative;
 `;
-const StyledShow = styled.button`
+const StyledShow = styled.button<ShowPswProps>(
+    ({ $isEdit }) => `
     position: absolute;
     right: 14.7vw;
-    bottom: 6.3vw;
-`;
+    bottom: ${$isEdit ? `5.6vw` : `6.3vw`};
+`
+);
 const ShowImg = styled.img`
     width: 1.2vw;
 `;
@@ -118,6 +126,7 @@ const PageContainer = styled.div`
     z-index: 2;
 `;
 // Fin du style --------------//
+
 function generateMdp(nbChar: number) {
     const history = [];
     let hexKey = '';
@@ -132,7 +141,6 @@ function generateMdp(nbChar: number) {
     history.push(hexKey);
     return hexKey;
 }
-
 function getInitPassw(passw?: APasswType): APasswType {
     if (passw && passw.titre) {
         return passw;
@@ -147,21 +155,44 @@ function getInitPassw(passw?: APasswType): APasswType {
         icoLink: './src/assets/logoPW/defaultIcoDark.png',
     };
 }
+
 export function CreatePassw({
     newPassw,
     closed,
     arrOfArr,
     aPassw,
+    isEdit,
 }: CreatePswProps) {
     const [aPassword, setPassword] = useState<APasswType>(getInitPassw(aPassw));
     const [isHide, setIsHide] = useState(false);
     const [hidenMdpVal, setHidenMdpVal] = useState('');
     const [isCategMenu, setIsMenu] = useState(false);
     const [isValidCateg, setIsCategValid] = useState(false);
+    const [isValided, setIsValided] = useState(false);
     const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 
     const icoInputRef = useRef<HTMLInputElement | null>(null);
 
+    const fetchIco = (siteLink: string) => {
+        const withoutPref = siteLink.replace(/https?:\/\/(www\.)?/i, ''); // ? Supprimer le préfixe (http, https, www)
+        const domain = withoutPref.split('/')[0]; // ? Extraire nom de domaine (jusqu'au premier "/")
+
+        const icoLink = `https://logo.clearbit.com/${domain.toLowerCase()}?size=50*`;
+
+        return axios
+            .get(icoLink, {
+                responseType: 'arraybuffer', // pour obtenir l'image sous forme de Blob
+            })
+            .then((response) => {
+                const base64 = btoa(
+                    new Uint8Array(response.data).reduce(
+                        (data, byte) => data + String.fromCharCode(byte),
+                        ''
+                    )
+                );
+                return `data:image/png;base64,${base64}`;
+            });
+    };
     function makeCategArr(listfolderList: Array<APasswType[]>) {
         const CategArr: Array<string> = [];
         listfolderList.forEach((categ, i) => {
@@ -236,8 +267,31 @@ export function CreatePassw({
         const hidenVal = '*'.repeat(aPassword.mdp.length);
         setHidenMdpVal(hidenVal);
     };
+    const handleValid = () => {
+        newPassw(aPassword, aPassword.categName);
+        closed(true);
+        setIsValided((prev) => !prev);
+        console.log(aPassword.icoLink);
+    };
 
-    const { titre, siteAddress, identifier, mdp, categName } = aPassword;
+    const { titre, siteAddress, identifier, mdp } = aPassword;
+
+    useEffect(() => {
+        fetchIco(siteAddress)
+            .then((icoSrc) => {
+                setPassword((prevState) => ({
+                    ...prevState,
+                    icoLink: icoSrc,
+                }));
+            })
+            .catch((error) => {
+                console.error(
+                    "Erreur lors de la récupération de l'image:",
+                    error
+                );
+            });
+    }, [isValided]);
+
     return (
         <PageContainer>
             <Backgrnd onClick={() => closed(true)} />
@@ -309,7 +363,7 @@ export function CreatePassw({
                         value={isHide ? hidenMdpVal : mdp}
                         onChange={isHide ? handleGetLetter : handleShowMdp}
                     />
-                    <StyledShow onClick={handleIsHide}>
+                    <StyledShow onClick={handleIsHide} $isEdit={isEdit}>
                         <ShowImg src={isHide ? eysOpen : eysClose} alt="show" />
                     </StyledShow>
                     <GenerPopup
@@ -322,12 +376,7 @@ export function CreatePassw({
                         }}
                     />
                 </MdpContainer>
-                <ValidButton
-                    onClick={() => {
-                        newPassw(aPassword, categName);
-                        closed(true);
-                    }}
-                >
+                <ValidButton onClick={handleValid}>
                     <ValidImg src={check} alt="valid" />
                 </ValidButton>
             </PasswDiv>

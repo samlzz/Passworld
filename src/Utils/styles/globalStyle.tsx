@@ -8,7 +8,8 @@ export const LogoPW = styled.img`
     z-index: 100;
     ${({ theme }) =>
         theme.isHomeRendered &&
-        `    margin-bottom: 5vh;
+        `    margin-left: -200px;
+            z-index: -100;
     `}
 `;
 
