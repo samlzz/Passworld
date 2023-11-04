@@ -1,0 +1,11 @@
+{
+    "execMap": {
+      "ts": "npx tsc"
+    },
+    "watch": "./code",
+    "ext": "ts",
+    "ignore": [],
+    "delay": "500",
+    "script": "tsc",
+    "args": ["--project", "../../tsconfig.node.json", "&&", "node", "./compiled/src/Backend/code/server.js"]
+}

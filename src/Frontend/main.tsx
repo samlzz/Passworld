@@ -13,7 +13,7 @@ const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
 function App() {
-    // Créez un état pour suivre si Home est rendu
+    // ? Créez un état pour suivre si Home est rendu
     const [isItRende, setIsItRender] = useState(false);
     return (
         <Router>
@@ -26,7 +26,11 @@ function App() {
                     <Route
                         path="/home"
                         element={
-                            <Home isRendered={(valu) => setIsItRender(valu)} />
+                            <Home
+                                isRendered={(valu: boolean) =>
+                                    setIsItRender(valu)
+                                }
+                            />
                         }
                     />
                 </Routes>

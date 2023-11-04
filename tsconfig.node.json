@@ -4,7 +4,8 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./src/Backend/compiled"
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "src/backEnd/**/*.ts"]
 }

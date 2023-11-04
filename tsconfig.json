@@ -18,12 +18,15 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    "esModuleInterop": true
   },
   "include": [
     ".eslintrc.cjs",
     "declaration.d.ts",
-    "src"
+    "src",
+    "src/Backend"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
