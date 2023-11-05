@@ -1,7 +1,3 @@
-Sure, here's a basic README.md file that includes both the frontend and backend setup instructions and information:
-
-markdown
-Copy code
 # Passworld
 
 Passworld is a secure password management application, with a React-based frontend and an Express.js backend. This project is split into two main directories, one for the frontend (`passworld`) and one for the backend (`passworld_serv`).
@@ -20,82 +16,89 @@ The backend service for Passworld is built with Node.js and Express, using Mongo
 To get started with the backend, navigate to the backend directory and install the dependencies:
 
 ```bash
-cd path/to/passworld_serv
+cd .\src\Backend\
 npm install
-Building
+```
+
+### Compilation
+
 To compile the TypeScript to JavaScript:
-
-bash
-Copy code
+```bash
 npm run build
-Running
+```
+
+### Exécution
+
 To start the server:
-
-bash
-Copy code
+```bash
 npm start
+```
+
 For development, to watch for changes:
-
-bash
-Copy code
+```bash
 npm run dev
-Testing
-Currently, there are no tests specified. To run tests once they are added:
+```
 
-bash
-Copy code
-npm test
-Frontend - passworld
+## Frontend - passworld
+
 The frontend UI for Passworld is built using React and styled with MUI (Material UI).
 
-Requirements
-Node.js
-Installation
-Navigate to the frontend directory and install the dependencies:
+### Requirements
 
-bash
-Copy code
-cd path/to/passworld
+- Node.js
+
+### Installation
+
+To get started with the backend, be at the root of the project and install the dependencies:
+
+```bash
 npm install
-Development
+```
+
+### Développement
+
 To start the development server:
 
-bash
-Copy code
+```bash
 npm run dev
-Building
+```
+
+### Compilation
+
 To build the static files for production:
 
-bash
-Copy code
+```bash
 npm run build
-Clearing Starter Files
+```
+
+### Nettoyage des fichiers de démarrage
+
 To clear the starter files and set up initial directories:
 
-bash
-Copy code
+```bash
 npm run clear
-Previewing Production Build
+```
+
+### Aperçu du build de production
+
 To preview the production build:
 
-bash
-Copy code
+```bash
 npm run preview
-Linting
+```
+
+### Linting
+
 To lint the project files:
 
-bash
-Copy code
+```bash
 npm run lint
-Contributing
+```
+
+## Contribution
+
 Contributions are welcome. Please feel free to submit pull requests or open issues to improve the project.
 
-License
+## License
+
 This project is open-sourced software licensed under the ISC license.
-
-vbnet
-Copy code
-
-Don't forget to replace `path/to/passworld` and `path/to/passworld_serv` with the actual paths to the frontend and backend directories in your project.
-
-You might also want to add sections on how to configure the environment, co
