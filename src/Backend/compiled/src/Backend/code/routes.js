@@ -1,16 +1,19 @@
 import express from 'express';
-import { User } from './models/user.js';
+import { checkIdAndCreate, checkIdAndMdp, deleteUser, } from './controllers/user.js';
+import { returnPasswList } from './controllers/home.js';
+import { addPassword, deletePassword, replaceAPsw, } from './controllers/password.js';
+import { addCategory, deleteCategory } from './controllers/categ.js';
+import { authentified } from './middleware/auth.js';
 var router = express.Router();
 //* USER
-router.get('/register', function (req, res, next) {
-    var user = new User({
-        email: 'sliziard@test.com',
-        password: 'mdpdetest',
-    });
-    user.save()
-        .then(function () { return res.status(201).json({ msg: 'Utilisateur créé !' }); })
-        .catch(function (error) { return res.status(400).json({ error: error }); });
-    next();
-}); //! need : username, password
-router.post('/login', function () { }); //! need : data_name, password
+router.post('/register', checkIdAndCreate); //! need : email(id), mdp
+router.post('/login', checkIdAndMdp); //! need : email(id), mdp
+router.delete('/delUser', deleteUser); //! need: userId
+//* AUTH (need id in url)
+router.get('/home/:id', authentified, returnPasswList);
+router.post('/addPsw/:id', authentified, addPassword); //! need: newPassw  --> pswId
+router.delete('/delPsw/:id', authentified, deletePassword); //! need: pswId, categName
+router.put('/editPsw/:id', authentified, replaceAPsw); //! need: editedPsw
+router.post('/addCateg/:id', authentified, addCategory); //! need: categName  --> categId
+router.delete('/delCateg/:id', authentified, deleteCategory); //! need: categId
 export default router;

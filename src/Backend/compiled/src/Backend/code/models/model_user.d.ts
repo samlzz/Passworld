@@ -21,18 +21,31 @@
 /// <reference types="mongoose/types/utility" />
 /// <reference types="mongoose/types/validation" />
 /// <reference types="mongoose/types/virtuals" />
-/// <reference types="mongoose" />
 /// <reference types="mongoose/types/inferschematype" />
-interface IPassw {
-    id?: number;
-    categName: string;
+import { Document, Types } from 'mongoose';
+export interface IPassw extends Document {
+    _id: Types.ObjectId;
+    categName?: string;
     titre: string;
     siteAddress: string;
     identifier: string;
     mdp: string;
     icoLink?: string;
 }
-export declare const Password: import("mongoose").Model<IPassw, {}, {}, {}, import("mongoose").Document<unknown, {}, IPassw> & IPassw & {
-    _id: import("mongoose").Types.ObjectId;
-}, any>;
+export interface ICateg {
+    _id?: Types.ObjectId;
+    name: string;
+    passwords: Array<IPassw>;
+}
+type PswByCategType = ICateg[];
+interface IUser extends Document {
+    _id: Types.ObjectId;
+    email: string;
+    motDePasse: string;
+    allPassw: IPassw[];
+    pswByCateg: PswByCategType;
+}
+export declare const User: import("mongoose").Model<IUser, {}, {}, {}, Document<unknown, {}, IUser> & IUser & Required<{
+    _id: Types.ObjectId;
+}>, any>;
 export {};

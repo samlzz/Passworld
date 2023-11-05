@@ -1,7 +1,8 @@
 //* IMPORTS
 import express from 'express';
-import { connect } from 'mongoose';
+import pkg from 'mongoose';
 import router from './routes.js';
+var connect = pkg.connect, connection = pkg.connection;
 //* INIT APP
 var app = express();
 //* CORS
@@ -24,4 +25,10 @@ app.use(express.json()); // ? for application/json
 //* SEND REQUEST TO ROUTER
 app.use('', router);
 //* TEST FOR DEV
+// check connexion to database
+app.get('/mongodb', function (req, res, next) {
+    var DbIsCo = connection.readyState === 1 ? 'connected' : 'disconnected';
+    res.json("MongoDB is ".concat(DbIsCo));
+    next();
+});
 export default app;

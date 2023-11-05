@@ -5,7 +5,7 @@
     "watch": "./code",
     "ext": "ts",
     "ignore": [],
-    "delay": "500",
+    "delay": "10",
     "script": "tsc",
     "args": ["--project", "../../tsconfig.node.json", "&&", "node", "./compiled/src/Backend/code/server.js"]
 }

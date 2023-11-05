@@ -57,5 +57,6 @@ module.exports = {
         'react/no-array-index-key': 'off',
         'react/jsx-no-useless-fragment': 'off',
         'react-hooks/exhaustive-deps': 'off',
+        'no-underscore-dangle': ['error', { allow: ['_id'] }],
     },
 };
