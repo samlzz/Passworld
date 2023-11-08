@@ -21,13 +21,13 @@ export const authentified = (
     next: exp.NextFunction
 ) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
+        const { token } = req.cookies;
         const decodedToken = jwt.verify(
             token,
             'RANDOM_TOKEN_SECRET'
         ) as DecodedToken;
         const { userId } = decodedToken;
-        if (userId !== req.params.id) {
+        if (userId !== req.cookies.userId) {
             useError(res, { err: 'Veuillez vous reconnectez' }, 401);
         }
         req.auth = {

@@ -1,15 +1,16 @@
 import { ReactNode } from 'react';
+import { Types } from 'mongoose';
 
 //* Global Interfaces:
 
-export interface APasswType {
-    categName: string;
-    id: number;
+export interface IPassw {
+    _id: Types.ObjectId;
+    categName?: string;
     titre: string;
     siteAddress: string;
     identifier: string;
     mdp: string;
-    icoLink: string;
+    icoLink?: string;
 }
 export interface ColorProviderProps {
     children: ReactNode;
@@ -33,10 +34,37 @@ export interface GlobStyleProps {
     theme: ThemeValues;
 }
 
+//* Contexte Interfaces:
+
+export interface ProviderProps {
+    children: ReactNode;
+}
+export interface ICateg {
+    _id?: Types.ObjectId;
+    name: string;
+    passwords: IPassw[];
+}
+export interface IData {
+    allPsw: IPassw[];
+    pswByCateg: ICateg[];
+}
+export interface IDefaultDataValu {
+    allPsw: IPassw[];
+    pswByCateg: ICateg[];
+    addData: (newData: object) => void;
+    addPassw: (newPsw: IPassw) => void;
+    delPassw: (pswToDelID: Types.ObjectId, categOf: string | undefined) => void;
+    addNewCateg: (newCategNm: string) => void;
+}
+
 //* pages Interfaces:
 
 export interface HomeProps {
     isRendered: (isIt: boolean) => void;
+}
+export interface IHomeServData {
+    allPassw: IPassw[];
+    categPassw: ICateg[];
 }
 
 //* component Interfaces
@@ -47,7 +75,7 @@ export interface FormsProps {
     noAccount: boolean;
 }
 export interface ForRegisterProps {
-    forRegister?: boolean;
+    $forRegister?: boolean;
 }
 // ? Navigation Tab:
 export interface LitleLogoProps {
@@ -61,27 +89,26 @@ export interface ElemProps {
     $isClick?: boolean;
 }
 export interface ElemOfTabProps {
-    aPassw: APasswType;
+    aPassw: IPassw;
 }
 export interface FolderOfTabProps {
     title: string;
-    allPassw: Array<APasswType>;
+    allPassw: IPassw[];
     whoIsClick: (isIt: string) => void;
     IsSelect: boolean;
     isDeleted: () => void;
 }
 // ? Password Card:
 export interface PasswCardProps {
-    aPassw: APasswType;
+    aPassw: IPassw;
     copyIsSucces: (isCopied: boolean) => void;
-    toDelete?: (categName: string, id: number, titre: string) => void;
-    listFolderList: APasswType[][];
+    toDelete?: (categName: string | undefined, id: Types.ObjectId) => void;
 }
 // ? Search Bar:
 export interface SearchBarProps {
     openFolder: string;
-    allPassw: APasswType[];
-    searchResult: (result: Array<APasswType>, searchProceed: boolean) => void;
+    allPassw: IPassw[] | undefined;
+    searchResult: (result: Array<IPassw>, searchProceed: boolean) => void;
 }
 // ? Password:
 export interface ContainerProps {
@@ -93,9 +120,8 @@ export interface ShowPswProps {
 }
 export interface CreatePswProps {
     closed: (toDo: boolean) => void;
-    newPassw: (newPsw: APasswType, categName: string) => void;
-    arrOfArr: Array<APasswType[]>;
-    aPassw?: APasswType | undefined;
+    newPassw: (newPsw: IPassw) => void;
+    aPassw?: IPassw | undefined;
     isEdit?: boolean;
 }
 // ? Material UI:
@@ -107,7 +133,7 @@ export interface SelectBoxProps {
     getAnchor: (anchor: HTMLElement) => void;
 }
 export interface GenerPopupProps {
-    valuStrong: (val: number) => void;
+    valuHash: (hash: string) => void;
 }
 export interface CategPopupProps {
     anchor: HTMLElement | null;

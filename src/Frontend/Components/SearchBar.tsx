@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import searchIco from '../assets/svgShape/Search.svg';
 
-import { SearchBarProps, APasswType } from '../Utils/type';
+import { SearchBarProps, IPassw } from '../Utils/type';
 
 // Début du style -------------->
 const StyledSearchBar = styled.input(
@@ -37,27 +37,27 @@ export function SearchBar({
             firstRender.current = false;
             return;
         }
-        const result: APasswType[] = [];
-        // const splitContent = searchContent.match(/\$L: (\w+)/); // ? ve
-        // const contentToCheck = splitContent ? splitContent[1] : searchContent;
-        allPassw.forEach((passw) => {
-            const siteName = passw.titre.toLowerCase();
-            const siteEmail = passw?.identifier?.toLowerCase();
-            const lowSearched = searchContent
-                ? searchContent.toLowerCase()
-                : '';
-            if (siteName.includes(lowSearched)) {
-                result.push(passw);
-                searchProceed = true;
-            } else if (siteEmail?.includes(lowSearched)) {
-                result.push(passw);
-                searchProceed = true;
+        if (allPassw) {
+            const result: IPassw[] = [];
+            allPassw.forEach((passw) => {
+                const siteName = passw.titre.toLowerCase();
+                const siteEmail = passw?.identifier?.toLowerCase();
+                const lowSearched = searchContent
+                    ? searchContent.toLowerCase()
+                    : '';
+                if (siteName.includes(lowSearched)) {
+                    result.push(passw);
+                    searchProceed = true;
+                } else if (siteEmail?.includes(lowSearched)) {
+                    result.push(passw);
+                    searchProceed = true;
+                }
+            });
+            if (searchContent === '') {
+                searchProceed = false;
             }
-        });
-        if (searchContent === '') {
-            searchProceed = false;
+            searchResult(result, searchProceed);
         }
-        searchResult(result, searchProceed);
     }, [searchContent]);
     if (openFolder === '') {
         return (

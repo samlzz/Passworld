@@ -117,7 +117,20 @@ const StyledPopup = styled(Popup)`
     z-index: 2;
 `;
 
-export function GenerPopup({ valuStrong }: GenerPopupProps) {
+function generateMdp(nbChar: number) {
+    let hexKey = '';
+    const characters = '0123456789abcdefghijklmnopqrstuvwxyz#&@/!?%${}';
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < nbChar; i += 1) {
+        hexKey += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+        );
+    }
+    return hexKey;
+}
+
+export function GenerPopup({ valuHash }: GenerPopupProps) {
     const [anchor, setAnchor] = React.useState<HTMLButtonElement | null>(null);
     const [open, setOpen] = React.useState(false);
     const [strongOfPsw, setStrongPsw] = React.useState(0);
@@ -151,7 +164,7 @@ export function GenerPopup({ valuStrong }: GenerPopupProps) {
                                     value={strongOfPsw}
                                     onChange={(e) => {
                                         setStrongPsw(e.target?.value);
-                                        valuStrong(strongOfPsw);
+                                        valuHash(generateMdp(strongOfPsw));
                                     }}
                                     color="info"
                                 />

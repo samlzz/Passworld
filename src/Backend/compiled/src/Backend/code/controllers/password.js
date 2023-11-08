@@ -18,7 +18,7 @@ export var addPassword = function (req, res) {
         .then(function (user) {
         if (!user)
             useError(res, { err: "User don't found" });
-        var newPswSimple = newPsw.toObject ? newPsw.toObject() : newPsw;
+        var newPswSimple = (newPsw === null || newPsw === void 0 ? void 0 : newPsw.toObject) ? newPsw.toObject() : newPsw;
         var newPswWithId = __assign(__assign({}, newPswSimple), { _id: new Types.ObjectId() });
         if (newPswWithId === null || newPswWithId === void 0 ? void 0 : newPswWithId.categName) {
             user.pswByCateg.forEach(function (categ) {
@@ -45,6 +45,10 @@ export var deletePassword = function (req, res) {
         if (!user) {
             useError(res, { err: 'Password not found' }, 404);
         }
+        var deletedPassword = user.allPassw.find(function (psw) {
+            return psw._id.equals(new Types.ObjectId(pswId));
+        });
+        // Supprime le mpd
         var pswLess = user;
         pswLess.allPassw = pswLess.allPassw.filter(function (psw) { return !psw._id.equals(new Types.ObjectId(pswId)); });
         pswLess.pswByCateg = pswLess.pswByCateg.map(function (categ) {
@@ -55,7 +59,11 @@ export var deletePassword = function (req, res) {
         });
         pswLess
             .save()
-            .then(function () { return useReturn(res, 'Password succesfully deleted'); })
+            .then(function () {
+            return useReturn(res, 'Password succesfully deleted', 200, {
+                deletedPsw: deletedPassword,
+            });
+        })
             .catch(function (e) { return useError(res, e); });
     })
         .catch(function (e) { return useError(res, e); });

@@ -9,12 +9,11 @@ export const addPassword = (req: exp.Request, res: exp.Response) => {
     User.findById(req.auth.userId)
         .then((user) => {
             if (!user) useError(res, { err: "User don't found" });
-            const newPswSimple = newPsw.toObject ? newPsw.toObject() : newPsw;
+            const newPswSimple = newPsw?.toObject ? newPsw.toObject() : newPsw;
             const newPswWithId = {
                 ...newPswSimple,
                 _id: new Types.ObjectId(),
             };
-
             if (newPswWithId?.categName) {
                 user.pswByCateg.forEach((categ) => {
                     if (categ.name === newPsw?.categName) {
@@ -41,6 +40,11 @@ export const deletePassword = (req: exp.Request, res: exp.Response) => {
             if (!user) {
                 useError(res, { err: 'Password not found' }, 404);
             }
+            const deletedPassword = user.allPassw.find((psw) =>
+                psw._id.equals(new Types.ObjectId(pswId))
+            );
+
+            // Supprime le mpd
             const pswLess = user;
             pswLess.allPassw = pswLess.allPassw.filter(
                 (psw) => !psw._id.equals(new Types.ObjectId(pswId))
@@ -59,7 +63,11 @@ export const deletePassword = (req: exp.Request, res: exp.Response) => {
 
             pswLess
                 .save()
-                .then(() => useReturn(res, 'Password succesfully deleted'))
+                .then(() =>
+                    useReturn(res, 'Password succesfully deleted', 200, {
+                        deletedPsw: deletedPassword,
+                    })
+                )
                 .catch((e) => useError(res, e));
         })
         .catch((e) => useError(res, e));

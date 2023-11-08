@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 
+import { Types } from 'mongoose';
 import cross from '../assets/Icones/crossWhite.svg';
 import check from '../assets/Icones/Valid.svg';
 import ico from '../assets/logoPW/defaultIcoDark.png';
@@ -9,13 +10,15 @@ import eysClose from '../assets/Icones/PasswCard/oeuil_fermer.svg';
 import eysOpen from '../assets/Icones/PasswCard/eye-solid (1).svg';
 
 import {
-    APasswType,
+    IPassw,
     ContainerProps,
     CreatePswProps,
     ShowPswProps,
+    ICateg,
 } from '../Utils/type';
 import SelectBox from './Material_Ui/SelectBox';
 import { AddCategPopup, GenerPopup } from './Material_Ui/PopUp';
+import { useData } from '../Utils/contexte';
 
 // Début du style -------------->
 const Backgrnd = styled.button`
@@ -127,43 +130,28 @@ const PageContainer = styled.div`
 `;
 // Fin du style --------------//
 
-function generateMdp(nbChar: number) {
-    const history = [];
-    let hexKey = '';
-    const characters = '0123456789abcdefghijklmnopqrstuvwxyz#&@/:!?%*£${}';
-    const charactersLength = characters.length;
-
-    for (let i = 0; i < nbChar; i += 1) {
-        hexKey += characters.charAt(
-            Math.floor(Math.random() * charactersLength)
-        );
-    }
-    history.push(hexKey);
-    return hexKey;
-}
-function getInitPassw(passw?: APasswType): APasswType {
+function getInitPassw(passw?: IPassw): IPassw {
     if (passw && passw.titre) {
         return passw;
     }
     return {
-        categName: '',
-        id: 0,
+        _id: new Types.ObjectId(),
+        categName: undefined,
         titre: '',
         siteAddress: '',
         identifier: '',
         mdp: '',
-        icoLink: './src/assets/logoPW/defaultIcoDark.png',
+        icoLink: ico,
     };
 }
 
 export function CreatePassw({
     newPassw,
     closed,
-    arrOfArr,
     aPassw,
     isEdit,
 }: CreatePswProps) {
-    const [aPassword, setPassword] = useState<APasswType>(getInitPassw(aPassw));
+    const [aPassword, setPassword] = useState<IPassw>(getInitPassw(aPassw));
     const [isHide, setIsHide] = useState(false);
     const [hidenMdpVal, setHidenMdpVal] = useState('');
     const [isCategMenu, setIsMenu] = useState(false);
@@ -172,16 +160,18 @@ export function CreatePassw({
     const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 
     const icoInputRef = useRef<HTMLInputElement | null>(null);
+    const { addNewCateg, pswByCateg } = useData();
 
     const fetchIco = (siteLink: string) => {
         const withoutPref = siteLink.replace(/https?:\/\/(www\.)?/i, ''); // ? Supprimer le préfixe (http, https, www)
         const domain = withoutPref.split('/')[0]; // ? Extraire nom de domaine (jusqu'au premier "/")
 
-        const icoLink = `https://logo.clearbit.com/${domain.toLowerCase()}?size=50*`;
+        const icoLink = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://www.${domain.toLowerCase()}&size=50`;
 
         return axios
             .get(icoLink, {
                 responseType: 'arraybuffer', // pour obtenir l'image sous forme de Blob
+                withCredentials: false,
             })
             .then((response) => {
                 const base64 = btoa(
@@ -193,29 +183,22 @@ export function CreatePassw({
                 return `data:image/png;base64,${base64}`;
             });
     };
-    function makeCategArr(listfolderList: Array<APasswType[]>) {
-        const CategArr: Array<string> = [];
-        listfolderList.forEach((categ, i) => {
-            if (i !== 0 && categ.length > 0) {
-                CategArr.push(categ[0].categName);
-            }
-        });
-        return CategArr;
+    function makeCategArr(
+        listfolderList: ICateg[],
+        withAllPsw: boolean = false
+    ): Array<string> {
+        const filteredCateg = listfolderList.filter(
+            (categ, i) => i !== 0 && categ.passwords.length >= 0
+        );
+
+        const categList = filteredCateg.map((categ) => categ.name);
+
+        if (withAllPsw) {
+            categList.unshift('All passwords');
+        }
+        return categList;
     }
-    const addNewCateg = (LatestCateg: string) => {
-        const nexCateg = [
-            {
-                categName: LatestCateg,
-                id: 0,
-                titre: 'Test',
-                siteAddress: 'www.test/unpeuplus/long.com',
-                identifier: 'moyentest@icloud.com',
-                icoLink: './src/assets/logoPW/SubmitLogo.png',
-                mdp: 'motDePasseDeTest',
-            },
-        ];
-        arrOfArr.push(nexCateg);
-    };
+
     const setIcoByUser = () => {
         if (icoInputRef.current) {
             icoInputRef.current.click();
@@ -251,7 +234,6 @@ export function CreatePassw({
         });
         const hidenVal = '*'.repeat(e.target.value.length);
         setHidenMdpVal(hidenVal);
-        console.log(aPassword.mdp);
     };
     const handleShowMdp = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword((prevState) => ({
@@ -260,7 +242,6 @@ export function CreatePassw({
         }));
         const hidenVal = '*'.repeat(e.target.value.length);
         setHidenMdpVal(hidenVal);
-        console.log(aPassword.mdp);
     };
     const handleIsHide = () => {
         setIsHide((prev) => !prev);
@@ -268,10 +249,9 @@ export function CreatePassw({
         setHidenMdpVal(hidenVal);
     };
     const handleValid = () => {
-        newPassw(aPassword, aPassword.categName);
+        newPassw(aPassword);
         closed(true);
         setIsValided((prev) => !prev);
-        console.log(aPassword.icoLink);
     };
 
     const { titre, siteAddress, identifier, mdp } = aPassword;
@@ -284,11 +264,9 @@ export function CreatePassw({
                     icoLink: icoSrc,
                 }));
             })
-            .catch((error) => {
-                console.error(
-                    "Erreur lors de la récupération de l'image:",
-                    error
-                );
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            .catch((_error) => {
+                console.error("Erreur lors de la récupération de l'image:");
             });
     }, [isValided]);
 
@@ -323,7 +301,7 @@ export function CreatePassw({
                         }
                     />
                     <SelectBox
-                        categArray={makeCategArr(arrOfArr)}
+                        categArray={makeCategArr(pswByCateg, true)}
                         returnCateg={(categChoosen) =>
                             setPassword((prevState) => ({
                                 ...prevState,
@@ -367,13 +345,12 @@ export function CreatePassw({
                         <ShowImg src={isHide ? eysOpen : eysClose} alt="show" />
                     </StyledShow>
                     <GenerPopup
-                        valuStrong={(val: number) => {
-                            const hash = generateMdp(val);
+                        valuHash={(hash) =>
                             setPassword((prevState) => ({
                                 ...prevState,
                                 mdp: hash,
-                            }));
-                        }}
+                            }))
+                        }
                     />
                 </MdpContainer>
                 <ValidButton onClick={handleValid}>

@@ -15,7 +15,7 @@ export const addCategory = (req: exp.Request, res: exp.Response) => {
         .then((result) => {
             if (!result) useError(res, { err: "User don't found" });
             useReturn(res, 'Category succesfully added', 200, {
-                categId: result._id,
+                categ: result,
             });
         })
         .catch((e) => useError(res, e));

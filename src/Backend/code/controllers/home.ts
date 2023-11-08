@@ -10,7 +10,7 @@ export const returnPasswList = (req: exp.Request, res: exp.Response) => {
             const { allPassw, pswByCateg } = user;
             useReturn(res, null, 200, {
                 allPassw,
-                pswByCateg,
+                categPassw: pswByCateg,
             });
         })
         .catch((e) => useError(res, e));

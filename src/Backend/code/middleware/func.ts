@@ -5,6 +5,7 @@ export const useError = (
     error: Error | { err: string },
     statusCode: number = 500
 ) => {
+    console.error(error);
     return res.status(statusCode).json(error);
 };
 

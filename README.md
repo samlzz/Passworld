@@ -71,14 +71,6 @@ To build the static files for production:
 npm run build
 ```
 
-### Nettoyage des fichiers de démarrage
-
-To clear the starter files and set up initial directories:
-
-```bash
-npm run clear
-```
-
 ### Aperçu du build de production
 
 To preview the production build:

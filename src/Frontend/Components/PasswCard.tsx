@@ -86,17 +86,13 @@ const StyledDelete = styled.button`
 `;
 // Fin du style --------------//
 
-export function PasswCard({
-    aPassw,
-    copyIsSucces,
-    toDelete,
-    listFolderList,
-}: PasswCardProps) {
+export function PasswCard({ aPassw, copyIsSucces, toDelete }: PasswCardProps) {
     const [isCopied, setIsCopied] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [locPassw, setLocPassw] = useState(aPassw);
     const [hidenmdp, setHidenmdp] = useState('**************');
-    const { titre, icoLink, identifier, categName, id } = locPassw;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { titre, icoLink, identifier, categName, _id } = locPassw;
 
     useEffect(() => {
         if (isCopied) {
@@ -130,7 +126,6 @@ export function PasswCard({
                         setLocPassw(newPssw);
                     }}
                     closed={(toClose) => setIsEdit(!toClose)}
-                    arrOfArr={listFolderList}
                     aPassw={locPassw}
                     isEdit
                 />
@@ -175,9 +170,7 @@ export function PasswCard({
                 </MdpWshow>
             </MdpContainer>
             <StyledDelete
-                onClick={
-                    toDelete ? () => toDelete(categName, id, titre) : undefined
-                }
+                onClick={toDelete ? () => toDelete(categName, _id) : undefined}
             >
                 <IcoImg src={suprIco} alt="delete" />
             </StyledDelete>

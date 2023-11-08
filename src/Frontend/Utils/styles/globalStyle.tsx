@@ -1,5 +1,4 @@
 import styled, { createGlobalStyle } from 'styled-components';
-import { GlobStyleProps } from '../type';
 
 export const LogoPW = styled.img`
     width: 18vw;
@@ -13,7 +12,7 @@ export const LogoPW = styled.img`
     `}
 `;
 
-export const GlobalStyle = createGlobalStyle`${({ theme }: GlobStyleProps) => `
+export const GlobalStyle = createGlobalStyle`${({ theme }) => `
     * {
         font-family: 'Trebuchet MS', Helvetica, sans-serif;
     }

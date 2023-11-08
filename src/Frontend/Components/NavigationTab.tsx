@@ -93,21 +93,6 @@ export function FolderOfTab({
     IsSelect,
     isDeleted,
 }: FolderOfTabProps) {
-    function generateHexKey(nbChar: number) {
-        const history = [];
-        let hexKey = '';
-        const characters = '0123456789abcdef';
-        const charactersLength = characters.length;
-
-        for (let i = 0; i < nbChar; i += 1) {
-            hexKey += characters.charAt(
-                Math.floor(Math.random() * charactersLength)
-            );
-        }
-        history.push(hexKey);
-        return hexKey;
-    }
-
     return (
         <>
             <FolderDiv $isClick={IsSelect}>
@@ -134,7 +119,7 @@ export function FolderOfTab({
             </FolderDiv>
             {IsSelect &&
                 allPassw.map((mdp) => (
-                    <ElemOfTab key={generateHexKey(8)} aPassw={mdp} />
+                    <ElemOfTab key={mdp._id.toString()} aPassw={mdp} />
                 ))}
         </>
     );

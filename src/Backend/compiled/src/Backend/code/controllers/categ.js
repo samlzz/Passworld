@@ -9,7 +9,7 @@ export var addCategory = function (req, res) {
         if (!result)
             useError(res, { err: "User don't found" });
         useReturn(res, 'Category succesfully added', 200, {
-            categId: result._id,
+            categ: result,
         });
     })
         .catch(function (e) { return useError(res, e); });

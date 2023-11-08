@@ -1,6 +1,7 @@
 //* IMPORTS
 import express, { Express } from 'express';
 import pkg from 'mongoose';
+import cookieParser from 'cookie-parser';
 import router from './routes.js';
 
 const { connect, connection } = pkg;
@@ -10,17 +11,23 @@ const app: Express = express();
 
 //* CORS
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*'); // TODO: remplacer 'x' par l'adresse du frontend (ex:'https://cloudix.netlify.app')
+    const allowedOrigins = ['http://localhost:5173'];
+    const { origin } = req.headers;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader(
         'Access-Control-Allow-Headers',
-        'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization'
+        'Origin, Accept, Content-Type, Authorization'
     );
     res.setHeader(
         'Access-Control-Allow-Methods',
         'GET, POST, PUT, DELETE, PATCH, OPTIONS'
     );
+    res.setHeader('Access-Control-Allow-Credentials', 'true'); // ?Pour permettre les cookies
     next();
 });
+
 //* CONNEXION MONGODB
 
 connect(
@@ -35,6 +42,7 @@ connect(
 
 //* ALLOW ACCES TO DATA IN .JSON
 app.use(express.json()); // ? for application/json
+app.use(cookieParser());
 
 //* SEND REQUEST TO ROUTER
 app.use('', router);

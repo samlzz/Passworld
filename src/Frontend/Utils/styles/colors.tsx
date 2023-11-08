@@ -26,7 +26,7 @@ export function ColorProvider({
         ...colors,
         isHomeRendered,
     };
-    return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+    return <ThemeProvider theme={theme}> {children} </ThemeProvider>;
 }
 ColorProvider.defaultProps = {
     isHomeRendered: false,

@@ -1,18 +1,21 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
+import { useNavigate } from 'react-router';
 
 import { FolderOfTab } from '../Components/NavigationTab';
 import { SearchBar } from '../Components/SearchBar';
 import { PasswCard } from '../Components/PasswCard';
 import { CreatePassw } from '../Components/Password';
+
 import pp from '../assets/Icones/ProfilePic.png';
 import logo from '../assets/logoPW/logoPassWorld.png';
 import plusButt from '../assets/svgShape/plusButton.svg';
-import defaultIco from '../assets/logoPW/defaultIcoDark.png';
 import plus from '../assets/svgShape/+PlusIco.png';
 
-import { APasswType, HomeProps } from '../Utils/type';
+import { IPassw, HomeProps, IHomeServData, ICateg } from '../Utils/type';
 import { AddCategPopup } from '../Components/Material_Ui/PopUp';
+import { useData } from '../Utils/contexte';
 
 // Début du style -------------->
 const PageHome = styled.div`
@@ -98,233 +101,10 @@ const AddCategImg = styled.img`
 `;
 // Fin du style --------------//
 
-// todo Value For test
-const researchRes: APasswType[] = [];
-const mdpExemples = [
-    {
-        categName: 'All Passwords',
-        id: 0,
-        titre: 'Youtube',
-        siteAddress: 'www.Youtube.com',
-        identifier: 'sliziard@icloud.com',
-        icoLink: defaultIco,
-        mdp: 'motdePasse',
-    },
-    {
-        categName: 'All Passwords',
-        id: 1,
-        titre: 'Google',
-        siteAddress: 'www.Google.com',
-        identifier: 'sliziard@icloud.com',
-        icoLink: defaultIco,
-        mdp: 'motdePasse',
-    },
-    {
-        categName: 'All Passwords',
-        id: 2,
-        titre: 'GitHub',
-        siteAddress: 'www.GitHub.com',
-        identifier: 'sliziard@icloud.com',
-        icoLink: defaultIco,
-        mdp: 'motdePasse',
-    },
-    {
-        categName: 'All Passwords',
-        id: 3,
-        titre: 'Figma',
-        siteAddress: 'www.Figma.com',
-        identifier: 'sliziard@icloud.com',
-        icoLink: defaultIco,
-        mdp: 'motdePasse',
-    },
-];
-const mdpDevExemples = [
-    {
-        categName: 'Devops',
-        id: 2,
-        titre: 'GitHub',
-        siteAddress: 'www.GitHub.com',
-        identifier: 'sliziard@icloud.com',
-        icoLink: defaultIco,
-        mdp: 'motdePasse',
-    },
-    {
-        categName: 'Devops',
-        id: 3,
-        titre: 'Figma',
-        siteAddress: 'www.Figma.com',
-        identifier: 'sliziard@icloud.com',
-        icoLink: defaultIco,
-        mdp: 'motdePasse',
-    },
-];
-const mdpLoisirsExemples = [
-    {
-        categName: 'Loisirs',
-        id: 0,
-        titre: 'Youtube',
-        siteAddress: 'www.Youtube.com',
-        identifier: 'sliziard@icloud.com',
-        icoLink: defaultIco,
-        mdp: 'motdePasse',
-    },
-    {
-        categName: 'Loisirs',
-        id: 1,
-        titre: 'Google',
-        siteAddress: 'www.Google.com',
-        identifier: 'sliziard@icloud.com',
-        icoLink: defaultIco,
-        mdp: 'motdePasse',
-    },
-];
-const categExemple = [
-    researchRes,
-    mdpExemples,
-    mdpDevExemples,
-    mdpLoisirsExemples,
-];
-
-// * Begin Functions ===========>
-function generateHexKey(nbChar: number) {
-    const history = [];
-    let hexKey = '';
-    const characters = '0123456789abcdef';
-    const charactersLength = characters.length;
-
-    for (let i = 0; i < nbChar; i += 1) {
-        hexKey += characters.charAt(
-            Math.floor(Math.random() * charactersLength)
-        );
-    }
-    history.push(hexKey);
-    return hexKey;
-}
-function renderOpFoldCard(
-    folderOpen: string,
-    folderList: Array<Array<APasswType>>,
-    isSearch: boolean,
-    setIsCopy: React.Dispatch<React.SetStateAction<boolean>>,
-    setFolderList: React.Dispatch<React.SetStateAction<APasswType[][]>>
-) {
-    //* Check si le dossier ouvert fait partie des categ
-    const nbCateg = folderList.length;
-    let cardContent = <p />;
-    if (isSearch) {
-        cardContent = (
-            <CardContainer>
-                {folderList[0].map((passw) => (
-                    <PasswCard
-                        key={generateHexKey(8)}
-                        aPassw={passw}
-                        copyIsSucces={(isCopied) => setIsCopy(isCopied)}
-                        listFolderList={folderList}
-                    />
-                ))}
-            </CardContainer>
-        );
-    } else {
-        for (let i = 0; i < nbCateg; i += 1) {
-            if (i !== 0) {
-                if (folderOpen === folderList[i][0]?.categName) {
-                    cardContent = (
-                        <CardContainer>
-                            {folderList[i].map((passw) => (
-                                <PasswCard
-                                    key={generateHexKey(8)}
-                                    aPassw={passw}
-                                    copyIsSucces={(isCopied) =>
-                                        setIsCopy(isCopied)
-                                    }
-                                    listFolderList={folderList}
-                                    toDelete={(categOf, id, titre) =>
-                                        setFolderList((prevState) => {
-                                            const updatedState = [...prevState];
-
-                                            prevState.forEach(
-                                                (categ, index) => {
-                                                    if (
-                                                        categ[0]?.categName ===
-                                                        categOf
-                                                    ) {
-                                                        const updatedCateg =
-                                                            categ.filter(
-                                                                (psw) =>
-                                                                    !(
-                                                                        psw.id ===
-                                                                            id &&
-                                                                        psw.titre ===
-                                                                            titre
-                                                                    )
-                                                            );
-                                                        updatedState[index] =
-                                                            updatedCateg;
-                                                    }
-                                                }
-                                            );
-
-                                            return updatedState;
-                                        })
-                                    }
-                                />
-                            ))}
-                        </CardContainer>
-                    );
-                }
-            }
-        }
-    }
-    return cardContent;
-}
-function getCategByName(categName: string, ArrayOfArray: Array<APasswType[]>) {
-    for (let i = 0; i < ArrayOfArray.length; i += 1) {
-        const categ = ArrayOfArray[i];
-        if (i !== 0) {
-            if (categ[0]?.categName === categName) {
-                return ArrayOfArray[i];
-            }
-        }
-    }
-    return [];
-}
-function addPassw(
-    newPssw: APasswType,
-    categName: string,
-    setFolderList: React.Dispatch<React.SetStateAction<APasswType[][]>>
-) {
-    setFolderList((prevState) => {
-        return prevState.map((categ) => {
-            if (categ[0]?.categName === categName) {
-                let newId = categ.length;
-                const passWid = {
-                    ...newPssw,
-                    id: (newId += 1),
-                };
-                return [...categ, passWid];
-            }
-            return categ;
-        });
-    });
-}
-const addNewCateg = (LatestCateg: string, arrOfArr: APasswType[][]) => {
-    const nexCateg = [
-        {
-            categName: LatestCateg,
-            id: 0,
-            titre: 'Test',
-            siteAddress: 'www.test/unpeuplus/long.com',
-            identifier: 'moyentest@icloud.com',
-            icoLink: './src/assets/logoPW/SubmitLogo.png',
-            mdp: 'motDePasseDeTest',
-        },
-    ];
-    arrOfArr.push(nexCateg);
-    return arrOfArr;
-};
-// * End Functions ===========//
-
 export function Home({ isRendered }: HomeProps) {
-    const [listfolderList, setFolderList] = useState(categExemple);
+    const { allPsw, pswByCateg, addData, addPassw, delPassw, addNewCateg } =
+        useData();
+
     const [folderOpen, setFolderOpen] = useState('');
     const [deletedFolders, setDeletedFolders] = useState<Set<number>>(
         new Set()
@@ -334,9 +114,44 @@ export function Home({ isRendered }: HomeProps) {
     const [isCreate, setIsCreate] = useState(false);
     const [isAddCateg, setIsAddCateg] = useState(false);
     const [plusAnchor, setPlusAnchor] = useState<HTMLElement | null>(null);
+    const [cardContent, setCardContent] = useState<JSX.Element>(<></>);
+
+    const navigate = useNavigate();
+
+    // * Begin Functions ===========>
+    function getCategByName(categName: string): ICateg | undefined {
+        return pswByCateg.find((categ) => categ.name === categName);
+    }
+    function getPswListByName(categName: string): IPassw[] | undefined {
+        if (categName === 'All passwords') {
+            return allPsw;
+        }
+        const theCateg = getCategByName(categName);
+        // console.log(theCateg);
+        const pswList = theCateg?.passwords.filter(
+            (psw) => psw.categName === categName
+        );
+        return pswList;
+    }
 
     useEffect(() => {
         isRendered(true);
+        axios
+            .get('http://localhost:3000/home')
+            .then((resp) => {
+                console.log(resp);
+                if (resp.status === 200) {
+                    const { allPassw, categPassw }: IHomeServData = resp.data;
+                    addData({ allPsw: allPassw, pswByCateg: categPassw });
+                }
+                if (resp.status === 401) {
+                    navigate('/');
+                }
+            })
+            .catch((err) => {
+                console.warn(err);
+                navigate('/');
+            });
     }, []);
     useEffect(() => {
         if (isCopy) {
@@ -347,12 +162,38 @@ export function Home({ isRendered }: HomeProps) {
         }
         return () => null;
     }, [isCopy]);
-    useEffect(() => {
-        const categSelect = getCategByName(folderOpen, listfolderList);
-        if (!categSelect || categSelect.length === 0) {
-            setFolderOpen('');
+
+    function renderOpFoldCard(folderList: IPassw[]) {
+        let cardContain;
+        if (isSearching) {
+            cardContain = (
+                <CardContainer>
+                    {pswByCateg[0].passwords.map((passw) => (
+                        <PasswCard
+                            key={passw._id.toString()}
+                            aPassw={passw}
+                            copyIsSucces={(isCopied) => setIsCopy(isCopied)}
+                            toDelete={(categOf, id) => delPassw(id, categOf)}
+                        />
+                    ))}
+                </CardContainer>
+            );
+        } else {
+            cardContain = (
+                <CardContainer>
+                    {folderList.map((passw) => (
+                        <PasswCard
+                            key={passw._id.toString()}
+                            aPassw={passw}
+                            copyIsSucces={(isCopied) => setIsCopy(isCopied)}
+                            toDelete={(categOf, id) => delPassw(id, categOf)}
+                        />
+                    ))}
+                </CardContainer>
+            );
         }
-    }, [listfolderList]);
+        return cardContain;
+    }
 
     const handleIsAddCateg = () => {
         if (plusAnchor) {
@@ -360,7 +201,6 @@ export function Home({ isRendered }: HomeProps) {
         }
     };
     const handleFolderDeleted = (index: number) => {
-        console.log('test');
         setDeletedFolders((prevDeletedFolders) => {
             const newDeletedFolders = new Set(prevDeletedFolders);
             newDeletedFolders.add(index);
@@ -368,6 +208,18 @@ export function Home({ isRendered }: HomeProps) {
         });
         // todo: suprimer la categ dans base de donnée
     };
+
+    useEffect(() => {
+        const categSelect = getPswListByName(folderOpen);
+
+        if (!categSelect) {
+            setCardContent(<></>);
+        } else {
+            setCardContent(renderOpFoldCard(categSelect));
+        }
+    }, [folderOpen, allPsw, pswByCateg]);
+
+    // * End Functions ===========//
 
     return (
         <PageHome>
@@ -385,29 +237,31 @@ export function Home({ isRendered }: HomeProps) {
                     <AddCategPopup
                         anchor={plusAnchor}
                         open={isAddCateg}
-                        getNewCateg={(NouvCateg) =>
-                            setFolderList(
-                                addNewCateg(NouvCateg, listfolderList)
-                            )
-                        }
+                        getNewCateg={(NouvCateg) => addNewCateg(NouvCateg)}
                         isPopup={(isValid) => setIsAddCateg(!isValid)}
                         forTab
                     />
                 ) : null}
-
-                {listfolderList.map((categorie, i) =>
+                <FolderOfTab
+                    title="All passwords"
+                    allPassw={allPsw}
+                    whoIsClick={(categWho) => setFolderOpen(categWho)}
+                    IsSelect={folderOpen === 'All passwords'}
+                    isDeleted={() => handleFolderDeleted(0)} // todo
+                />
+                {pswByCateg.map((categ, i) =>
                     i !== 0 &&
-                    categorie.length > 0 &&
+                    categ.passwords.length >= 0 &&
                     !deletedFolders.has(i) ? (
                         <FolderOfTab
-                            key={generateHexKey(8)}
-                            title={categorie[0]?.categName}
-                            allPassw={categorie}
+                            key={categ._id?.toString()}
+                            title={categ.name}
+                            allPassw={categ.passwords}
                             whoIsClick={(folderName) => {
                                 setFolderOpen(folderName);
                             }}
-                            IsSelect={folderOpen === categorie[0]?.categName}
-                            isDeleted={() => handleFolderDeleted(i)}
+                            IsSelect={folderOpen === categ.name}
+                            isDeleted={() => handleFolderDeleted(i)} // todo
                         />
                     ) : null
                 )}
@@ -415,28 +269,18 @@ export function Home({ isRendered }: HomeProps) {
 
             <ProfilButton>My account</ProfilButton>
             <SearchBar
-                allPassw={getCategByName(folderOpen, listfolderList)} // todo
+                allPassw={getPswListByName(folderOpen)}
                 openFolder={folderOpen}
                 searchResult={(result, searchProceed) => {
-                    if (searchProceed) {
-                        setIsSearching(true);
-                    } else {
-                        setIsSearching(false);
+                    setIsSearching(searchProceed);
+                    const newPswByCateg = [...pswByCateg];
+                    if (newPswByCateg[0]?.passwords) {
+                        newPswByCateg[0].passwords = result;
                     }
-                    setFolderList((prevArray) => {
-                        const updatedArray = [...prevArray];
-                        updatedArray[0] = result;
-                        return updatedArray;
-                    });
+                    addData({ pswByCateg: newPswByCateg });
                 }}
             />
-            {renderOpFoldCard(
-                folderOpen,
-                listfolderList,
-                isSearching,
-                setIsCopy,
-                setFolderList
-            )}
+            {cardContent}
 
             <AddPassw onClick={() => setIsCreate(true)}>
                 <AddShape src={plusButt} alt="plus button" />
@@ -445,11 +289,8 @@ export function Home({ isRendered }: HomeProps) {
             {isCopy ? <CopySucces>Copied to clipboard</CopySucces> : null}
             {isCreate ? (
                 <CreatePassw
-                    newPassw={(newPssw, categName) =>
-                        addPassw(newPssw, categName, setFolderList)
-                    }
+                    newPassw={(newPssw) => addPassw(newPssw)}
                     closed={(toClose) => setIsCreate(!toClose)}
-                    arrOfArr={listfolderList}
                 />
             ) : null}
         </PageHome>

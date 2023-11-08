@@ -5,36 +5,44 @@ import jwt from 'jsonwebtoken';
 import { Types } from 'mongoose';
 
 import { useError, useReturn } from '../middleware/func.js';
-import { User } from '../models/model_user.js';
+import { ICateg, User } from '../models/model_user.js';
 
 function makeTokenAndReturn(
     res: exp.Response,
     IsLogin: boolean,
     IdOfUser: Types.ObjectId
 ) {
-    if (IsLogin) {
-        return useReturn(res, 'User was login', 200, {
-            id: IdOfUser,
-            token: jwt.sign(
-                { userId: IdOfUser },
-                'RANDOM_TOKEN_SECRET', // todo: changer par chaine complexe
-                { expiresIn: '24h' }
-            ),
-        });
-    }
-    return useReturn(res, 'User was created', 201, {
-        id: IdOfUser,
-        token: jwt.sign(
-            { userId: IdOfUser },
-            'RANDOM_TOKEN_SECRET', // todo: changer par chaine complexe
-            { expiresIn: '24h' }
-        ),
+    const token = jwt.sign(
+        { userId: IdOfUser },
+        'RANDOM_TOKEN_SECRET', // todo: changer par chaine complexe
+        { expiresIn: '24h' }
+    );
+    res.cookie('token', token, {
+        httpOnly: true, // ?pas accessible via JavaScript
+        // todo: décommenter quand site en HTTPS
+        // secure: true, //? Le cookie est envoyé uniquement sur HTTPS
+        sameSite: 'strict', // ?pas envoyé avec les requêtes cross-site
+        maxAge: 24 * 60 * 60 * 1000, // ?expiration de 24 heures
     });
+    res.cookie('userId', IdOfUser, {
+        httpOnly: true,
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000,
+    });
+    if (IsLogin) {
+        return useReturn(res, 'User was login');
+    }
+    return useReturn(res, 'User was created');
 }
 
+const searchCateg: ICateg = {
+    name: 'SearchContent',
+    passwords: [],
+};
+
 export const checkIdAndCreate = (req: exp.Request, res: exp.Response) => {
-    const { mdp, id } = req.body;
-    User.findOne({ email: id })
+    const { mdp, email } = req.body;
+    User.findOne({ email })
         .then((user) => {
             if (user) {
                 useError(res, { err: 'Email already exists' }, 409);
@@ -42,10 +50,10 @@ export const checkIdAndCreate = (req: exp.Request, res: exp.Response) => {
                 hash(mdp, 10)
                     .then((cryptedMdp: string) => {
                         const addUser = new User({
-                            email: id,
+                            email,
                             motDePasse: cryptedMdp,
                             allPassw: [],
-                            pswByCateg: [],
+                            pswByCateg: [searchCateg],
                         });
                         addUser
                             .save()
@@ -61,9 +69,9 @@ export const checkIdAndCreate = (req: exp.Request, res: exp.Response) => {
 };
 
 export const checkIdAndMdp = (req: exp.Request, res: exp.Response) => {
-    const { id, mdp } = req.body;
+    const { email, mdp } = req.body;
 
-    User.findOne({ email: id })
+    User.findOne({ email })
         .then((user) => {
             if (!user) {
                 return useError(

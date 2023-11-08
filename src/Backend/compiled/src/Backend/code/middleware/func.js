@@ -11,6 +11,7 @@ var __assign = (this && this.__assign) || function () {
 };
 export var useError = function (res, error, statusCode) {
     if (statusCode === void 0) { statusCode = 500; }
+    console.error(error);
     return res.status(statusCode).json(error);
 };
 export var useReturn = function (res, message, statusCode, data) {

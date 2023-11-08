@@ -7,7 +7,7 @@ export var returnPasswList = function (req, res) {
         var allPassw = user.allPassw, pswByCateg = user.pswByCateg;
         useReturn(res, null, 200, {
             allPassw: allPassw,
-            pswByCateg: pswByCateg,
+            categPassw: pswByCateg,
         });
     })
         .catch(function (e) { return useError(res, e); });

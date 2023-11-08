@@ -17,18 +17,18 @@ import { authentified } from './middleware/auth.js';
 const router = express.Router();
 
 //* USER
-router.post('/register', checkIdAndCreate); //! need : email(id), mdp  --> id, token
-router.post('/login', checkIdAndMdp); //! need : email(id), mdp  --> id, token
+router.post('/register', checkIdAndCreate); //! need : email, mdp  --> cookie(userId, token)
+router.post('/login', checkIdAndMdp); //! need : email, mdp  --> cookie(userId, token)
 router.delete('/delUser', deleteUser); //! need: userId  --> deletedUser
 
-//* AUTH (need id in url)
-router.get('/home/:id', authentified, returnPasswList); //! --> allPassw, pswByCateg
+//* AUTH (need userId and token in cookie)
+router.get('/home', authentified, returnPasswList); //! --> allPassw, categPassw
 
-router.post('/addPsw/:id', authentified, addPassword); //! need: newPassw  --> pswId
-router.delete('/delPsw/:id', authentified, deletePassword); //! need: pswId, categName
-router.put('/editPsw/:id', authentified, replaceAPsw); //! need: editedPsw
+router.post('/addPsw', authentified, addPassword); //! need: newPassw  --> pswId
+router.post('/delPsw', authentified, deletePassword); //! need: pswId, categName  --> deletedPsw
+router.put('/editPsw', authentified, replaceAPsw); //! need: editedPsw
 
-router.post('/addCateg/:id', authentified, addCategory); //! need: categName  --> categId
-router.delete('/delCateg/:id', authentified, deleteCategory); //! need: categId
+router.post('/addCateg', authentified, addCategory); //! need: categName  --> categ
+router.post('/delCateg', authentified, deleteCategory); //! need: categId
 
 export default router;
