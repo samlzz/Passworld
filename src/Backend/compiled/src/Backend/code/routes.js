@@ -14,6 +14,6 @@ router.get('/home', authentified, returnPasswList); //! --> allPassw, categPassw
 router.post('/addPsw', authentified, addPassword); //! need: newPassw  --> pswId
 router.post('/delPsw', authentified, deletePassword); //! need: pswId, categName  --> deletedPsw
 router.put('/editPsw', authentified, replaceAPsw); //! need: editedPsw
-router.post('/addCateg', authentified, addCategory); //! need: categName  --> categ
+router.post('/addCateg', authentified, addCategory); //! need: categName  --> addedCateg
 router.post('/delCateg', authentified, deleteCategory); //! need: categId
 export default router;

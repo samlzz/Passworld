@@ -158,15 +158,16 @@ export function GenerPopup({ valuHash }: GenerPopupProps) {
 
                                 <Slider
                                     size="small"
-                                    defaultValue={70}
                                     aria-label="Small"
                                     valueLabelDisplay="auto"
                                     value={strongOfPsw}
                                     onChange={(e) => {
-                                        setStrongPsw(e.target?.value);
+                                        setStrongPsw(e.target.value);
                                         valuHash(generateMdp(strongOfPsw));
                                     }}
                                     color="info"
+                                    min={0}
+                                    max={40}
                                 />
                             </PopupBody>
                         </PopAnimation>

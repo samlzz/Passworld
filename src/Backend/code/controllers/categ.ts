@@ -1,5 +1,4 @@
 import exp from 'express';
-import { Types } from 'mongoose';
 
 import { ICateg, User } from '../models/model_user.js';
 import { useError, useReturn } from '../middleware/func.js';
@@ -15,7 +14,7 @@ export const addCategory = (req: exp.Request, res: exp.Response) => {
         .then((result) => {
             if (!result) useError(res, { err: "User don't found" });
             useReturn(res, 'Category succesfully added', 200, {
-                categ: result,
+                addedCateg: result,
             });
         })
         .catch((e) => useError(res, e));
@@ -30,7 +29,7 @@ export const deleteCategory = (req: exp.Request, res: exp.Response) => {
             }
             const categLess = user;
             categLess.pswByCateg = categLess.pswByCateg.filter(
-                (categ) => !categ._id.equals(new Types.ObjectId(categId))
+                (categ) => !categ._id.toString() === categId
             );
             categLess
                 .save()

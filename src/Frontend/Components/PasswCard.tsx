@@ -8,6 +8,7 @@ import editIco from '../assets/Icones/PasswCard/edit.svg';
 
 import { PasswCardProps } from '../Utils/type';
 import { CreatePassw } from './Password';
+import { useData } from '../Utils/contexte';
 
 // Début du style -------------->
 const CardDiv = styled.div`
@@ -91,8 +92,16 @@ export function PasswCard({ aPassw, copyIsSucces, toDelete }: PasswCardProps) {
     const [isEdit, setIsEdit] = useState(false);
     const [locPassw, setLocPassw] = useState(aPassw);
     const [hidenmdp, setHidenmdp] = useState('**************');
+
+    const { editPassw } = useData();
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const { titre, icoLink, identifier, categName, _id } = locPassw;
+    if (!categName) {
+        setLocPassw((prev) => ({
+            ...prev,
+            categName: 'All paswords',
+        }));
+    }
 
     useEffect(() => {
         if (isCopied) {
@@ -124,6 +133,7 @@ export function PasswCard({ aPassw, copyIsSucces, toDelete }: PasswCardProps) {
                 <CreatePassw
                     newPassw={(newPssw) => {
                         setLocPassw(newPssw);
+                        editPassw(newPssw);
                     }}
                     closed={(toClose) => setIsEdit(!toClose)}
                     aPassw={locPassw}
@@ -169,9 +179,7 @@ export function PasswCard({ aPassw, copyIsSucces, toDelete }: PasswCardProps) {
                     </StyledShow>
                 </MdpWshow>
             </MdpContainer>
-            <StyledDelete
-                onClick={toDelete ? () => toDelete(categName, _id) : undefined}
-            >
+            <StyledDelete onClick={() => toDelete(categName as string, _id)}>
                 <IcoImg src={suprIco} alt="delete" />
             </StyledDelete>
         </CardDiv>

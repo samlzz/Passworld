@@ -78,7 +78,7 @@ export const replaceAPsw = (req: exp.Request, res: exp.Response) => {
 
     function replaceGoodPsw(listOfPsw: IPassw[]) {
         return listOfPsw.map((passw) => {
-            if (passw._id === editedPsw._id) {
+            if (passw._id.equals(new Types.ObjectId(editedPsw._id))) {
                 return editedPsw;
             }
             return passw;

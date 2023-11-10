@@ -102,19 +102,23 @@ const AddCategImg = styled.img`
 // Fin du style --------------//
 
 export function Home({ isRendered }: HomeProps) {
-    const { allPsw, pswByCateg, addData, addPassw, delPassw, addNewCateg } =
-        useData();
+    const {
+        allPsw,
+        pswByCateg,
+        addData,
+        addPassw,
+        delPassw,
+        addNewCateg,
+        delCateg,
+    } = useData();
 
     const [folderOpen, setFolderOpen] = useState('');
-    const [deletedFolders, setDeletedFolders] = useState<Set<number>>(
-        new Set()
-    );
     const [isSearching, setIsSearching] = useState(false);
     const [isCopy, setIsCopy] = useState(false);
     const [isCreate, setIsCreate] = useState(false);
     const [isAddCateg, setIsAddCateg] = useState(false);
     const [plusAnchor, setPlusAnchor] = useState<HTMLElement | null>(null);
-    const [cardContent, setCardContent] = useState<JSX.Element>(<></>);
+    const [selectFolder, setSelectFold] = useState<IPassw[] | null>(null);
 
     const navigate = useNavigate();
 
@@ -163,59 +167,28 @@ export function Home({ isRendered }: HomeProps) {
         return () => null;
     }, [isCopy]);
 
-    function renderOpFoldCard(folderList: IPassw[]) {
-        let cardContain;
-        if (isSearching) {
-            cardContain = (
-                <CardContainer>
-                    {pswByCateg[0].passwords.map((passw) => (
-                        <PasswCard
-                            key={passw._id.toString()}
-                            aPassw={passw}
-                            copyIsSucces={(isCopied) => setIsCopy(isCopied)}
-                            toDelete={(categOf, id) => delPassw(id, categOf)}
-                        />
-                    ))}
-                </CardContainer>
-            );
+    const handleDelPsw = (categOf: string, id: string) => {
+        const selectedCat = getCategByName(categOf);
+        if (selectedCat) {
+            delPassw(id, selectedCat._id);
         } else {
-            cardContain = (
-                <CardContainer>
-                    {folderList.map((passw) => (
-                        <PasswCard
-                            key={passw._id.toString()}
-                            aPassw={passw}
-                            copyIsSucces={(isCopied) => setIsCopy(isCopied)}
-                            toDelete={(categOf, id) => delPassw(id, categOf)}
-                        />
-                    ))}
-                </CardContainer>
-            );
+            delPassw(id);
         }
-        return cardContain;
-    }
+    };
 
     const handleIsAddCateg = () => {
         if (plusAnchor) {
             setIsAddCateg(!isAddCateg);
         }
     };
-    const handleFolderDeleted = (index: number) => {
-        setDeletedFolders((prevDeletedFolders) => {
-            const newDeletedFolders = new Set(prevDeletedFolders);
-            newDeletedFolders.add(index);
-            return newDeletedFolders;
-        });
-        // todo: suprimer la categ dans base de donnée
-    };
 
     useEffect(() => {
         const categSelect = getPswListByName(folderOpen);
 
         if (!categSelect) {
-            setCardContent(<></>);
+            setSelectFold(null);
         } else {
-            setCardContent(renderOpFoldCard(categSelect));
+            setSelectFold(categSelect);
         }
     }, [folderOpen, allPsw, pswByCateg]);
 
@@ -247,21 +220,18 @@ export function Home({ isRendered }: HomeProps) {
                     allPassw={allPsw}
                     whoIsClick={(categWho) => setFolderOpen(categWho)}
                     IsSelect={folderOpen === 'All passwords'}
-                    isDeleted={() => handleFolderDeleted(0)} // todo
                 />
                 {pswByCateg.map((categ, i) =>
-                    i !== 0 &&
-                    categ.passwords.length >= 0 &&
-                    !deletedFolders.has(i) ? (
+                    i !== 0 && categ.passwords.length >= 0 ? (
                         <FolderOfTab
-                            key={categ._id?.toString()}
+                            key={categ._id.toString()}
                             title={categ.name}
                             allPassw={categ.passwords}
                             whoIsClick={(folderName) => {
                                 setFolderOpen(folderName);
                             }}
                             IsSelect={folderOpen === categ.name}
-                            isDeleted={() => handleFolderDeleted(i)} // todo
+                            isDeleted={() => delCateg(categ._id)} // todo
                         />
                     ) : null
                 )}
@@ -280,7 +250,29 @@ export function Home({ isRendered }: HomeProps) {
                     addData({ pswByCateg: newPswByCateg });
                 }}
             />
-            {cardContent}
+            {isSearching ? (
+                <CardContainer>
+                    {pswByCateg[0].passwords.map((passw) => (
+                        <PasswCard
+                            key={passw._id.toString()}
+                            aPassw={passw}
+                            copyIsSucces={(isCopied) => setIsCopy(isCopied)}
+                            toDelete={handleDelPsw}
+                        />
+                    ))}
+                </CardContainer>
+            ) : selectFolder ? (
+                <CardContainer>
+                    {selectFolder.map((passw) => (
+                        <PasswCard
+                            key={passw._id.toString()}
+                            aPassw={passw}
+                            copyIsSucces={(isCopied) => setIsCopy(isCopied)}
+                            toDelete={handleDelPsw}
+                        />
+                    ))}
+                </CardContainer>
+            ) : null}
 
             <AddPassw onClick={() => setIsCreate(true)}>
                 <AddShape src={plusButt} alt="plus button" />

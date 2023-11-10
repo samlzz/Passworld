@@ -1,10 +1,9 @@
 import { ReactNode } from 'react';
-import { Types } from 'mongoose';
 
 //* Global Interfaces:
 
 export interface IPassw {
-    _id: Types.ObjectId;
+    _id: string;
     categName?: string;
     titre: string;
     siteAddress: string;
@@ -40,7 +39,7 @@ export interface ProviderProps {
     children: ReactNode;
 }
 export interface ICateg {
-    _id?: Types.ObjectId;
+    _id: string;
     name: string;
     passwords: IPassw[];
 }
@@ -51,10 +50,12 @@ export interface IData {
 export interface IDefaultDataValu {
     allPsw: IPassw[];
     pswByCateg: ICateg[];
-    addData: (newData: object) => void;
+    addData: (newData: Partial<IData>) => void;
     addPassw: (newPsw: IPassw) => void;
-    delPassw: (pswToDelID: Types.ObjectId, categOf: string | undefined) => void;
+    delPassw: (pswToDelID: string, categOf?: string | undefined) => void;
+    editPassw: (editedPsw: IPassw) => void;
     addNewCateg: (newCategNm: string) => void;
+    delCateg: (categIdToDel: string) => void;
 }
 
 //* pages Interfaces:
@@ -96,13 +97,13 @@ export interface FolderOfTabProps {
     allPassw: IPassw[];
     whoIsClick: (isIt: string) => void;
     IsSelect: boolean;
-    isDeleted: () => void;
+    isDeleted?: () => void;
 }
 // ? Password Card:
 export interface PasswCardProps {
     aPassw: IPassw;
     copyIsSucces: (isCopied: boolean) => void;
-    toDelete?: (categName: string | undefined, id: Types.ObjectId) => void;
+    toDelete: (categName: string, id: string) => void;
 }
 // ? Search Bar:
 export interface SearchBarProps {
@@ -114,9 +115,6 @@ export interface SearchBarProps {
 export interface ContainerProps {
     $id?: boolean;
     $link?: boolean;
-}
-export interface ShowPswProps {
-    $isEdit?: boolean;
 }
 export interface CreatePswProps {
     closed: (toDo: boolean) => void;

@@ -1,21 +1,14 @@
 import styled from 'styled-components';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import axios from 'axios';
 
-import { Types } from 'mongoose';
 import cross from '../assets/Icones/crossWhite.svg';
 import check from '../assets/Icones/Valid.svg';
 import ico from '../assets/logoPW/defaultIcoDark.png';
 import eysClose from '../assets/Icones/PasswCard/oeuil_fermer.svg';
 import eysOpen from '../assets/Icones/PasswCard/eye-solid (1).svg';
 
-import {
-    IPassw,
-    ContainerProps,
-    CreatePswProps,
-    ShowPswProps,
-    ICateg,
-} from '../Utils/type';
+import { IPassw, ContainerProps, CreatePswProps, ICateg } from '../Utils/type';
 import SelectBox from './Material_Ui/SelectBox';
 import { AddCategPopup, GenerPopup } from './Material_Ui/PopUp';
 import { useData } from '../Utils/contexte';
@@ -97,11 +90,14 @@ const MdpContainer = styled.div`
     gap: 1vw;
     position: relative;
 `;
-const StyledShow = styled.button<ShowPswProps>(
-    ({ $isEdit }) => `
+const StyledShow = styled.button(
+    ({ theme }) => `
     position: absolute;
-    right: 14.7vw;
-    bottom: ${$isEdit ? `5.6vw` : `6.3vw`};
+    right: 14.1vw;
+    padding: 0 0.6vw 0 -0.1vw;
+    bottom: 6.3vw;
+    background: ${theme.selected};
+    box-shadow: -10px 0 6px -2px ${theme.selected};
 `
 );
 const ShowImg = styled.img`
@@ -135,7 +131,7 @@ function getInitPassw(passw?: IPassw): IPassw {
         return passw;
     }
     return {
-        _id: new Types.ObjectId(),
+        _id: '',
         categName: undefined,
         titre: '',
         siteAddress: '',
@@ -256,19 +252,19 @@ export function CreatePassw({
 
     const { titre, siteAddress, identifier, mdp } = aPassword;
 
-    useEffect(() => {
-        fetchIco(siteAddress)
-            .then((icoSrc) => {
-                setPassword((prevState) => ({
-                    ...prevState,
-                    icoLink: icoSrc,
-                }));
-            })
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            .catch((_error) => {
-                console.error("Erreur lors de la récupération de l'image:");
-            });
-    }, [isValided]);
+    // useEffect(() => {
+    //     fetchIco(siteAddress)
+    //         .then((icoSrc) => {
+    //             setPassword((prevState) => ({
+    //                 ...prevState,
+    //                 icoLink: icoSrc,
+    //             }));
+    //         })
+    //         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    //         .catch((_error) => {
+    //             console.error("Erreur lors de la récupération de l'image:");
+    //         });
+    // }, [isValided]);
 
     return (
         <PageContainer>
@@ -341,7 +337,7 @@ export function CreatePassw({
                         value={isHide ? hidenMdpVal : mdp}
                         onChange={isHide ? handleGetLetter : handleShowMdp}
                     />
-                    <StyledShow onClick={handleIsHide} $isEdit={isEdit}>
+                    <StyledShow onClick={handleIsHide}>
                         <ShowImg src={isHide ? eysOpen : eysClose} alt="show" />
                     </StyledShow>
                     <GenerPopup

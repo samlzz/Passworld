@@ -1,4 +1,3 @@
-import { Types } from 'mongoose';
 import { User } from '../models/model_user.js';
 import { useError, useReturn } from '../middleware/func.js';
 export var addCategory = function (req, res) {
@@ -9,7 +8,7 @@ export var addCategory = function (req, res) {
         if (!result)
             useError(res, { err: "User don't found" });
         useReturn(res, 'Category succesfully added', 200, {
-            categ: result,
+            addedCateg: result,
         });
     })
         .catch(function (e) { return useError(res, e); });
@@ -22,7 +21,7 @@ export var deleteCategory = function (req, res) {
             useError(res, { err: 'Category not found' }, 404);
         }
         var categLess = user;
-        categLess.pswByCateg = categLess.pswByCateg.filter(function (categ) { return !categ._id.equals(new Types.ObjectId(categId)); });
+        categLess.pswByCateg = categLess.pswByCateg.filter(function (categ) { return !categ._id.toString() === categId; });
         categLess
             .save()
             .then(function () { return useReturn(res, 'Category succesfully deleted'); })

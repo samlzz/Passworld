@@ -72,7 +72,7 @@ export var replaceAPsw = function (req, res) {
     var editedPsw = req.body.editedPsw;
     function replaceGoodPsw(listOfPsw) {
         return listOfPsw.map(function (passw) {
-            if (passw._id === editedPsw._id) {
+            if (passw._id.equals(new Types.ObjectId(editedPsw._id))) {
                 return editedPsw;
             }
             return passw;

@@ -58,5 +58,6 @@ module.exports = {
         'react/jsx-no-useless-fragment': 'off',
         'react-hooks/exhaustive-deps': 'off',
         'no-underscore-dangle': ['error', { allow: ['_id'] }],
+        'no-nested-ternary': 'off',
     },
 };

@@ -2,7 +2,6 @@ import { createContext, useState, useMemo, useContext } from 'react';
 import axios from 'axios';
 
 import { useNavigate } from 'react-router';
-import { Types } from 'mongoose';
 import { IDefaultDataValu, ProviderProps, IData, IPassw } from './type';
 
 const defaultDataCtxtValu: IDefaultDataValu = {
@@ -11,7 +10,9 @@ const defaultDataCtxtValu: IDefaultDataValu = {
     addData: () => {},
     addPassw: () => {},
     delPassw: () => {},
+    editPassw: () => {},
     addNewCateg: () => {},
+    delCateg: () => {},
 };
 const DataContext = createContext(defaultDataCtxtValu);
 
@@ -123,10 +124,7 @@ export function DataProvider({ children }: ProviderProps) {
                 }
             });
     };
-    const delPassw = (
-        pswToDelID: Types.ObjectId,
-        categOf: string | undefined
-    ) => {
+    const delPassw = (pswToDelID: string, categOf?: string | undefined) => {
         axios
             .post(
                 'http://localhost:3000/delPsw',
@@ -135,22 +133,73 @@ export function DataProvider({ children }: ProviderProps) {
             )
             .then((resp) => {
                 console.log(resp);
-                const pswLess = pswByCateg.map((categ) => {
-                    const deletedPswId: Types.ObjectId =
-                        resp.data.deletedPsw._id;
-
-                    const filteredPsw = categ.passwords.filter((psw) => {
-                        console.log(deletedPswId, '__', psw._id);
-                        if (deletedPswId === psw._id) return false;
-                        return true;
+                const deletedPswId: string = resp.data.deletedPsw._id;
+                if (categOf) {
+                    const pswLess = pswByCateg.map((categ) => {
+                        if (categ._id === categOf) {
+                            const filteredPsw = categ.passwords.filter(
+                                (psw) => !(deletedPswId === psw._id)
+                            );
+                            return { ...categ, passwords: filteredPsw };
+                        }
+                        return categ;
+                    });
+                    setData((prev) => ({
+                        ...prev,
+                        pswByCateg: pswLess,
+                    }));
+                }
+                const allPswLess = allPsw.filter(
+                    (psw) => !(deletedPswId === psw._id)
+                );
+                setData((prev) => ({
+                    ...prev,
+                    allPsw: allPswLess,
+                }));
+            })
+            .catch((err) => {
+                console.warn(err);
+                if (err.response && err.response.status === 401) {
+                    navigate('/');
+                }
+            });
+    };
+    const editPassw = (editedPsw: IPassw) => {
+        axios
+            .put(
+                'http://localhost:3000/editPsw',
+                { editedPsw },
+                { headers: { 'Content-Type': 'application/json' } }
+            )
+            .then((resp) => {
+                console.log(resp);
+                if (resp.status === 200) {
+                    const allPswUpdated = allPsw.map((psw) => {
+                        if (psw._id === editedPsw._id) {
+                            return editedPsw;
+                        }
+                        return psw;
+                    });
+                    const pswByCategUpdated = pswByCateg.map((categ) => {
+                        if (categ.name === editedPsw.categName) {
+                            const updatedPasswords = categ.passwords.map(
+                                (mdp) =>
+                                    mdp._id === editedPsw._id ? editedPsw : mdp
+                            );
+                            return {
+                                ...categ,
+                                passwords: updatedPasswords,
+                            };
+                        }
+                        return categ;
                     });
 
-                    return {
-                        ...categ,
-                        passwords: filteredPsw,
-                    };
-                });
-                addData({ pswByCateg: pswLess });
+                    setData((prev) => ({
+                        ...prev,
+                        allPsw: allPswUpdated,
+                        pswByCateg: pswByCategUpdated,
+                    }));
+                }
             })
             .catch((err) => {
                 console.warn(err);
@@ -183,12 +232,44 @@ export function DataProvider({ children }: ProviderProps) {
                         // ? Ajouter la nouvelle catégorie
                         newPswByCateg = [
                             ...pswByCateg,
-                            { name: newCategNm, passwords: [] },
+                            {
+                                _id: resp.data.addedCateg,
+                                name: newCategNm,
+                                passwords: [],
+                            },
                         ];
                     }
                     addData({ pswByCateg: newPswByCateg });
                 } else if (resp.status === 401) {
                     navigate('/');
+                }
+            })
+            .catch((err) => {
+                console.warn(err);
+                if (err.response && err.response.status === 401) {
+                    navigate('/');
+                }
+            });
+    };
+    const delCateg = (categIdToDel: string) => {
+        axios
+            .post(
+                'http://localhost:3000/delCateg',
+                { categId: categIdToDel },
+                { headers: { 'Content-Type': 'application/json' } }
+            )
+            .then((resp) => {
+                console.log(resp);
+                if (resp.status === 200) {
+                    setData((prev) => {
+                        const filteredCateg = pswByCateg.filter(
+                            (categ) => !(categ._id === categIdToDel)
+                        );
+                        return {
+                            ...prev,
+                            pswByCateg: filteredCateg,
+                        };
+                    });
                 }
             })
             .catch((err) => {
@@ -205,7 +286,9 @@ export function DataProvider({ children }: ProviderProps) {
             addData,
             addPassw,
             delPassw,
+            editPassw,
             addNewCateg,
+            delCateg,
         }),
         [data]
     );
