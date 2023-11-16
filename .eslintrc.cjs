@@ -59,5 +59,6 @@ module.exports = {
         'react-hooks/exhaustive-deps': 'off',
         'no-underscore-dangle': ['error', { allow: ['_id'] }],
         'no-nested-ternary': 'off',
+        'jsx-a11y/control-has-associated-label': 'off',
     },
 };

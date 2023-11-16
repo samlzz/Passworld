@@ -86,3 +86,13 @@ export var deleteUser = function (req, res) {
     })
         .catch(function (e) { return useError(res, e); });
 };
+export var deleteCookies = function (req, res) {
+    try {
+        res.cookie('token', '', { expires: new Date(0) });
+        res.cookie('userId', '', { expires: new Date(0) });
+        useReturn(res, 'Cookies have been reset');
+    }
+    catch (err) {
+        useError(res, err);
+    }
+};

@@ -45,9 +45,7 @@ export var deletePassword = function (req, res) {
         if (!user) {
             useError(res, { err: 'Password not found' }, 404);
         }
-        var deletedPassword = user.allPassw.find(function (psw) {
-            return psw._id.equals(new Types.ObjectId(pswId));
-        });
+        var deletedPsw = user.allPassw.find(function (psw) { return psw._id.toString() === pswId; });
         // Supprime le mpd
         var pswLess = user;
         pswLess.allPassw = pswLess.allPassw.filter(function (psw) { return !psw._id.equals(new Types.ObjectId(pswId)); });
@@ -60,8 +58,8 @@ export var deletePassword = function (req, res) {
         pswLess
             .save()
             .then(function () {
-            return useReturn(res, 'Password succesfully deleted', 200, {
-                deletedPsw: deletedPassword,
+            useReturn(res, 'Password succesfully deleted', 200, {
+                deletedPsw: deletedPsw,
             });
         })
             .catch(function (e) { return useError(res, e); });

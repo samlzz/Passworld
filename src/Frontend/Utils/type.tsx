@@ -51,10 +51,11 @@ export interface IDefaultDataValu {
     allPsw: IPassw[];
     pswByCateg: ICateg[];
     addData: (newData: Partial<IData>) => void;
+    resetData: () => void;
     addPassw: (newPsw: IPassw) => void;
     delPassw: (pswToDelID: string, categOf?: string | undefined) => void;
     editPassw: (editedPsw: IPassw) => void;
-    addNewCateg: (newCategNm: string) => void;
+    addNewCateg: (newCategNm: string, categNameArr: string[]) => void;
     delCateg: (categIdToDel: string) => void;
 }
 
@@ -77,6 +78,11 @@ export interface FormsProps {
 }
 export interface ForRegisterProps {
     $forRegister?: boolean;
+}
+export interface EyesProps {
+    $isHide: boolean;
+    $isEdit: boolean;
+    $isConfirm?: boolean;
 }
 // ? Navigation Tab:
 export interface LitleLogoProps {
@@ -120,12 +126,12 @@ export interface CreatePswProps {
     closed: (toDo: boolean) => void;
     newPassw: (newPsw: IPassw) => void;
     aPassw?: IPassw | undefined;
-    isEdit?: boolean;
 }
 // ? Material UI:
 export interface SelectBoxProps {
     categArray: Array<string>;
     isCategPopup: boolean;
+    defaultCateg: string | undefined;
     returnCateg: (categ: string) => void;
     isCategMenu: (isIt: boolean) => void;
     getAnchor: (anchor: HTMLElement) => void;

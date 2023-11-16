@@ -40,8 +40,8 @@ export const deletePassword = (req: exp.Request, res: exp.Response) => {
             if (!user) {
                 useError(res, { err: 'Password not found' }, 404);
             }
-            const deletedPassword = user.allPassw.find((psw) =>
-                psw._id.equals(new Types.ObjectId(pswId))
+            const deletedPsw = user.allPassw.find(
+                (psw) => psw._id.toString() === pswId
             );
 
             // Supprime le mpd
@@ -63,11 +63,11 @@ export const deletePassword = (req: exp.Request, res: exp.Response) => {
 
             pswLess
                 .save()
-                .then(() =>
+                .then(() => {
                     useReturn(res, 'Password succesfully deleted', 200, {
-                        deletedPsw: deletedPassword,
-                    })
-                )
+                        deletedPsw,
+                    });
+                })
                 .catch((e) => useError(res, e));
         })
         .catch((e) => useError(res, e));

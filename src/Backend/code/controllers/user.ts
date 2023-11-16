@@ -112,3 +112,13 @@ export const deleteUser = (req: exp.Request, res: exp.Response) => {
         })
         .catch((e) => useError(res, e));
 };
+
+export const deleteCookies = (req: exp.Request, res: exp.Response) => {
+    try {
+        res.cookie('token', '', { expires: new Date(0) });
+        res.cookie('userId', '', { expires: new Date(0) });
+        useReturn(res, 'Cookies have been reset');
+    } catch (err) {
+        useError(res, err);
+    }
+};

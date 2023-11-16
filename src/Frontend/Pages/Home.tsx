@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import { Types } from 'mongoose';
+import Cookies from 'js-cookie';
 
 import { FolderOfTab } from '../Components/NavigationTab';
 import { SearchBar } from '../Components/SearchBar';
@@ -106,6 +108,7 @@ export function Home({ isRendered }: HomeProps) {
         allPsw,
         pswByCateg,
         addData,
+        resetData,
         addPassw,
         delPassw,
         addNewCateg,
@@ -117,9 +120,9 @@ export function Home({ isRendered }: HomeProps) {
     const [isCopy, setIsCopy] = useState(false);
     const [isCreate, setIsCreate] = useState(false);
     const [isAddCateg, setIsAddCateg] = useState(false);
-    const [plusAnchor, setPlusAnchor] = useState<HTMLElement | null>(null);
     const [selectFolder, setSelectFold] = useState<IPassw[] | null>(null);
 
+    const plusAnchor = useRef<HTMLButtonElement | null>(null);
     const navigate = useNavigate();
 
     // * Begin Functions ===========>
@@ -137,6 +140,21 @@ export function Home({ isRendered }: HomeProps) {
         );
         return pswList;
     }
+    function makeCategArr(
+        listfolderList: ICateg[],
+        withAllPsw: boolean = false
+    ): Array<string> {
+        const filteredCateg = listfolderList.filter(
+            (categ, i) => i !== 0 && categ.passwords.length >= 0
+        );
+
+        const categList = filteredCateg.map((categ) => categ.name);
+
+        if (withAllPsw) {
+            categList.unshift('All passwords');
+        }
+        return categList;
+    }
 
     useEffect(() => {
         isRendered(true);
@@ -146,6 +164,17 @@ export function Home({ isRendered }: HomeProps) {
                 console.log(resp);
                 if (resp.status === 200) {
                     const { allPassw, categPassw }: IHomeServData = resp.data;
+                    const searchCateg: ICateg = {
+                        _id: '',
+                        name: 'SearchContent',
+                        passwords: [],
+                    };
+                    if (categPassw[0].name !== searchCateg.name) {
+                        categPassw[0] = {
+                            ...searchCateg,
+                            _id: new Types.ObjectId().toString(),
+                        };
+                    }
                     addData({ allPsw: allPassw, pswByCateg: categPassw });
                 }
                 if (resp.status === 401) {
@@ -182,6 +211,22 @@ export function Home({ isRendered }: HomeProps) {
         }
     };
 
+    const handleLogOut = () => {
+        axios
+            .delete('http://localhost:3000/resetCookies')
+            .then((resp) => {
+                console.log(resp);
+                if (resp.status === 200) {
+                    resetData();
+                    Cookies.remove('token', { path: '/' });
+                    Cookies.remove('userId', { path: '/' });
+                    Cookies.remove('auth_token', { path: '/' });
+                    navigate('/');
+                }
+            })
+            .catch((e) => console.warn(e));
+    };
+
     useEffect(() => {
         const categSelect = getPswListByName(folderOpen);
 
@@ -200,7 +245,7 @@ export function Home({ isRendered }: HomeProps) {
                 <LogoPassWorld src={logo} alt="Logo of PassWorld" />
                 <AddCategButt
                     type="button"
-                    onClick={(e) => setPlusAnchor(e.currentTarget)}
+                    ref={plusAnchor}
                     onMouseDown={handleIsAddCateg}
                 >
                     <p> Add Category </p>
@@ -208,9 +253,11 @@ export function Home({ isRendered }: HomeProps) {
                 </AddCategButt>
                 {isAddCateg ? (
                     <AddCategPopup
-                        anchor={plusAnchor}
+                        anchor={plusAnchor.current}
                         open={isAddCateg}
-                        getNewCateg={(NouvCateg) => addNewCateg(NouvCateg)}
+                        getNewCateg={(NouvCateg) =>
+                            addNewCateg(NouvCateg, makeCategArr(pswByCateg))
+                        }
                         isPopup={(isValid) => setIsAddCateg(!isValid)}
                         forTab
                     />
@@ -222,7 +269,7 @@ export function Home({ isRendered }: HomeProps) {
                     IsSelect={folderOpen === 'All passwords'}
                 />
                 {pswByCateg.map((categ, i) =>
-                    i !== 0 && categ.passwords.length >= 0 ? (
+                    i !== 0 ? (
                         <FolderOfTab
                             key={categ._id.toString()}
                             title={categ.name}
@@ -231,13 +278,13 @@ export function Home({ isRendered }: HomeProps) {
                                 setFolderOpen(folderName);
                             }}
                             IsSelect={folderOpen === categ.name}
-                            isDeleted={() => delCateg(categ._id)} // todo
+                            isDeleted={() => delCateg(categ._id)}
                         />
                     ) : null
                 )}
             </TabContainer>
 
-            <ProfilButton>My account</ProfilButton>
+            <ProfilButton onClick={handleLogOut}> Log Out </ProfilButton>
             <SearchBar
                 allPassw={getPswListByName(folderOpen)}
                 openFolder={folderOpen}

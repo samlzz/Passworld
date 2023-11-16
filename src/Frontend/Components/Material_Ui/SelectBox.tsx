@@ -114,6 +114,14 @@ function generateHexKey(nbChar: number) {
     return hexKey;
 }
 
+function getValuCateg(defaultCateg: string | undefined, arrOfCateg: string[]) {
+    if (defaultCateg) {
+        const index = arrOfCateg.indexOf(defaultCateg);
+        return index * 10;
+    }
+    return 0;
+}
+
 const CustomSelect = React.forwardRef(function CustomSelect<
     TValue extends object,
     Multiple extends boolean,
@@ -138,11 +146,14 @@ const CustomSelect = React.forwardRef(function CustomSelect<
 export default function SelectBox({
     categArray,
     isCategPopup,
+    defaultCateg,
     returnCateg,
     isCategMenu,
     getAnchor,
 }: SelectBoxProps) {
-    const [value, setValue] = React.useState<number>(0);
+    const [value, setValue] = React.useState<number>(
+        getValuCateg(defaultCateg, categArray)
+    );
     const [categMenu, setcategMenu] = React.useState(false);
     React.useEffect(() => {
         returnCateg(categArray[value / 10]);
@@ -155,6 +166,7 @@ export default function SelectBox({
             setcategMenu(false);
         }
     }, [isCategPopup]);
+
     return (
         <CustomSelect
             value={value}

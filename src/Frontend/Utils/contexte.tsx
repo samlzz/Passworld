@@ -2,12 +2,19 @@ import { createContext, useState, useMemo, useContext } from 'react';
 import axios from 'axios';
 
 import { useNavigate } from 'react-router';
-import { IDefaultDataValu, ProviderProps, IData, IPassw } from './type';
+import { IDefaultDataValu, ProviderProps, IData, IPassw, ICateg } from './type';
 
 const defaultDataCtxtValu: IDefaultDataValu = {
     allPsw: [],
-    pswByCateg: [],
+    pswByCateg: [
+        {
+            _id: '0',
+            name: 'SearchContent',
+            passwords: [],
+        },
+    ],
     addData: () => {},
+    resetData: () => {},
     addPassw: () => {},
     delPassw: () => {},
     editPassw: () => {},
@@ -86,6 +93,9 @@ export function DataProvider({ children }: ProviderProps) {
             return updatedData;
         });
     };
+    const resetData = () => {
+        setData({ allPsw: [], pswByCateg: [] });
+    };
 
     const addPassw = (newPssw: IPassw) => {
         axios
@@ -101,6 +111,8 @@ export function DataProvider({ children }: ProviderProps) {
                         ...newPssw,
                         _id: resp.data.pswId,
                     };
+                    const allPswWith = [...allPsw, pswtoAdd];
+                    addData({ allPsw: allPswWith });
                     if (newPssw.categName) {
                         const withPsw = pswByCateg.map((categ) => {
                             if (categ.name === newPssw.categName) {
@@ -113,8 +125,6 @@ export function DataProvider({ children }: ProviderProps) {
                         });
                         addData({ pswByCateg: withPsw });
                     }
-                    const allPswWith = [...allPsw, pswtoAdd];
-                    addData({ allPsw: allPswWith });
                 }
             })
             .catch((err) => {
@@ -136,7 +146,7 @@ export function DataProvider({ children }: ProviderProps) {
                 const deletedPswId: string = resp.data.deletedPsw._id;
                 if (categOf) {
                     const pswLess = pswByCateg.map((categ) => {
-                        if (categ._id === categOf) {
+                        if (categ?._id === categOf) {
                             const filteredPsw = categ.passwords.filter(
                                 (psw) => !(deletedPswId === psw._id)
                             );
@@ -164,6 +174,15 @@ export function DataProvider({ children }: ProviderProps) {
                 }
             });
     };
+    const isIdInPswArr = (editedPswId: string, categ: ICateg) => {
+        let isIdIn;
+        categ.passwords.forEach((mdp) => {
+            if (mdp._id === editedPswId) {
+                isIdIn = true;
+            }
+        });
+        return isIdIn;
+    };
     const editPassw = (editedPsw: IPassw) => {
         axios
             .put(
@@ -182,13 +201,29 @@ export function DataProvider({ children }: ProviderProps) {
                     });
                     const pswByCategUpdated = pswByCateg.map((categ) => {
                         if (categ.name === editedPsw.categName) {
-                            const updatedPasswords = categ.passwords.map(
-                                (mdp) =>
-                                    mdp._id === editedPsw._id ? editedPsw : mdp
-                            );
+                            if (isIdInPswArr(editedPsw._id, categ)) {
+                                const updatedPasswords = categ.passwords.map(
+                                    (mdp) =>
+                                        mdp._id === editedPsw._id
+                                            ? editedPsw
+                                            : mdp
+                                );
+                                return {
+                                    ...categ,
+                                    passwords: updatedPasswords,
+                                };
+                            }
                             return {
                                 ...categ,
-                                passwords: updatedPasswords,
+                                passwords: [...categ.passwords, editedPsw],
+                            };
+                        }
+                        if (isIdInPswArr(editedPsw._id, categ)) {
+                            return {
+                                ...categ,
+                                passwords: categ.passwords.filter(
+                                    (psw) => !(editedPsw._id === psw._id)
+                                ),
                             };
                         }
                         return categ;
@@ -209,7 +244,11 @@ export function DataProvider({ children }: ProviderProps) {
             });
     };
 
-    const addNewCateg = (newCategNm: string) => {
+    const addNewCateg = (newCategNm: string, categNameArr: string[]) => {
+        if (newCategNm in categNameArr) {
+            console.log('Categ already exist');
+            return;
+        }
         axios
             .post(
                 'http://localhost:3000/addCateg',
@@ -219,26 +258,24 @@ export function DataProvider({ children }: ProviderProps) {
             .then((resp) => {
                 console.log(resp);
                 if (resp.status === 200) {
+                    const { addedCateg } = resp.data;
                     const existingCateg = pswByCateg.find(
-                        (categ) => categ.name === newCategNm
+                        (categ) => categ._id === addedCateg._id
                     );
-                    let newPswByCateg;
                     if (existingCateg) {
-                        // ? Mise à jour de la catégorie existante...
-                        newPswByCateg = pswByCateg.map((categ) =>
-                            categ.name === newCategNm ? { ...categ } : categ
-                        );
-                    } else {
-                        // ? Ajouter la nouvelle catégorie
-                        newPswByCateg = [
-                            ...pswByCateg,
-                            {
-                                _id: resp.data.addedCateg,
-                                name: newCategNm,
-                                passwords: [],
-                            },
-                        ];
+                        console.log('Categ already exist');
+                        return;
                     }
+                    // ? Ajouter la nouvelle catégorie
+                    const newPswByCateg = [
+                        ...pswByCateg,
+                        {
+                            _id: resp.data.addedCateg._id,
+                            name: newCategNm,
+                            passwords: [],
+                        },
+                    ];
+
                     addData({ pswByCateg: newPswByCateg });
                 } else if (resp.status === 401) {
                     navigate('/');
@@ -284,6 +321,7 @@ export function DataProvider({ children }: ProviderProps) {
         () => ({
             ...data,
             addData,
+            resetData,
             addPassw,
             delPassw,
             editPassw,

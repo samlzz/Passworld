@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useRef, useState } from 'react';
-import axios from 'axios';
 
+import { Types } from 'mongoose';
 import cross from '../assets/Icones/crossWhite.svg';
 import check from '../assets/Icones/Valid.svg';
 import ico from '../assets/logoPW/defaultIcoDark.png';
@@ -131,7 +131,7 @@ function getInitPassw(passw?: IPassw): IPassw {
         return passw;
     }
     return {
-        _id: '',
+        _id: new Types.ObjectId().toString(),
         categName: undefined,
         titre: '',
         siteAddress: '',
@@ -141,44 +141,18 @@ function getInitPassw(passw?: IPassw): IPassw {
     };
 }
 
-export function CreatePassw({
-    newPassw,
-    closed,
-    aPassw,
-    isEdit,
-}: CreatePswProps) {
+export function CreatePassw({ newPassw, closed, aPassw }: CreatePswProps) {
     const [aPassword, setPassword] = useState<IPassw>(getInitPassw(aPassw));
     const [isHide, setIsHide] = useState(false);
     const [hidenMdpVal, setHidenMdpVal] = useState('');
     const [isCategMenu, setIsMenu] = useState(false);
     const [isValidCateg, setIsCategValid] = useState(false);
-    const [isValided, setIsValided] = useState(false);
     const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 
     const icoInputRef = useRef<HTMLInputElement | null>(null);
+    const validRef = useRef<HTMLButtonElement | null>(null);
     const { addNewCateg, pswByCateg } = useData();
 
-    const fetchIco = (siteLink: string) => {
-        const withoutPref = siteLink.replace(/https?:\/\/(www\.)?/i, ''); // ? Supprimer le préfixe (http, https, www)
-        const domain = withoutPref.split('/')[0]; // ? Extraire nom de domaine (jusqu'au premier "/")
-
-        const icoLink = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://www.${domain.toLowerCase()}&size=50`;
-
-        return axios
-            .get(icoLink, {
-                responseType: 'arraybuffer', // pour obtenir l'image sous forme de Blob
-                withCredentials: false,
-            })
-            .then((response) => {
-                const base64 = btoa(
-                    new Uint8Array(response.data).reduce(
-                        (data, byte) => data + String.fromCharCode(byte),
-                        ''
-                    )
-                );
-                return `data:image/png;base64,${base64}`;
-            });
-    };
     function makeCategArr(
         listfolderList: ICateg[],
         withAllPsw: boolean = false
@@ -245,12 +219,48 @@ export function CreatePassw({
         setHidenMdpVal(hidenVal);
     };
     const handleValid = () => {
+        let isNull;
+        // eslint-disable-next-line no-restricted-syntax
+        for (const valus of Object.values(aPassword)) {
+            if (valus === '') isNull = true;
+        }
+        if (isNull) {
+            return;
+        }
         newPassw(aPassword);
         closed(true);
-        setIsValided((prev) => !prev);
+    };
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            if (validRef.current) {
+                validRef.current.click();
+            }
+        }
     };
 
-    const { titre, siteAddress, identifier, mdp } = aPassword;
+    const { titre, siteAddress, identifier, mdp, categName } = aPassword;
+
+    // const fetchIco = (siteLink: string) => {
+    //     const withoutPref = siteLink.replace(/https?:\/\/(www\.)?/i, ''); // ? Supprimer le préfixe (http, https, www)
+    //     const domain = withoutPref.split('/')[0]; // ? Extraire nom de domaine (jusqu'au premier "/")
+
+    //     const icoLink = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://www.${domain.toLowerCase()}&size=50`;
+
+    //     return axios
+    //         .get(icoLink, {
+    //             responseType: 'arraybuffer', // pour obtenir l'image sous forme de Blob
+    //             withCredentials: false,
+    //         })
+    //         .then((response) => {
+    //             const base64 = btoa(
+    //                 new Uint8Array(response.data).reduce(
+    //                     (data, byte) => data + String.fromCharCode(byte),
+    //                     ''
+    //                 )
+    //             );
+    //             return `data:image/png;base64,${base64}`;
+    //         });
+    // };
 
     // useEffect(() => {
     //     fetchIco(siteAddress)
@@ -267,7 +277,7 @@ export function CreatePassw({
     // }, [isValided]);
 
     return (
-        <PageContainer>
+        <PageContainer onKeyDown={handleKeyDown}>
             <Backgrnd onClick={() => closed(true)} />
             <PasswDiv>
                 <CrossButton onClick={() => closed(true)}>
@@ -307,6 +317,7 @@ export function CreatePassw({
                         isCategMenu={(resp) => setIsMenu(resp)}
                         getAnchor={(anch) => setAnchor(anch)}
                         isCategPopup={isValidCateg}
+                        defaultCateg={categName}
                     />
                 </NameAndCateg>
                 <StyledContainer
@@ -349,7 +360,7 @@ export function CreatePassw({
                         }
                     />
                 </MdpContainer>
-                <ValidButton onClick={handleValid}>
+                <ValidButton onClick={handleValid} ref={validRef}>
                     <ValidImg src={check} alt="valid" />
                 </ValidButton>
             </PasswDiv>
@@ -358,7 +369,9 @@ export function CreatePassw({
                     anchor={anchor}
                     open={isCategMenu}
                     isPopup={(resp) => setIsCategValid(resp)}
-                    getNewCateg={(NouvCateg) => addNewCateg(NouvCateg)}
+                    getNewCateg={(NouvCateg) =>
+                        addNewCateg(NouvCateg, makeCategArr(pswByCateg))
+                    }
                 />
             ) : (
                 <></>

@@ -137,7 +137,6 @@ export function PasswCard({ aPassw, copyIsSucces, toDelete }: PasswCardProps) {
                     }}
                     closed={(toClose) => setIsEdit(!toClose)}
                     aPassw={locPassw}
-                    isEdit
                 />
             ) : (
                 <></>

@@ -4,7 +4,9 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
 import submitLogo from '../assets/logoPW/SubmitLogo.png';
-import { ForRegisterProps, FormsProps } from '../Utils/type';
+import openedeys from '../assets/Icones/PasswCard/oeuil_ouvert.svg';
+import closedeys from '../assets/Icones/PasswCard/oeuil_fermer.svg';
+import { EyesProps, ForRegisterProps, FormsProps } from '../Utils/type';
 
 // Début du style -------------->
 const PageParent = styled.div`
@@ -30,6 +32,7 @@ const InputContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 4vh;
+    position: relative;
 `;
 const StyledInput = styled.input`
     background-color: ${(props) => props.theme.secondary};
@@ -40,6 +43,20 @@ const StyledInput = styled.input`
     width: 80%;
     height: 7vh;
     padding-left: 20px;
+`;
+const EyesButton = styled.button<EyesProps>`
+    width: 2vw;
+    position: absolute;
+    right: 4.3vw;
+    ${(props) =>
+        props.$isEdit
+            ? props.$isConfirm
+                ? `bottom: ${props.$isHide ? `7.9vw` : `7.5vw`};`
+                : `bottom: ${props.$isHide ? `13.9vw` : `13.5vw`};`
+            : `bottom: ${props.$isHide ? `8.5vw` : `8.2vw`};`}
+`;
+const StyledEyes = styled.img`
+    width: 2vw;
 `;
 const StyledSubmit = styled.input<ForRegisterProps>`
     border: none;
@@ -68,6 +85,9 @@ export function BegginForms({ title, noAccount }: FormsProps) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPsw, setConfirmPsw] = useState('');
+    const [isHide, setIsHide] = useState(false);
+    const [hidenMdpVal, setHidenMdpVal] = useState('');
+    const [hidenConfVal, setHidenConfVal] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = (
@@ -81,6 +101,10 @@ export function BegginForms({ title, noAccount }: FormsProps) {
             apiUrl = 'http://localhost:3000/register';
             if (password !== confirmPsw) {
                 console.log('2 passwords are different'); // todo: faire une popup qui demande de saisir 2 mdp identique
+                return;
+            }
+            if (email === '' || password === '') {
+                console.log('need email, password and confirmation');
                 return;
             }
         } else {
@@ -101,6 +125,41 @@ export function BegginForms({ title, noAccount }: FormsProps) {
             .catch((err) => console.warn(err));
     };
 
+    const handleGetLetter = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword((prevState) => {
+            if (e.target.value.length < password.length) {
+                return prevState.slice(0, -1);
+            }
+            const lastLetter = e.target.value[e.target.value.length - 1];
+            return prevState + lastLetter;
+        });
+
+        const hidenVal = '*'.repeat(e.target.value.length);
+        setHidenMdpVal(hidenVal);
+    };
+    const handleShowMdp = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(e.target.value);
+        const hidenVal = '*'.repeat(e.target.value.length);
+        setHidenMdpVal(hidenVal);
+    };
+    const handleConfirmGetLetter = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setConfirmPsw((prevState) => {
+            if (e.target.value.length < password.length) {
+                return prevState.slice(0, -1);
+            }
+            const lastLetter = e.target.value[e.target.value.length - 1];
+            return prevState + lastLetter;
+        });
+
+        const hidenVal = '*'.repeat(e.target.value.length);
+        setHidenConfVal(hidenVal);
+    };
+    const handleConfirmShowMdp = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setConfirmPsw(e.target.value);
+        const hidenVal = '*'.repeat(e.target.value.length);
+        setHidenConfVal(hidenVal);
+    };
+
     return (
         <PageParent>
             <FormContainer $forRegister={noAccount} onSubmit={handleSubmit}>
@@ -115,16 +174,41 @@ export function BegginForms({ title, noAccount }: FormsProps) {
                     <StyledInput
                         type="input"
                         placeholder="password..."
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        value={isHide ? hidenMdpVal : password}
+                        onChange={isHide ? handleGetLetter : handleShowMdp}
                     />
+                    <EyesButton
+                        type="button"
+                        onClick={() => setIsHide((prev) => !prev)}
+                        $isHide={isHide}
+                        $isEdit={noAccount}
+                    >
+                        <StyledEyes src={isHide ? openedeys : closedeys} />
+                    </EyesButton>
                     {noAccount && (
-                        <StyledInput
-                            type="input"
-                            placeholder="confirmation of password..."
-                            value={confirmPsw}
-                            onChange={(e) => setConfirmPsw(e.target.value)}
-                        />
+                        <>
+                            <EyesButton
+                                type="button"
+                                onClick={() => setIsHide((prev) => !prev)}
+                                $isHide={isHide}
+                                $isEdit={noAccount}
+                                $isConfirm
+                            >
+                                <StyledEyes
+                                    src={isHide ? openedeys : closedeys}
+                                />
+                            </EyesButton>
+                            <StyledInput
+                                type="input"
+                                placeholder="confirmation of password..."
+                                value={isHide ? hidenConfVal : confirmPsw}
+                                onChange={
+                                    isHide
+                                        ? handleConfirmGetLetter
+                                        : handleConfirmShowMdp
+                                }
+                            />
+                        </>
                     )}
                     <StyledSubmit
                         type="submit"
