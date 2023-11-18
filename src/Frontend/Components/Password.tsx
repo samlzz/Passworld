@@ -12,6 +12,7 @@ import { IPassw, ContainerProps, CreatePswProps, ICateg } from '../Utils/type';
 import SelectBox from './Material_Ui/SelectBox';
 import { AddCategPopup, GenerPopup } from './Material_Ui/PopUp';
 import { useData } from '../Utils/contexte';
+import { ErrorAlert } from './SweetAlert';
 
 // Début du style -------------->
 const Backgrnd = styled.button`
@@ -225,6 +226,7 @@ export function CreatePassw({ newPassw, closed, aPassw }: CreatePswProps) {
             if (valus === '') isNull = true;
         }
         if (isNull) {
+            ErrorAlert('Please fill all fields');
             return;
         }
         newPassw(aPassword);
@@ -232,6 +234,7 @@ export function CreatePassw({ newPassw, closed, aPassw }: CreatePswProps) {
     };
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
+            event.preventDefault();
             if (validRef.current) {
                 validRef.current.click();
             }

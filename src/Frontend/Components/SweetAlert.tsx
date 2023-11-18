@@ -26,7 +26,6 @@ export function AxiosErrAlert(error: AxiosError) {
 export function CatchErrorAlert(error: AxiosError) {
     const data = error.response?.data as { err: string };
     if (data?.err) {
-        console.warn(error);
         ErrorAlert(data.err);
     } else {
         AxiosErrAlert(error);
@@ -44,10 +43,10 @@ const Toast = Swal.mixin({
         toast.onmouseleave = Swal.resumeTimer;
     },
 });
-export function GoodSignIn() {
+export function GoodAlert(title: string) {
     Toast.fire({
         icon: 'success',
-        title: 'Signed in successfully',
+        title,
         background: '#141B2F',
         color: '#FFFFFFCC',
     });

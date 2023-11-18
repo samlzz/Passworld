@@ -3,7 +3,11 @@ import axios from 'axios';
 
 import { useNavigate } from 'react-router';
 import { IDefaultDataValu, ProviderProps, IData, IPassw, ICateg } from './type';
-import { CatchErrorAlert } from '../Components/SweetAlert';
+import {
+    CatchErrorAlert,
+    ErrorAlert,
+    GoodAlert,
+} from '../Components/SweetAlert';
 
 const defaultDataCtxtValu: IDefaultDataValu = {
     allPsw: [],
@@ -106,8 +110,8 @@ export function DataProvider({ children }: ProviderProps) {
                 { headers: { 'Content-Type': 'application/json' } }
             )
             .then((resp) => {
-                console.log(resp);
                 if (resp.status === 200) {
+                    GoodAlert(resp.data.msg);
                     const pswtoAdd = {
                         ...newPssw,
                         _id: resp.data.pswId,
@@ -143,7 +147,7 @@ export function DataProvider({ children }: ProviderProps) {
                 { headers: { 'Content-Type': 'application/json' } }
             )
             .then((resp) => {
-                console.log(resp);
+                GoodAlert(resp.data.msg);
                 const deletedPswId: string = resp.data.deletedPsw._id;
                 if (categOf) {
                     const pswLess = pswByCateg.map((categ) => {
@@ -192,8 +196,8 @@ export function DataProvider({ children }: ProviderProps) {
                 { headers: { 'Content-Type': 'application/json' } }
             )
             .then((resp) => {
-                console.log(resp);
                 if (resp.status === 200) {
+                    GoodAlert(resp.data.msg);
                     const allPswUpdated = allPsw.map((psw) => {
                         if (psw._id === editedPsw._id) {
                             return editedPsw;
@@ -247,7 +251,7 @@ export function DataProvider({ children }: ProviderProps) {
 
     const addNewCateg = (newCategNm: string, categNameArr: string[]) => {
         if (categNameArr.includes(newCategNm)) {
-            console.log('Categ already exist');
+            ErrorAlert('Category already exist');
             return;
         }
         axios
@@ -257,15 +261,14 @@ export function DataProvider({ children }: ProviderProps) {
                 { headers: { 'Content-Type': 'application/json' } }
             )
             .then((resp) => {
-                console.log(resp);
                 if (resp.status === 200) {
+                    GoodAlert(resp.data.msg);
                     const { addedCateg } = resp.data;
-                    console.log('dans resp', addedCateg);
                     const existingCateg = pswByCateg.find(
                         (categ) => categ._id === addedCateg._id
                     );
                     if (existingCateg) {
-                        console.log('Categ already exist');
+                        ErrorAlert('Category already exist');
                         return;
                     }
                     // ? Ajouter la nouvelle catégorie
@@ -277,7 +280,6 @@ export function DataProvider({ children }: ProviderProps) {
                             passwords: [],
                         },
                     ];
-                    console.log(newPswByCateg);
                     addData({ pswByCateg: newPswByCateg });
                 } else if (resp.status === 401) {
                     navigate('/');
@@ -298,8 +300,8 @@ export function DataProvider({ children }: ProviderProps) {
                 { headers: { 'Content-Type': 'application/json' } }
             )
             .then((resp) => {
-                console.log(resp);
                 if (resp.status === 200) {
+                    GoodAlert(resp.data.msg);
                     setData((prev) => {
                         const filteredCateg = pswByCateg.filter(
                             (categ) => categ._id !== categIdToDel

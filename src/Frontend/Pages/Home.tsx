@@ -18,7 +18,7 @@ import plus from '../assets/svgShape/+PlusIco.png';
 import { IPassw, HomeProps, IHomeServData, ICateg } from '../Utils/type';
 import { AddCategPopup } from '../Components/Material_Ui/PopUp';
 import { useData } from '../Utils/contexte';
-import { AxiosErrAlert, GoodSignIn } from '../Components/SweetAlert';
+import { AxiosErrAlert, GoodAlert } from '../Components/SweetAlert';
 
 // Début du style -------------->
 const PageHome = styled.div`
@@ -160,9 +160,7 @@ export function Home({ isRendered }: HomeProps) {
         axios
             .get('http://localhost:3000/home')
             .then((resp) => {
-                console.log(resp);
                 if (resp.status === 200) {
-                    GoodSignIn();
                     const { allPassw, categPassw }: IHomeServData = resp.data;
                     const searchCateg: ICateg = {
                         _id: '',
@@ -215,7 +213,7 @@ export function Home({ isRendered }: HomeProps) {
         axios
             .delete('http://localhost:3000/resetCookies')
             .then((resp) => {
-                console.log(resp);
+                GoodAlert('Succesfully log out');
                 if (resp.status === 200) {
                     resetData();
                     Cookies.remove('token', { path: '/' });

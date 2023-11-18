@@ -7,7 +7,7 @@ import submitLogo from '../assets/logoPW/SubmitLogo.png';
 import openedeys from '../assets/Icones/PasswCard/oeuil_ouvert.svg';
 import closedeys from '../assets/Icones/PasswCard/oeuil_fermer.svg';
 import { EyesProps, ForRegisterProps, FormsProps } from '../Utils/type';
-import { CatchErrorAlert, ErrorAlert } from './SweetAlert';
+import { CatchErrorAlert, ErrorAlert, GoodAlert } from './SweetAlert';
 
 // Début du style -------------->
 const PageParent = styled.div`
@@ -118,8 +118,9 @@ export function BegginForms({ title, noAccount }: FormsProps) {
                 { headers: { 'Content-Type': 'application/json' } }
             )
             .then((resp) => {
-                console.log(resp);
                 if (resp.status === 200) {
+                    if (noAccount) GoodAlert('Account successfully created');
+                    else GoodAlert('Signed in successfully');
                     navigate('/home');
                 }
             })
