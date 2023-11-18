@@ -18,6 +18,7 @@ import plus from '../assets/svgShape/+PlusIco.png';
 import { IPassw, HomeProps, IHomeServData, ICateg } from '../Utils/type';
 import { AddCategPopup } from '../Components/Material_Ui/PopUp';
 import { useData } from '../Utils/contexte';
+import { AxiosErrAlert, GoodSignIn } from '../Components/SweetAlert';
 
 // Début du style -------------->
 const PageHome = styled.div`
@@ -144,9 +145,7 @@ export function Home({ isRendered }: HomeProps) {
         listfolderList: ICateg[],
         withAllPsw: boolean = false
     ): Array<string> {
-        const filteredCateg = listfolderList.filter(
-            (categ, i) => i !== 0 && categ.passwords.length >= 0
-        );
+        const filteredCateg = listfolderList.filter((_, i) => i !== 0);
 
         const categList = filteredCateg.map((categ) => categ.name);
 
@@ -163,13 +162,14 @@ export function Home({ isRendered }: HomeProps) {
             .then((resp) => {
                 console.log(resp);
                 if (resp.status === 200) {
+                    GoodSignIn();
                     const { allPassw, categPassw }: IHomeServData = resp.data;
                     const searchCateg: ICateg = {
                         _id: '',
                         name: 'SearchContent',
                         passwords: [],
                     };
-                    if (categPassw[0].name !== searchCateg.name) {
+                    if (categPassw[0]?.name !== searchCateg.name) {
                         categPassw[0] = {
                             ...searchCateg,
                             _id: new Types.ObjectId().toString(),
@@ -182,7 +182,7 @@ export function Home({ isRendered }: HomeProps) {
                 }
             })
             .catch((err) => {
-                console.warn(err);
+                AxiosErrAlert(err);
                 navigate('/');
             });
     }, []);
@@ -207,7 +207,7 @@ export function Home({ isRendered }: HomeProps) {
 
     const handleIsAddCateg = () => {
         if (plusAnchor) {
-            setIsAddCateg(!isAddCateg);
+            setIsAddCateg((prev) => !prev);
         }
     };
 
@@ -224,7 +224,7 @@ export function Home({ isRendered }: HomeProps) {
                     navigate('/');
                 }
             })
-            .catch((e) => console.warn(e));
+            .catch((e) => AxiosErrAlert(e));
     };
 
     useEffect(() => {
@@ -246,41 +246,42 @@ export function Home({ isRendered }: HomeProps) {
                 <AddCategButt
                     type="button"
                     ref={plusAnchor}
-                    onMouseDown={handleIsAddCateg}
+                    onClick={handleIsAddCateg}
                 >
                     <p> Add Category </p>
                     <AddCategImg src={plus} alt="Add Category" />
                 </AddCategButt>
-                {isAddCateg ? (
+                {isAddCateg && (
                     <AddCategPopup
                         anchor={plusAnchor.current}
                         open={isAddCateg}
                         getNewCateg={(NouvCateg) =>
                             addNewCateg(NouvCateg, makeCategArr(pswByCateg))
                         }
-                        isPopup={(isValid) => setIsAddCateg(!isValid)}
+                        isPopup={(is) => setIsAddCateg(is)}
                         forTab
                     />
-                ) : null}
+                )}
                 <FolderOfTab
                     title="All passwords"
                     allPassw={allPsw}
                     whoIsClick={(categWho) => setFolderOpen(categWho)}
                     IsSelect={folderOpen === 'All passwords'}
                 />
-                {pswByCateg.map((categ, i) =>
-                    i !== 0 ? (
-                        <FolderOfTab
-                            key={categ._id.toString()}
-                            title={categ.name}
-                            allPassw={categ.passwords}
-                            whoIsClick={(folderName) => {
-                                setFolderOpen(folderName);
-                            }}
-                            IsSelect={folderOpen === categ.name}
-                            isDeleted={() => delCateg(categ._id)}
-                        />
-                    ) : null
+                {pswByCateg.map(
+                    (categ, i) =>
+                        i !== 0 && (
+                            <FolderOfTab
+                                key={categ._id || `${categ.name}-${i}`}
+                                title={categ.name}
+                                allPassw={categ.passwords}
+                                whoIsClick={(folderName) => {
+                                    setFolderOpen(folderName);
+                                }}
+                                IsSelect={folderOpen === categ.name}
+                                isDeleted={() => delCateg(categ._id)}
+                            />
+                        )
                 )}
             </TabContainer>
 
@@ -301,7 +302,7 @@ export function Home({ isRendered }: HomeProps) {
                 <CardContainer>
                     {pswByCateg[0].passwords.map((passw) => (
                         <PasswCard
-                            key={passw._id.toString()}
+                            key={passw._id}
                             aPassw={passw}
                             copyIsSucces={(isCopied) => setIsCopy(isCopied)}
                             toDelete={handleDelPsw}
@@ -312,7 +313,7 @@ export function Home({ isRendered }: HomeProps) {
                 <CardContainer>
                     {selectFolder.map((passw) => (
                         <PasswCard
-                            key={passw._id.toString()}
+                            key={passw._id}
                             aPassw={passw}
                             copyIsSucces={(isCopied) => setIsCopy(isCopied)}
                             toDelete={handleDelPsw}

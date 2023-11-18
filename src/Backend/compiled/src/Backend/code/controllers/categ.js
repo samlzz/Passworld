@@ -7,8 +7,9 @@ export var addCategory = function (req, res) {
         .then(function (result) {
         if (!result)
             useError(res, { err: "User don't found" });
+        var addedCateg = result.pswByCateg.find(function (categ) { return categ.name === newCateg.name; });
         useReturn(res, 'Category succesfully added', 200, {
-            addedCateg: result,
+            addedCateg: addedCateg._id,
         });
     })
         .catch(function (e) { return useError(res, e); });
@@ -21,7 +22,15 @@ export var deleteCategory = function (req, res) {
             useError(res, { err: 'Category not found' }, 404);
         }
         var categLess = user;
-        categLess.pswByCateg = categLess.pswByCateg.filter(function (categ) { return !categ._id.toString() === categId; });
+        categLess.pswByCateg = categLess.pswByCateg.filter(function (categ) {
+            if (categ.name === 'SearchContent') {
+                return true;
+            }
+            if (categ._id.toString() === categId) {
+                return false;
+            }
+            return true;
+        });
         categLess
             .save()
             .then(function () { return useReturn(res, 'Category succesfully deleted'); })

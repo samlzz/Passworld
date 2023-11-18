@@ -117,6 +117,7 @@ function generateHexKey(nbChar: number) {
 function getValuCateg(defaultCateg: string | undefined, arrOfCateg: string[]) {
     if (defaultCateg) {
         const index = arrOfCateg.indexOf(defaultCateg);
+        if (index === -1) return 0;
         return index * 10;
     }
     return 0;

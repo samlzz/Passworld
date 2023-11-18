@@ -21,7 +21,8 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^18.2.0",
     "react-router": "^6.16.0",
-    "styled-components": "^6.0.9"
+    "styled-components": "^6.0.9",
+    "sweetalert2": "^11.10.0"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

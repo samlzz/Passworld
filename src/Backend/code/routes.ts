@@ -24,7 +24,6 @@ router.delete('/delUser', deleteUser); //! need: userId  --> deletedUser
 
 //* AUTH (need userId and token in cookie)
 router.delete('/resetCookies', authentified, deleteCookies);
-
 router.get('/home', authentified, returnPasswList); //! --> allPassw, categPassw
 
 router.post('/addPsw', authentified, addPassword); //! need: newPassw  --> pswId

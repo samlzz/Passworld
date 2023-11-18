@@ -13,8 +13,11 @@ export const addCategory = (req: exp.Request, res: exp.Response) => {
     )
         .then((result) => {
             if (!result) useError(res, { err: "User don't found" });
+            const addedCateg = result.pswByCateg.find(
+                (categ) => categ.name === newCateg.name
+            );
             useReturn(res, 'Category succesfully added', 200, {
-                addedCateg: result,
+                addedCateg: addedCateg._id,
             });
         })
         .catch((e) => useError(res, e));
@@ -28,9 +31,15 @@ export const deleteCategory = (req: exp.Request, res: exp.Response) => {
                 useError(res, { err: 'Category not found' }, 404);
             }
             const categLess = user;
-            categLess.pswByCateg = categLess.pswByCateg.filter(
-                (categ) => !categ._id.toString() === categId
-            );
+            categLess.pswByCateg = categLess.pswByCateg.filter((categ) => {
+                if (categ.name === 'SearchContent') {
+                    return true;
+                }
+                if (categ._id.toString() === categId) {
+                    return false;
+                }
+                return true;
+            });
             categLess
                 .save()
                 .then(() => useReturn(res, 'Category succesfully deleted'))

@@ -113,14 +113,14 @@ export function FolderOfTab({
                     />
                     <FolderName> {title} </FolderName>
                 </ElemPassw>
-                <StyledDelete
-                    onClick={() =>
-                        typeof isDeleted === 'function' ? isDeleted() : null
-                    }
-                    $isClick={IsSelect}
-                >
-                    <StyledIco src={del} alt="delete" />
-                </StyledDelete>
+                {typeof isDeleted === 'function' && (
+                    <StyledDelete
+                        onClick={() => isDeleted()}
+                        $isClick={IsSelect}
+                    >
+                        <StyledIco src={del} alt="delete" />
+                    </StyledDelete>
+                )}
             </FolderDiv>
             {IsSelect &&
                 allPassw.map((mdp) => (

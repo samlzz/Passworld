@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import { useNavigate } from 'react-router';
 import { IDefaultDataValu, ProviderProps, IData, IPassw, ICateg } from './type';
+import { CatchErrorAlert } from '../Components/SweetAlert';
 
 const defaultDataCtxtValu: IDefaultDataValu = {
     allPsw: [],
@@ -128,7 +129,7 @@ export function DataProvider({ children }: ProviderProps) {
                 }
             })
             .catch((err) => {
-                console.warn(err);
+                CatchErrorAlert(err);
                 if (err.response && err.response.status === 401) {
                     navigate('/');
                 }
@@ -168,7 +169,7 @@ export function DataProvider({ children }: ProviderProps) {
                 }));
             })
             .catch((err) => {
-                console.warn(err);
+                CatchErrorAlert(err);
                 if (err.response && err.response.status === 401) {
                     navigate('/');
                 }
@@ -237,7 +238,7 @@ export function DataProvider({ children }: ProviderProps) {
                 }
             })
             .catch((err) => {
-                console.warn(err);
+                CatchErrorAlert(err);
                 if (err.response && err.response.status === 401) {
                     navigate('/');
                 }
@@ -245,7 +246,7 @@ export function DataProvider({ children }: ProviderProps) {
     };
 
     const addNewCateg = (newCategNm: string, categNameArr: string[]) => {
-        if (newCategNm in categNameArr) {
+        if (categNameArr.includes(newCategNm)) {
             console.log('Categ already exist');
             return;
         }
@@ -259,6 +260,7 @@ export function DataProvider({ children }: ProviderProps) {
                 console.log(resp);
                 if (resp.status === 200) {
                     const { addedCateg } = resp.data;
+                    console.log('dans resp', addedCateg);
                     const existingCateg = pswByCateg.find(
                         (categ) => categ._id === addedCateg._id
                     );
@@ -270,19 +272,19 @@ export function DataProvider({ children }: ProviderProps) {
                     const newPswByCateg = [
                         ...pswByCateg,
                         {
-                            _id: resp.data.addedCateg._id,
+                            _id: resp.data.addedCateg,
                             name: newCategNm,
                             passwords: [],
                         },
                     ];
-
+                    console.log(newPswByCateg);
                     addData({ pswByCateg: newPswByCateg });
                 } else if (resp.status === 401) {
                     navigate('/');
                 }
             })
             .catch((err) => {
-                console.warn(err);
+                CatchErrorAlert(err);
                 if (err.response && err.response.status === 401) {
                     navigate('/');
                 }
@@ -300,7 +302,7 @@ export function DataProvider({ children }: ProviderProps) {
                 if (resp.status === 200) {
                     setData((prev) => {
                         const filteredCateg = pswByCateg.filter(
-                            (categ) => !(categ._id === categIdToDel)
+                            (categ) => categ._id !== categIdToDel
                         );
                         return {
                             ...prev,
@@ -310,7 +312,7 @@ export function DataProvider({ children }: ProviderProps) {
                 }
             })
             .catch((err) => {
-                console.warn(err);
+                CatchErrorAlert(err);
                 if (err.response && err.response.status === 401) {
                     navigate('/');
                 }

@@ -241,10 +241,10 @@ export function AddCategPopup({
 
     const handleValidClick = () => {
         setPopupValid(true);
+        isPopup(popupIsValid);
         if (newCateg) {
             getNewCateg(newCateg);
         }
-        isPopup(popupIsValid);
     };
     const handleCickAway = () => {
         setPopupValid(true);
@@ -253,7 +253,7 @@ export function AddCategPopup({
 
     const validRef = React.useRef(null);
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && validRef) {
             validRef.current.click();
         }
     };

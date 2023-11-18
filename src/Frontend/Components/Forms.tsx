@@ -1,12 +1,13 @@
-import { useState } from 'react';
 import styled from 'styled-components';
-
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
+
 import submitLogo from '../assets/logoPW/SubmitLogo.png';
 import openedeys from '../assets/Icones/PasswCard/oeuil_ouvert.svg';
 import closedeys from '../assets/Icones/PasswCard/oeuil_fermer.svg';
 import { EyesProps, ForRegisterProps, FormsProps } from '../Utils/type';
+import { CatchErrorAlert, ErrorAlert } from './SweetAlert';
 
 // Début du style -------------->
 const PageParent = styled.div`
@@ -96,15 +97,15 @@ export function BegginForms({ title, noAccount }: FormsProps) {
             | React.MouseEvent<HTMLButtonElement>
     ) => {
         event.preventDefault();
+        if (email === '' || password === '') {
+            ErrorAlert('Need to provide email, password and confirmation');
+            return;
+        }
         let apiUrl;
         if (noAccount) {
             apiUrl = 'http://localhost:3000/register';
             if (password !== confirmPsw) {
-                console.log('2 passwords are different'); // todo: faire une popup qui demande de saisir 2 mdp identique
-                return;
-            }
-            if (email === '' || password === '') {
-                console.log('need email, password and confirmation');
+                ErrorAlert('Confirmation is different of password');
                 return;
             }
         } else {
@@ -122,7 +123,7 @@ export function BegginForms({ title, noAccount }: FormsProps) {
                     navigate('/home');
                 }
             })
-            .catch((err) => console.warn(err));
+            .catch((error: AxiosError) => CatchErrorAlert(error));
     };
 
     const handleGetLetter = (e: React.ChangeEvent<HTMLInputElement>) => {
