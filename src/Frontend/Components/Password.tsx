@@ -6,7 +6,7 @@ import cross from '../assets/Icones/crossWhite.svg';
 import check from '../assets/Icones/Valid.svg';
 import ico from '../assets/logoPW/defaultIcoDark.png';
 import eysClose from '../assets/Icones/PasswCard/oeuil_fermer.svg';
-import eysOpen from '../assets/Icones/PasswCard/eye-solid (1).svg';
+import eysOpen from '../assets/Icones/PasswCard/eye-solid1.svg';
 
 import { IPassw, ContainerProps, CreatePswProps, ICateg } from '../Utils/type';
 import SelectBox from './Material_Ui/SelectBox';
@@ -91,12 +91,11 @@ const MdpContainer = styled.div`
     gap: 1vw;
     position: relative;
 `;
-const StyledShow = styled.button(
-    ({ theme }) => `
+const StyledShow = styled.button<{ $isEdit?: boolean }>(
+    ({ theme, $isEdit }) => `
     position: absolute;
-    right: 14.1vw;
-    padding: 0 0.6vw 0 -0.1vw;
-    bottom: 6.3vw;
+    right: 14.4vw;
+    bottom: ${$isEdit ? `5.65vw;` : `6.3vw;`}
     background: ${theme.selected};
     box-shadow: -10px 0 6px -2px ${theme.selected};
 `
@@ -142,7 +141,13 @@ function getInitPassw(passw?: IPassw): IPassw {
     };
 }
 
-export function CreatePassw({ newPassw, closed, aPassw }: CreatePswProps) {
+export function CreatePassw({
+    newPassw,
+    newCateg,
+    closed,
+    aPassw,
+    isEdit,
+}: CreatePswProps) {
     const [aPassword, setPassword] = useState<IPassw>(getInitPassw(aPassw));
     const [isHide, setIsHide] = useState(false);
     const [hidenMdpVal, setHidenMdpVal] = useState('');
@@ -152,7 +157,7 @@ export function CreatePassw({ newPassw, closed, aPassw }: CreatePswProps) {
 
     const icoInputRef = useRef<HTMLInputElement | null>(null);
     const validRef = useRef<HTMLButtonElement | null>(null);
-    const { addNewCateg, pswByCateg } = useData();
+    const { pswByCateg } = useData();
 
     function makeCategArr(
         listfolderList: ICateg[],
@@ -243,42 +248,6 @@ export function CreatePassw({ newPassw, closed, aPassw }: CreatePswProps) {
 
     const { titre, siteAddress, identifier, mdp, categName } = aPassword;
 
-    // const fetchIco = (siteLink: string) => {
-    //     const withoutPref = siteLink.replace(/https?:\/\/(www\.)?/i, ''); // ? Supprimer le préfixe (http, https, www)
-    //     const domain = withoutPref.split('/')[0]; // ? Extraire nom de domaine (jusqu'au premier "/")
-
-    //     const icoLink = `https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://www.${domain.toLowerCase()}&size=50`;
-
-    //     return axios
-    //         .get(icoLink, {
-    //             responseType: 'arraybuffer', // pour obtenir l'image sous forme de Blob
-    //             withCredentials: false,
-    //         })
-    //         .then((response) => {
-    //             const base64 = btoa(
-    //                 new Uint8Array(response.data).reduce(
-    //                     (data, byte) => data + String.fromCharCode(byte),
-    //                     ''
-    //                 )
-    //             );
-    //             return `data:image/png;base64,${base64}`;
-    //         });
-    // };
-
-    // useEffect(() => {
-    //     fetchIco(siteAddress)
-    //         .then((icoSrc) => {
-    //             setPassword((prevState) => ({
-    //                 ...prevState,
-    //                 icoLink: icoSrc,
-    //             }));
-    //         })
-    //         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    //         .catch((_error) => {
-    //             console.error("Erreur lors de la récupération de l'image:");
-    //         });
-    // }, [isValided]);
-
     return (
         <PageContainer onKeyDown={handleKeyDown}>
             <Backgrnd onClick={() => closed(true)} />
@@ -351,7 +320,7 @@ export function CreatePassw({ newPassw, closed, aPassw }: CreatePswProps) {
                         value={isHide ? hidenMdpVal : mdp}
                         onChange={isHide ? handleGetLetter : handleShowMdp}
                     />
-                    <StyledShow onClick={handleIsHide}>
+                    <StyledShow $isEdit={isEdit} onClick={handleIsHide}>
                         <ShowImg src={isHide ? eysOpen : eysClose} alt="show" />
                     </StyledShow>
                     <GenerPopup
@@ -372,9 +341,7 @@ export function CreatePassw({ newPassw, closed, aPassw }: CreatePswProps) {
                     anchor={anchor}
                     open={isCategMenu}
                     isPopup={(resp) => setIsCategValid(resp)}
-                    getNewCateg={(NouvCateg) =>
-                        addNewCateg(NouvCateg, makeCategArr(pswByCateg))
-                    }
+                    getNewCateg={(NouvCateg) => newCateg(NouvCateg)}
                 />
             ) : (
                 <></>

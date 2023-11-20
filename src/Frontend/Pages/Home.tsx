@@ -75,19 +75,7 @@ const AddPassw = styled.button`
 const AddShape = styled.img`
     width: 6vw;
 `;
-const CopySucces = styled.span`
-    position: fixed;
-    bottom: 2vh;
-    left: 50%;
-    align-self: center;
-    background-color: ${({ theme }) => theme.darkSecondary};
-    width: 13vw;
-    height: 2.5vw;
-    border-radius: 1vw;
-    padding: 1vw 0 0 1.4vw; //haut droite bas gauche
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    opacity: 0.9;
-`;
+
 const AddCategButt = styled.button`
     display: flex;
     align-items: center;
@@ -118,7 +106,6 @@ export function Home({ isRendered }: HomeProps) {
 
     const [folderOpen, setFolderOpen] = useState('');
     const [isSearching, setIsSearching] = useState(false);
-    const [isCopy, setIsCopy] = useState(false);
     const [isCreate, setIsCreate] = useState(false);
     const [isAddCateg, setIsAddCateg] = useState(false);
     const [selectFolder, setSelectFold] = useState<IPassw[] | null>(null);
@@ -160,6 +147,7 @@ export function Home({ isRendered }: HomeProps) {
         axios
             .get('http://localhost:3000/home')
             .then((resp) => {
+                console.log(resp);
                 if (resp.status === 200) {
                     const { allPassw, categPassw }: IHomeServData = resp.data;
                     const searchCateg: ICateg = {
@@ -184,15 +172,6 @@ export function Home({ isRendered }: HomeProps) {
                 navigate('/');
             });
     }, []);
-    useEffect(() => {
-        if (isCopy) {
-            const timer = setTimeout(() => {
-                setIsCopy(false);
-            }, 1500); // 1.5 secondes
-            return () => clearTimeout(timer);
-        }
-        return () => null;
-    }, [isCopy]);
 
     const handleDelPsw = (categOf: string, id: string) => {
         const selectedCat = getCategByName(categOf);
@@ -302,19 +281,23 @@ export function Home({ isRendered }: HomeProps) {
                         <PasswCard
                             key={passw._id}
                             aPassw={passw}
-                            copyIsSucces={(isCopied) => setIsCopy(isCopied)}
                             toDelete={handleDelPsw}
+                            nouvCateg={(nouvCateg) =>
+                                addNewCateg(nouvCateg, makeCategArr(pswByCateg))
+                            }
                         />
                     ))}
                 </CardContainer>
             ) : selectFolder ? (
                 <CardContainer>
-                    {selectFolder.map((passw) => (
+                    {selectFolder.map((passw, i) => (
                         <PasswCard
-                            key={passw._id}
+                            key={`${passw._id}--${i}`}
                             aPassw={passw}
-                            copyIsSucces={(isCopied) => setIsCopy(isCopied)}
                             toDelete={handleDelPsw}
+                            nouvCateg={(nouvCateg) =>
+                                addNewCateg(nouvCateg, makeCategArr(pswByCateg))
+                            }
                         />
                     ))}
                 </CardContainer>
@@ -324,11 +307,13 @@ export function Home({ isRendered }: HomeProps) {
                 <AddShape src={plusButt} alt="plus button" />
             </AddPassw>
 
-            {isCopy ? <CopySucces>Copied to clipboard</CopySucces> : null}
             {isCreate ? (
                 <CreatePassw
                     newPassw={(newPssw) => addPassw(newPssw)}
                     closed={(toClose) => setIsCreate(!toClose)}
+                    newCateg={(newCtgNm) =>
+                        addNewCateg(newCtgNm, makeCategArr(pswByCateg))
+                    }
                 />
             ) : null}
         </PageHome>

@@ -4,8 +4,11 @@ var pswSchema = new Schema({
     titre: { type: String, required: true },
     siteAddress: { type: String, required: true },
     identifier: { type: String, required: true },
-    mdp: { type: String, required: true },
     icoLink: String,
+    mdp: {
+        iv: { type: String, required: true },
+        encryptedMdp: { type: String, required: true },
+    },
 });
 var notNullValidator = {
     validator: function (value) {

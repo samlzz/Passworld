@@ -1,16 +1,21 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
+export interface CryptedPsw {
+    iv: string;
+    encryptedMdp: string;
+}
+
 export interface IPassw extends Document {
     _id: Types.ObjectId;
     categName?: string;
     titre: string;
     siteAddress: string;
     identifier: string;
-    mdp: string;
+    mdp: CryptedPsw;
     icoLink?: string;
 }
-export interface ICateg {
-    _id?: Types.ObjectId;
+export interface ICateg extends Document {
+    _id: Types.ObjectId;
     name: string;
     passwords: Array<IPassw>;
 }
@@ -29,8 +34,11 @@ const pswSchema = new Schema<IPassw>({
     titre: { type: String, required: true },
     siteAddress: { type: String, required: true },
     identifier: { type: String, required: true },
-    mdp: { type: String, required: true },
     icoLink: String,
+    mdp: {
+        iv: { type: String, required: true },
+        encryptedMdp: { type: String, required: true },
+    },
 });
 const notNullValidator = {
     validator(value: IPassw[] | null): boolean {

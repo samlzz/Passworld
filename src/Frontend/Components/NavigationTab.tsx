@@ -123,8 +123,8 @@ export function FolderOfTab({
                 )}
             </FolderDiv>
             {IsSelect &&
-                allPassw.map((mdp) => (
-                    <ElemOfTab key={mdp._id.toString()} aPassw={mdp} />
+                allPassw.map((mdp, i) => (
+                    <ElemOfTab key={`${mdp._id}--${i}`} aPassw={mdp} />
                 ))}
         </>
     );

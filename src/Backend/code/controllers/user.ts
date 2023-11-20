@@ -4,38 +4,39 @@ import { compare, hash } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Types } from 'mongoose';
 
-import { useError, useReturn } from '../middleware/func.js';
-import { ICateg, User } from '../models/model_user.js';
+import { encrypt, getEnvVar, useError, useReturn } from '../middleware/func.js';
+import { User } from '../models/model_user.js';
 
 function makeTokenAndReturn(
     res: exp.Response,
     IsLogin: boolean,
     IdOfUser: Types.ObjectId
 ) {
-    const token = jwt.sign(
-        { userId: IdOfUser },
-        'RANDOM_TOKEN_SECRET', // todo: changer par chaine complexe
-        { expiresIn: '24h' }
-    );
+    const token = jwt.sign({ userId: IdOfUser.toHexString() }, getEnvVar(res), {
+        expiresIn: '24h',
+    });
     res.cookie('token', token, {
         httpOnly: true, // ?pas accessible via JavaScript
-        // todo: décommenter quand site en HTTPS
-        // secure: true, //? Le cookie est envoyé uniquement sur HTTPS
+        // secure: true, //? Le cookie est envoyé uniquement sur HTTPS  ||  décommenter quand site en HTTPS
         sameSite: 'strict', // ?pas envoyé avec les requêtes cross-site
         maxAge: 24 * 60 * 60 * 1000, // ?expiration de 24 heures
     });
-    res.cookie('userId', IdOfUser, {
-        httpOnly: true,
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000,
-    });
+    res.cookie(
+        'userId',
+        encrypt(IdOfUser.toHexString(), getEnvVar(res, true)),
+        {
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        }
+    );
     if (IsLogin) {
         return useReturn(res, 'User was login');
     }
     return useReturn(res, 'User was created');
 }
 
-const searchCateg: ICateg = {
+const searchCateg = {
     name: 'SearchContent',
     passwords: [],
 };

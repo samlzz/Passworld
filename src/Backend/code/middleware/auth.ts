@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import exp from 'express';
-import { useError } from './func.js';
+import { decrypt, getEnvVar, useError } from './func.js';
 
 interface DecodedToken extends JwtPayload {
     userId: string;
@@ -22,12 +22,10 @@ export const authentified = (
 ) => {
     try {
         const { token } = req.cookies;
-        const decodedToken = jwt.verify(
-            token,
-            'RANDOM_TOKEN_SECRET'
-        ) as DecodedToken;
+        const decodedToken = jwt.verify(token, getEnvVar(res)) as DecodedToken;
         const { userId } = decodedToken;
-        if (userId !== req.cookies.userId) {
+        const decryptedID = decrypt(req.cookies.userId, getEnvVar(res, true));
+        if (userId !== decryptedID) {
             useError(res, { err: 'Veuillez vous reconnectez' }, 401);
         }
         req.auth = {

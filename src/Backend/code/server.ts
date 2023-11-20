@@ -1,5 +1,6 @@
 import http from 'http';
 import app from './app.js';
+import logger from './middleware/log.js';
 
 // Utilisez le type number | string | boolean pour le retour de la fonction normPort
 const normPort = (val: string): number | string | boolean => {
@@ -21,6 +22,7 @@ app.set('port', port);
 const serveur = http.createServer(app);
 
 const gestErreur = (error: NodeJS.ErrnoException): void => {
+    logger.error(error);
     if (error.syscall !== 'listen') {
         throw error;
     }
@@ -51,3 +53,5 @@ serveur.on('listening', () => {
 });
 
 serveur.listen(port);
+
+export default serveur;

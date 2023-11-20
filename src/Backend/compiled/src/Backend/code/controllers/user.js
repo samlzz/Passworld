@@ -1,18 +1,18 @@
 import { compare, hash } from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { useError, useReturn } from '../middleware/func.js';
+import { encrypt, getEnvVar, useError, useReturn } from '../middleware/func.js';
 import { User } from '../models/model_user.js';
 function makeTokenAndReturn(res, IsLogin, IdOfUser) {
-    var token = jwt.sign({ userId: IdOfUser }, 'RANDOM_TOKEN_SECRET', // todo: changer par chaine complexe
-    { expiresIn: '24h' });
+    var token = jwt.sign({ userId: IdOfUser.toHexString() }, getEnvVar(res), {
+        expiresIn: '24h',
+    });
     res.cookie('token', token, {
         httpOnly: true,
-        // todo: décommenter quand site en HTTPS
-        // secure: true, //? Le cookie est envoyé uniquement sur HTTPS
+        // secure: true, //? Le cookie est envoyé uniquement sur HTTPS  ||  décommenter quand site en HTTPS
         sameSite: 'strict',
         maxAge: 24 * 60 * 60 * 1000, // ?expiration de 24 heures
     });
-    res.cookie('userId', IdOfUser, {
+    res.cookie('userId', encrypt(IdOfUser.toHexString(), getEnvVar(res, true)), {
         httpOnly: true,
         sameSite: 'strict',
         maxAge: 24 * 60 * 60 * 1000,

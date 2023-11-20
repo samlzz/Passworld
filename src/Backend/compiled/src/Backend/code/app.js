@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 //* IMPORTS
 import express from 'express';
 import pkg from 'mongoose';
 import cookieParser from 'cookie-parser';
 import router from './routes.js';
-var connect = pkg.connect, connection = pkg.connection;
+import logger from './middleware/log.js';
+import serveur from './server.js';
+import { useError } from './middleware/func.js';
+var connect = pkg.connect;
 //* INIT APP
 var app = express();
 //* CORS
@@ -19,23 +23,32 @@ app.use(function (req, res, next) {
     next();
 });
 //* CONNEXION MONGODB
-connect('mongodb+srv://sam:zaXMBRLuasccCUKv@cluster0.wpyzmou.mongodb.net/passworld')
-    .then(function () {
-    console.log('MongoDB are on');
-})
-    .catch(function () {
-    console.log('MongoDB are off');
-});
+var connectWithRetry = function (url, maxRetries) {
+    if (maxRetries === void 0) { maxRetries = 10; }
+    connect(url)
+        .then(function () {
+        logger.info('MongoDB est connecté');
+        console.log('Serveur correctement lancé');
+    })
+        .catch(function (err) {
+        logger.error('Erreur de connexion à MongoDB:', err);
+        if (maxRetries > 0) {
+            setTimeout(function () { return connectWithRetry(url, maxRetries - 1); }, 5000); // Réessayer après 5 secondes
+        }
+        else if (maxRetries === 0) {
+            console.log('Serveur arrêté');
+            serveur.close(function () { return logger.error('Serveur arrêté'); });
+        }
+    });
+};
+connectWithRetry('mongodb+srv://sam:zaXMBRLuasccCUKv@cluster0.wpyzmou.mongodb.net/passworld');
 //* ALLOW ACCES TO DATA IN .JSON
 app.use(express.json()); // ? for application/json
 app.use(cookieParser());
 //* SEND REQUEST TO ROUTER
 app.use('', router);
-//* TEST FOR DEV
-// check connexion to database
-app.get('/mongodb', function (req, res, next) {
-    var DbIsCo = connection.readyState === 1 ? 'connected' : 'disconnected';
-    res.json("MongoDB is ".concat(DbIsCo));
-    next();
+//* GET ERROR
+app.use(function (err, req, res, next) {
+    useError(res, { err: 'Quelque chose a mal tourné !' });
 });
 export default app;

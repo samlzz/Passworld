@@ -108,8 +108,8 @@ export interface FolderOfTabProps {
 // ? Password Card:
 export interface PasswCardProps {
     aPassw: IPassw;
-    copyIsSucces: (isCopied: boolean) => void;
     toDelete: (categName: string, id: string) => void;
+    nouvCateg: (nouvCategName: string) => void;
 }
 // ? Search Bar:
 export interface SearchBarProps {
@@ -125,7 +125,9 @@ export interface ContainerProps {
 export interface CreatePswProps {
     closed: (toDo: boolean) => void;
     newPassw: (newPsw: IPassw) => void;
+    newCateg: (newCategName: string) => void;
     aPassw?: IPassw | undefined;
+    isEdit?: boolean;
 }
 // ? Material UI:
 export interface SelectBoxProps {

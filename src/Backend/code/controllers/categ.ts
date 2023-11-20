@@ -1,11 +1,11 @@
 import exp from 'express';
 
-import { ICateg, User } from '../models/model_user.js';
+import { User } from '../models/model_user.js';
 import { useError, useReturn } from '../middleware/func.js';
 
 export const addCategory = (req: exp.Request, res: exp.Response) => {
     const { userId } = req.auth;
-    const newCateg: ICateg = { name: req.body.categName, passwords: [] };
+    const newCateg = { name: req.body.categName, passwords: [] };
     User.findByIdAndUpdate(
         userId,
         { $push: { pswByCateg: newCateg } },

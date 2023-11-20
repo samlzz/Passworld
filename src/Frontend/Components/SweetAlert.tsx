@@ -14,16 +14,26 @@ export function ErrorAlert(text: string) {
 
 export function AxiosErrAlert(error: AxiosError) {
     console.warn(error);
-    Swal.fire({
-        title: 'Error',
-        text: error.response?.statusText,
-        icon: 'error',
-        background: '#141B2F',
-        color: '#FFFFFFCC',
-    });
+    if (error.response?.statusText)
+        Swal.fire({
+            title: 'Error',
+            text: error.response?.statusText,
+            icon: 'error',
+            background: '#141B2F',
+            color: '#FFFFFFCC',
+        });
+    else
+        Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            background: '#141B2F',
+            color: '#FFFFFFCC',
+        });
 }
 
 export function CatchErrorAlert(error: AxiosError) {
+    console.log(error);
     const data = error.response?.data as { err: string };
     if (data?.err) {
         ErrorAlert(data.err);

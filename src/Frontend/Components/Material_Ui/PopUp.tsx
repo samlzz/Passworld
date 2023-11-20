@@ -253,7 +253,7 @@ export function AddCategPopup({
 
     const validRef = React.useRef(null);
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter' && validRef) {
+        if (event.key === 'Enter' && validRef.current) {
             validRef.current.click();
             event.preventDefault();
         }
