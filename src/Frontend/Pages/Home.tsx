@@ -257,6 +257,7 @@ export function Home({ isRendered }: HomeProps) {
                                 }}
                                 IsSelect={folderOpen === categ.name}
                                 isDeleted={() => delCateg(categ._id)}
+                                categId={categ._id}
                             />
                         )
                 )}

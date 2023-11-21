@@ -57,6 +57,7 @@ export interface IDefaultDataValu {
     editPassw: (editedPsw: IPassw) => void;
     addNewCateg: (newCategNm: string, categNameArr: string[]) => void;
     delCateg: (categIdToDel: string) => void;
+    moveOfCateg: (categId: string, passwId: string) => void;
 }
 
 //* pages Interfaces:
@@ -101,9 +102,14 @@ export interface ElemOfTabProps {
 export interface FolderOfTabProps {
     title: string;
     allPassw: IPassw[];
-    whoIsClick: (isIt: string) => void;
     IsSelect: boolean;
+    categId?: string;
+    whoIsClick: (isIt: string) => void;
     isDeleted?: () => void;
+}
+export interface Iitem {
+    id: string;
+    type: string;
 }
 // ? Password Card:
 export interface PasswCardProps {

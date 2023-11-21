@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import styled from 'styled-components';
+import { useDrag } from 'react-dnd/dist/hooks';
 
 import eysClose from '../assets/Icones/PasswCard/oeuil_fermer.svg';
 import eysOpen from '../assets/Icones/PasswCard/eye-solid1.svg';
@@ -130,6 +131,11 @@ export function PasswCard({ aPassw, toDelete, nouvCateg }: PasswCardProps) {
         }));
     }
 
+    const [, dragRef] = useDrag(() => ({
+        type: 'PASSWCARD',
+        item: { id: _id, type: 'PASSWCARD' },
+    }));
+
     useEffect(() => {
         if (isCopied) {
             const timer = setTimeout(() => {
@@ -160,7 +166,7 @@ export function PasswCard({ aPassw, toDelete, nouvCateg }: PasswCardProps) {
 
     return (
         <>
-            <CardDiv>
+            <CardDiv ref={dragRef}>
                 <StyledEdit onClick={() => setIsEdit(true)}>
                     <IcoImg src={editIco} alt="edit" />
                 </StyledEdit>

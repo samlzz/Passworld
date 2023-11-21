@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import { useDrop } from 'react-dnd/dist/hooks';
+
 import clickedFleche from '../assets/svgShape/Polygon.svg';
 import fleche from '../assets/svgShape/Polygon _.svg';
 import del from '../assets/Icones/PasswCard/suppr.svg';
@@ -9,7 +11,9 @@ import {
     ElemOfTabProps,
     FolderOfTabProps,
     FoldDivProps,
+    Iitem,
 } from '../Utils/type';
+import { useData } from '../Utils/contexte';
 
 // Début du style -------------->
 const FolderDiv = styled.div<FoldDivProps>`
@@ -89,13 +93,23 @@ export function ElemOfTab({ aPassw }: ElemOfTabProps) {
 export function FolderOfTab({
     title,
     allPassw,
-    whoIsClick,
     IsSelect,
+    whoIsClick,
     isDeleted,
+    categId,
 }: FolderOfTabProps) {
+    const { moveOfCateg } = useData();
+    const [, dropRef] = useDrop(() => ({
+        accept: 'PASSWCARD',
+        drop: (item: Iitem) => {
+            if (item.type === 'PASSWCARD' && categId) {
+                moveOfCateg(categId, item.id);
+            }
+        },
+    }));
     return (
-        <>
-            <FolderDiv $isClick={IsSelect}>
+        <div>
+            <FolderDiv $isClick={IsSelect} ref={dropRef}>
                 <ElemPassw
                     onMouseDown={() => {
                         if (IsSelect) {
@@ -126,6 +140,6 @@ export function FolderOfTab({
                 allPassw.map((mdp, i) => (
                     <ElemOfTab key={`${mdp._id}--${i}`} aPassw={mdp} />
                 ))}
-        </>
+        </div>
     );
 }

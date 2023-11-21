@@ -119,46 +119,106 @@ export const deletePassword = (req: exp.Request, res: exp.Response) => {
         .catch((e) => useError(res, e));
 };
 
+// export const replacePassw = (req: exp.Request, res: exp.Response) => {
+//     const { editedPsw } = req.body;
+
+//     function replaceGoodPsw(listOfPsw: IPassw[], userID: string) {
+//         console.log(editedPsw);
+//         const editedCrypt = {
+//             ...editedPsw,
+//             mdp: encrypt(editedPsw.mdp, userID),
+//         };
+//         console.log('var', listOfPsw);
+//         const crtyptedList = listOfPsw.map((passw) => {
+//             if (passw.categName === editedCrypt.categName) {
+//                 return editedCrypt;
+//             }
+//             return passw;
+//         });
+//         console.log('return', crtyptedList);
+//         return crtyptedList;
+//     }
+
+//     User.findById(req.auth.userId)
+//         .then((user) => {
+//             if (!user) {
+//                 useError(res, { err: 'Password not found' }, 404);
+//             }
+//             const editedUser = user;
+//             editedUser.allPassw = replaceGoodPsw(
+//                 editedUser.allPassw,
+//                 user._id.toHexString()
+//             );
+//             if (editedPsw.categName) {
+//                 editedUser.pswByCateg = editedUser.pswByCateg.map((categ) => {
+//                     if (categ.name === editedPsw.categName) {
+//                         return {
+//                             ...categ,
+//                             passwords: replaceGoodPsw(
+//                                 categ.passwords,
+//                                 user._id.toHexString()
+//                             ),
+//                         } as ICateg;
+//                     }
+//                     return categ;
+//                 });
+//                 // console.log(editedUser.pswByCateg[1].passwords);
+//             }
+//             editedUser
+//                 .save()
+//                 .then(() => useReturn(res, 'Password succesfully edited'))
+//                 .catch((e) => useError(res, e));
+//         })
+//         .catch((e) => useError(res, e));
+// };
+
 export const replaceAPsw = (req: exp.Request, res: exp.Response) => {
     const { editedPsw } = req.body;
-
-    function replaceGoodPsw(listOfPsw: IPassw[], userID: string) {
-        const editedCrypt = {
-            ...editedPsw,
-            mdp: encrypt(editedPsw.mdp, userID),
-        };
-        return listOfPsw.map((passw) => {
-            if (passw._id.equals(new Types.ObjectId(editedPsw._id))) {
-                return editedCrypt;
-            }
-            return passw;
-        });
-    }
-
+    const cryptEditPsw: IPassw = {
+        ...editedPsw,
+        mdp: encrypt(editedPsw.mdp, req.auth.userId),
+    };
     User.findById(req.auth.userId)
         .then((user) => {
             if (!user) {
                 useError(res, { err: 'Password not found' }, 404);
             }
             const editedUser = user;
-            editedUser.allPassw = replaceGoodPsw(
-                editedUser.allPassw,
-                user._id.toHexString()
+            const oldPsw = editedUser.allPassw.find(
+                (psw) => psw._id.toHexString() === editedPsw._id
             );
-            if (editedPsw.categName) {
-                editedUser.pswByCateg = editedUser.pswByCateg.map((categ) => {
-                    if (categ.name === editedPsw.categName) {
-                        return {
-                            ...categ,
-                            passwords: replaceGoodPsw(
-                                categ.passwords,
-                                user._id.toHexString()
-                            ),
-                        } as ICateg;
-                    }
-                    return categ;
-                });
-            }
+            editedUser.allPassw = editedUser.allPassw.map((psw) => {
+                if (psw._id.toHexString() === editedPsw._id)
+                    return cryptEditPsw;
+                return psw;
+            });
+
+            editedUser.pswByCateg = editedUser.pswByCateg.map((categ) => {
+                // ? on retire le mot de passe de son ancienne categ
+                if (
+                    categ.name === oldPsw.categName &&
+                    categ.name !== cryptEditPsw.categName
+                ) {
+                    const passwords = categ.passwords.filter(
+                        (psw) =>
+                            !psw._id.equals(new Types.ObjectId(editedPsw._id))
+                    );
+                    return {
+                        ...categ,
+                        passwords,
+                    };
+                }
+                // ? on ajoute le mot de passe dans sa nouvelle categ
+                if (categ.name === cryptEditPsw.categName) {
+                    const updatedPsws = categ.passwords;
+                    updatedPsws.push(cryptEditPsw);
+                    return {
+                        ...categ,
+                        passwords: updatedPsws,
+                    };
+                }
+                return categ;
+            }) as ICateg[];
             editedUser
                 .save()
                 .then(() => useReturn(res, 'Password succesfully edited'))

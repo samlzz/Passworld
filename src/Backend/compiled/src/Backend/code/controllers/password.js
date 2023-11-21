@@ -77,7 +77,7 @@ export var addPassword = function (req, res) {
                         return [2 /*return*/, "data:image/png;base64,".concat(base64)];
                     case 2:
                         error_1 = _a.sent();
-                        logger.error("Erreur lors de la récupération de l'image", error_1);
+                        logger.error("Erreur lors de la récupération de l'image");
                         return [2 /*return*/, null];
                     case 3: return [2 /*return*/];
                 }
@@ -163,32 +163,88 @@ export var deletePassword = function (req, res) {
     })
         .catch(function (e) { return useError(res, e); });
 };
+// export const replacePassw = (req: exp.Request, res: exp.Response) => {
+//     const { editedPsw } = req.body;
+//     function replaceGoodPsw(listOfPsw: IPassw[], userID: string) {
+//         console.log(editedPsw);
+//         const editedCrypt = {
+//             ...editedPsw,
+//             mdp: encrypt(editedPsw.mdp, userID),
+//         };
+//         console.log('var', listOfPsw);
+//         const crtyptedList = listOfPsw.map((passw) => {
+//             if (passw.categName === editedCrypt.categName) {
+//                 return editedCrypt;
+//             }
+//             return passw;
+//         });
+//         console.log('return', crtyptedList);
+//         return crtyptedList;
+//     }
+//     User.findById(req.auth.userId)
+//         .then((user) => {
+//             if (!user) {
+//                 useError(res, { err: 'Password not found' }, 404);
+//             }
+//             const editedUser = user;
+//             editedUser.allPassw = replaceGoodPsw(
+//                 editedUser.allPassw,
+//                 user._id.toHexString()
+//             );
+//             if (editedPsw.categName) {
+//                 editedUser.pswByCateg = editedUser.pswByCateg.map((categ) => {
+//                     if (categ.name === editedPsw.categName) {
+//                         return {
+//                             ...categ,
+//                             passwords: replaceGoodPsw(
+//                                 categ.passwords,
+//                                 user._id.toHexString()
+//                             ),
+//                         } as ICateg;
+//                     }
+//                     return categ;
+//                 });
+//                 // console.log(editedUser.pswByCateg[1].passwords);
+//             }
+//             editedUser
+//                 .save()
+//                 .then(() => useReturn(res, 'Password succesfully edited'))
+//                 .catch((e) => useError(res, e));
+//         })
+//         .catch((e) => useError(res, e));
+// };
 export var replaceAPsw = function (req, res) {
     var editedPsw = req.body.editedPsw;
-    function replaceGoodPsw(listOfPsw, userID) {
-        var editedCrypt = __assign(__assign({}, editedPsw), { mdp: encrypt(editedPsw.mdp, userID) });
-        return listOfPsw.map(function (passw) {
-            if (passw._id.equals(new Types.ObjectId(editedPsw._id))) {
-                return editedCrypt;
-            }
-            return passw;
-        });
-    }
+    var cryptEditPsw = __assign(__assign({}, editedPsw), { mdp: encrypt(editedPsw.mdp, req.auth.userId) });
     User.findById(req.auth.userId)
         .then(function (user) {
         if (!user) {
             useError(res, { err: 'Password not found' }, 404);
         }
         var editedUser = user;
-        editedUser.allPassw = replaceGoodPsw(editedUser.allPassw, user._id.toHexString());
-        if (editedPsw.categName) {
-            editedUser.pswByCateg = editedUser.pswByCateg.map(function (categ) {
-                if (categ.name === editedPsw.categName) {
-                    return __assign(__assign({}, categ), { passwords: replaceGoodPsw(categ.passwords, user._id.toHexString()) });
-                }
-                return categ;
-            });
-        }
+        var oldPsw = editedUser.allPassw.find(function (psw) { return psw._id.toHexString() === editedPsw._id; });
+        editedUser.allPassw = editedUser.allPassw.map(function (psw) {
+            if (psw._id.toHexString() === editedPsw._id)
+                return cryptEditPsw;
+            return psw;
+        });
+        editedUser.pswByCateg = editedUser.pswByCateg.map(function (categ) {
+            // ? on retire le mot de passe de son ancienne categ
+            if (categ.name === oldPsw.categName &&
+                categ.name !== cryptEditPsw.categName) {
+                var passwords = categ.passwords.filter(function (psw) {
+                    return !psw._id.equals(new Types.ObjectId(editedPsw._id));
+                });
+                return __assign(__assign({}, categ), { passwords: passwords });
+            }
+            // ? on ajoute le mot de passe dans sa nouvelle categ
+            if (categ.name === cryptEditPsw.categName) {
+                var updatedPsws = categ.passwords;
+                updatedPsws.push(cryptEditPsw);
+                return __assign(__assign({}, categ), { passwords: updatedPsws });
+            }
+            return categ;
+        });
         editedUser
             .save()
             .then(function () { return useReturn(res, 'Password succesfully edited'); })

@@ -61,3 +61,23 @@ export function GoodAlert(title: string) {
         color: '#FFFFFFCC',
     });
 }
+
+const Tist = Swal.mixin({
+    toast: true,
+    position: 'bottom-start',
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+    },
+});
+export function BadAlert(title: string) {
+    Tist.fire({
+        icon: 'error',
+        title,
+        background: '#141B2F',
+        color: '#FFFFFFCC',
+    });
+}

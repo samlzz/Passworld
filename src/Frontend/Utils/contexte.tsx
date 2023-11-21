@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router';
 import { IDefaultDataValu, ProviderProps, IData, IPassw, ICateg } from './type';
 import {
+    BadAlert,
     CatchErrorAlert,
     ErrorAlert,
     GoodAlert,
@@ -23,6 +24,7 @@ const defaultDataCtxtValu: IDefaultDataValu = {
     addPassw: () => {},
     delPassw: () => {},
     editPassw: () => {},
+    moveOfCateg: () => {},
     addNewCateg: () => {},
     delCateg: () => {},
 };
@@ -196,6 +198,7 @@ export function DataProvider({ children }: ProviderProps) {
                 { headers: { 'Content-Type': 'application/json' } }
             )
             .then((resp) => {
+                console.log(resp);
                 if (resp.status === 200) {
                     GoodAlert(resp.data.msg);
                     const allPswUpdated = allPsw.map((psw) => {
@@ -247,6 +250,40 @@ export function DataProvider({ children }: ProviderProps) {
                     navigate('/');
                 }
             });
+    };
+    const moveOfCateg = (categId: string, passwId: string) => {
+        try {
+            const categToUpdate = pswByCateg.find((categ) => {
+                return categ.passwords.forEach((passw) => {
+                    if (passw._id === passwId) return true;
+                    return false;
+                });
+            });
+            const categToMove = pswByCateg.find((categ) => {
+                return categ._id === categId;
+            });
+            let pswChangedCateg: IPassw | undefined;
+            if (categToUpdate) {
+                pswChangedCateg = categToUpdate.passwords.find(
+                    (passw) => passw._id === passwId
+                ) as IPassw;
+            } else {
+                pswChangedCateg = allPsw.find(
+                    (passw) => passw._id === passwId
+                ) as IPassw;
+            }
+            if (categToMove) {
+                pswChangedCateg = {
+                    ...pswChangedCateg,
+                    categName: categToMove.name,
+                };
+                editPassw(pswChangedCateg);
+            } else {
+                throw new Error("Categ don't find");
+            }
+        } catch (error) {
+            BadAlert(`Failed to move password to categ`);
+        }
     };
 
     const addNewCateg = (newCategNm: string, categNameArr: string[]) => {
@@ -329,6 +366,7 @@ export function DataProvider({ children }: ProviderProps) {
             addPassw,
             delPassw,
             editPassw,
+            moveOfCateg,
             addNewCateg,
             delCateg,
         }),
