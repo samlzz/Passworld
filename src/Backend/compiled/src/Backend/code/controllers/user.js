@@ -2,6 +2,7 @@ import { compare, hash } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { encrypt, getEnvVar, useError, useReturn } from '../middleware/func.js';
 import { User } from '../models/model_user.js';
+import logger from '../middleware/log.js';
 function makeTokenAndReturn(res, IsLogin, IdOfUser) {
     var token = jwt.sign({ userId: IdOfUser.toHexString() }, getEnvVar(res), {
         expiresIn: '24h',
@@ -90,9 +91,11 @@ export var deleteCookies = function (req, res) {
     try {
         res.cookie('token', '', { expires: new Date(0) });
         res.cookie('userId', '', { expires: new Date(0) });
+        logger.info("Un utilisateur s'est d\u00E9connect\u00E9, SUCCES _id: ".concat(req.auth.userId));
         useReturn(res, 'Cookies have been reset');
     }
     catch (err) {
+        logger.info("Un utilisateur s'est d\u00E9connect\u00E9, ERROR _id: ".concat(req.auth.userId));
         useError(res, err);
     }
 };

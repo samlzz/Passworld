@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useDrop } from 'react-dnd/dist/hooks';
 
+import { useState } from 'react';
 import clickedFleche from '../assets/svgShape/Polygon.svg';
 import fleche from '../assets/svgShape/Polygon _.svg';
 import del from '../assets/Icones/PasswCard/suppr.svg';
@@ -26,7 +27,9 @@ const FolderDiv = styled.div<FoldDivProps>`
     height: 4.5vh;
     margin-bottom: 1.5vh;
     margin-top: 2vh;
-    width: 100%;
+    width: 100%;S
+    ${({ $isAll }) => !$isAll && `margin-left: 0vw; width: 99%;`}
+    margin-left: 0.3vw;
 `;
 const ElemPassw = styled.button<ElemProps>`
     //? cancel buttun style
@@ -98,18 +101,20 @@ export function FolderOfTab({
     isDeleted,
     categId,
 }: FolderOfTabProps) {
-    const { moveOfCateg } = useData();
+    const { moveOfCateg, rmInCategNotAllPsw } = useData();
+    const [isAllPsw] = useState<boolean>(title === 'All passwords');
     const [, dropRef] = useDrop(() => ({
         accept: 'PASSWCARD',
         drop: (item: Iitem) => {
-            if (item.type === 'PASSWCARD' && categId) {
-                moveOfCateg(categId, item.id);
+            if (item.type === 'PASSWCARD') {
+                if (categId) moveOfCateg(categId, item.id);
+                else rmInCategNotAllPsw(item.id);
             }
         },
     }));
     return (
         <div>
-            <FolderDiv $isClick={IsSelect} ref={dropRef}>
+            <FolderDiv $isClick={IsSelect} ref={dropRef} $isAll={isAllPsw}>
                 <ElemPassw
                     onMouseDown={() => {
                         if (IsSelect) {

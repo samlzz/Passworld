@@ -21,11 +21,14 @@ export var useReturn = function (res, message, statusCode, data) {
     if (statusCode === void 0) { statusCode = 200; }
     if (data === void 0) { data = null; }
     if (data === null) {
+        logger.info(message);
         return res.status(statusCode).json({ msg: message });
     }
     if (message === null) {
+        logger.info(data);
         return res.status(statusCode).json(data);
     }
+    logger.info(message, data);
     var toReturn = __assign({ msg: message }, data);
     return res.status(statusCode).json(toReturn);
 };

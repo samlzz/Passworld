@@ -6,6 +6,7 @@ import { Types } from 'mongoose';
 
 import { encrypt, getEnvVar, useError, useReturn } from '../middleware/func.js';
 import { User } from '../models/model_user.js';
+import logger from '../middleware/log.js';
 
 function makeTokenAndReturn(
     res: exp.Response,
@@ -118,8 +119,14 @@ export const deleteCookies = (req: exp.Request, res: exp.Response) => {
     try {
         res.cookie('token', '', { expires: new Date(0) });
         res.cookie('userId', '', { expires: new Date(0) });
+        logger.info(
+            `Un utilisateur s'est déconnecté, SUCCES _id: ${req.auth.userId}`
+        );
         useReturn(res, 'Cookies have been reset');
     } catch (err) {
+        logger.info(
+            `Un utilisateur s'est déconnecté, ERROR _id: ${req.auth.userId}`
+        );
         useError(res, err);
     }
 };

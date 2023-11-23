@@ -27,6 +27,7 @@ const defaultDataCtxtValu: IDefaultDataValu = {
     moveOfCateg: () => {},
     addNewCateg: () => {},
     delCateg: () => {},
+    rmInCategNotAllPsw: () => {},
 };
 const DataContext = createContext(defaultDataCtxtValu);
 
@@ -251,6 +252,45 @@ export function DataProvider({ children }: ProviderProps) {
                 }
             });
     };
+    const rmInCategNotAllPsw = (pswId: string) => {
+        const categWithout = pswByCateg.map((categ, i) => {
+            if (i !== 0) {
+                const updatedPsws = categ.passwords.filter(
+                    (psw) => psw._id !== pswId
+                );
+                return {
+                    ...categ,
+                    passwords: updatedPsws,
+                };
+            }
+            return categ;
+        });
+        const removedPsw = allPsw.find((psw) => psw._id === pswId);
+        const editedPsw = {
+            ...removedPsw,
+            categName: 'All passwords',
+        };
+        axios
+            .put(
+                'http://localhost:3000/editPsw',
+                { editedPsw },
+                { headers: { 'Content-Type': 'application/json' } }
+            )
+            .then((resp) => {
+                setData((prev) => ({
+                    ...prev,
+                    pswByCateg: categWithout,
+                }));
+                GoodAlert(resp.data.msg);
+            })
+            .catch((e) => {
+                CatchErrorAlert(e);
+                if (e.response && e.response.status === 401) {
+                    navigate('/');
+                }
+            });
+        return { categWithout, removedPsw };
+    };
     const moveOfCateg = (categId: string, passwId: string) => {
         try {
             const categToUpdate = pswByCateg.find((categ) => {
@@ -279,10 +319,10 @@ export function DataProvider({ children }: ProviderProps) {
                 };
                 editPassw(pswChangedCateg);
             } else {
-                throw new Error("Categ don't find");
+                throw new Error();
             }
         } catch (error) {
-            BadAlert(`Failed to move password to categ`);
+            BadAlert(`Failed to move password of categ`);
         }
     };
 
@@ -369,6 +409,7 @@ export function DataProvider({ children }: ProviderProps) {
             moveOfCateg,
             addNewCateg,
             delCateg,
+            rmInCategNotAllPsw,
         }),
         [data]
     );

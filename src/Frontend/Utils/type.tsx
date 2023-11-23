@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import { ReactNode } from 'react';
 
 //* Global Interfaces:
@@ -58,6 +59,7 @@ export interface IDefaultDataValu {
     addNewCateg: (newCategNm: string, categNameArr: string[]) => void;
     delCateg: (categIdToDel: string) => void;
     moveOfCateg: (categId: string, passwId: string) => void;
+    rmInCategNotAllPsw: (passwId: string) => void;
 }
 
 //* pages Interfaces:
@@ -91,6 +93,7 @@ export interface LitleLogoProps {
 }
 export interface FoldDivProps {
     $isClick?: boolean;
+    $isAll?: boolean;
 }
 export interface ElemProps {
     $isFolder?: boolean;
@@ -156,4 +159,8 @@ export interface CategPopupProps {
 }
 export interface MenuContainProps {
     $isItClick: boolean;
+}
+// ? SweetAlert:
+export interface ErrOfPW extends AxiosError {
+    data: { err: string };
 }

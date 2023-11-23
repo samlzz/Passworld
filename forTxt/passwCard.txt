@@ -76,24 +76,15 @@ const EmailContainer = styled.div`
     width: 80%;
     padding-left: 0.2vw;
 `;
-const StyledAttrib = styled.button<{ $toLong?: boolean; $id?: boolean }>(
-    (props) =>
-        `
+const StyledAttrib = styled.button<{ $toLong?: boolean }>`
     font-size: 1.1vw;
-    ${
-        props.$id &&
-        `
-        padding-right: 11vw;
-        padding-left: 0.8vw;`
-    }
-    ${
+    ${(props) =>
         props.$toLong &&
         `
         width: 8vw;
-        word-break: break-all;`
-    }
-`
-);
+        word-break: break-all;
+    `}
+`;
 const StyledShow = styled.button`
     position: absolute;
     right: 0.5vw;
@@ -215,7 +206,7 @@ export function PasswCard({ aPassw, toDelete, nouvCateg }: PasswCardProps) {
                             text={identifier}
                             onCopy={() => setIsCopied(true)}
                         >
-                            <StyledAttrib $id>{identifier}</StyledAttrib>
+                            <StyledAttrib>{identifier}</StyledAttrib>
                         </CopyToClipboard>
                     </EmailContainer>
                 )}

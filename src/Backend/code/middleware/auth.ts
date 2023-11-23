@@ -2,6 +2,7 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import exp from 'express';
 import { decrypt, getEnvVar, useError } from './func.js';
+import logger from './log.js';
 
 interface DecodedToken extends JwtPayload {
     userId: string;
@@ -31,8 +32,12 @@ export const authentified = (
         req.auth = {
             userId,
         };
+        logger.info(`Un utilisateur s'est connecté, SUCCES _id: ${userId}`);
         next();
     } catch (error) {
+        logger.info(
+            `Un utilisateur s'est connecté, ERROR _id: ${req.auth.userId}`
+        );
         useError(res, error, 401);
     }
 };

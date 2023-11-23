@@ -66,7 +66,6 @@ export const addPassword = (req: exp.Request, res: exp.Response) => {
                 });
             }
             user.allPassw.push(newPswWithId);
-            console.log(newPswWithId);
             user.save()
                 .then(() =>
                     useReturn(res, `Password succesfully added`, 200, {
@@ -119,59 +118,6 @@ export const deletePassword = (req: exp.Request, res: exp.Response) => {
         .catch((e) => useError(res, e));
 };
 
-// export const replacePassw = (req: exp.Request, res: exp.Response) => {
-//     const { editedPsw } = req.body;
-
-//     function replaceGoodPsw(listOfPsw: IPassw[], userID: string) {
-//         console.log(editedPsw);
-//         const editedCrypt = {
-//             ...editedPsw,
-//             mdp: encrypt(editedPsw.mdp, userID),
-//         };
-//         console.log('var', listOfPsw);
-//         const crtyptedList = listOfPsw.map((passw) => {
-//             if (passw.categName === editedCrypt.categName) {
-//                 return editedCrypt;
-//             }
-//             return passw;
-//         });
-//         console.log('return', crtyptedList);
-//         return crtyptedList;
-//     }
-
-//     User.findById(req.auth.userId)
-//         .then((user) => {
-//             if (!user) {
-//                 useError(res, { err: 'Password not found' }, 404);
-//             }
-//             const editedUser = user;
-//             editedUser.allPassw = replaceGoodPsw(
-//                 editedUser.allPassw,
-//                 user._id.toHexString()
-//             );
-//             if (editedPsw.categName) {
-//                 editedUser.pswByCateg = editedUser.pswByCateg.map((categ) => {
-//                     if (categ.name === editedPsw.categName) {
-//                         return {
-//                             ...categ,
-//                             passwords: replaceGoodPsw(
-//                                 categ.passwords,
-//                                 user._id.toHexString()
-//                             ),
-//                         } as ICateg;
-//                     }
-//                     return categ;
-//                 });
-//                 // console.log(editedUser.pswByCateg[1].passwords);
-//             }
-//             editedUser
-//                 .save()
-//                 .then(() => useReturn(res, 'Password succesfully edited'))
-//                 .catch((e) => useError(res, e));
-//         })
-//         .catch((e) => useError(res, e));
-// };
-
 export const replaceAPsw = (req: exp.Request, res: exp.Response) => {
     const { editedPsw } = req.body;
     const cryptEditPsw: IPassw = {
@@ -223,6 +169,24 @@ export const replaceAPsw = (req: exp.Request, res: exp.Response) => {
                 .save()
                 .then(() => useReturn(res, 'Password succesfully edited'))
                 .catch((e) => useError(res, e));
+        })
+        .catch((e) => useError(res, e));
+};
+
+export const addMultiplePsw = (req: exp.Request, res: exp.Response) => {
+    const { newpswList }: { newpswList: IPassw[] } = req.body;
+    User.findByIdAndUpdate(
+        req.auth.userId,
+        { $push: { allPsw: { $each: newpswList } } },
+        { new: true, safe: true, upsert: false }
+    )
+        .then((user) => {
+            if (!user) useError(res, { err: 'Do not find user' });
+            else
+                useReturn(
+                    res,
+                    `Correctly added ${newpswList.length} passwords`
+                );
         })
         .catch((e) => useError(res, e));
 };

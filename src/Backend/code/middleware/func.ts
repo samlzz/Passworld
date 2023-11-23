@@ -22,11 +22,14 @@ export const useReturn = <T>(
     data: T | null = null
 ) => {
     if (data === null) {
+        logger.info(message);
         return res.status(statusCode).json({ msg: message });
     }
     if (message === null) {
+        logger.info(data);
         return res.status(statusCode).json(data);
     }
+    logger.info(message, data);
     const toReturn: Record<string, unknown> = { msg: message, ...data };
     return res.status(statusCode).json(toReturn);
 };

@@ -11,10 +11,12 @@ var __assign = (this && this.__assign) || function () {
 };
 import { User } from '../models/model_user.js';
 import { useError, useReturn, decrypt } from '../middleware/func.js';
+import logger from '../middleware/log.js';
 export var returnPasswList = function (req, res) {
     var userId = req.auth.userId;
     User.findById(userId)
         .then(function (user) {
+        logger.info("utilisateur connect\u00E9: ".concat(user));
         var allPassw = user.allPassw, pswByCateg = user.pswByCateg;
         var decryptAllPsw = allPassw.map(function (psw) { return (__assign(__assign({}, psw.toObject()), { mdp: decrypt(psw.mdp, user._id.toHexString()) })); });
         var decrypCateg = pswByCateg.map(function (categ) { return (__assign(__assign({}, categ.toObject()), { passwords: categ.passwords.map(function (psw) { return (__assign(__assign({}, psw.toObject()), { mdp: decrypt(psw.mdp, user._id.toHexString()) })); }) })); });
