@@ -26,10 +26,9 @@ export const useReturn = <T>(
         return res.status(statusCode).json({ msg: message });
     }
     if (message === null) {
-        logger.info(data);
         return res.status(statusCode).json(data);
     }
-    logger.info(message, data);
+    logger.info(message);
     const toReturn: Record<string, unknown> = { msg: message, ...data };
     return res.status(statusCode).json(toReturn);
 };

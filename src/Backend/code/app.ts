@@ -61,16 +61,4 @@ app.use(cookieParser());
 //* SEND REQUEST TO ROUTER
 app.use('', router);
 
-//* GET ERROR
-app.use(
-    (
-        err: unknown,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction
-    ) => {
-        useError(res, { err: 'Quelque chose a mal tourné !' });
-    }
-);
-
 export default app;

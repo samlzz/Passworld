@@ -25,10 +25,9 @@ export var useReturn = function (res, message, statusCode, data) {
         return res.status(statusCode).json({ msg: message });
     }
     if (message === null) {
-        logger.info(data);
         return res.status(statusCode).json(data);
     }
-    logger.info(message, data);
+    logger.info(message);
     var toReturn = __assign({ msg: message }, data);
     return res.status(statusCode).json(toReturn);
 };

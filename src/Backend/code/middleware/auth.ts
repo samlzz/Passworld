@@ -35,9 +35,7 @@ export const authentified = (
         logger.info(`Un utilisateur s'est connecté, SUCCES _id: ${userId}`);
         next();
     } catch (error) {
-        logger.info(
-            `Un utilisateur s'est connecté, ERROR _id: ${req.auth.userId}`
-        );
-        useError(res, error, 401);
+        logger.info(`Un utilisateur a voulu se connecté, ERROR`);
+        useError(res, { err: 'Veuillez vous reconnectez' }, 401);
     }
 };
