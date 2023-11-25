@@ -13,8 +13,9 @@ export const LogoPW = styled.img`
 `;
 
 export const GlobalStyle = createGlobalStyle`${({ theme }) => `
+    @import url('https://fonts.googleapis.com/css2?family=Inter&family=Work+Sans:wght@100;300;400;700&display=swap');
     * {
-        font-family: 'Trebuchet MS', Helvetica, sans-serif;
+        font-family: 'Inter';
     }
     body, html {
         margin: 0;

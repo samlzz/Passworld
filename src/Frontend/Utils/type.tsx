@@ -74,6 +74,11 @@ export interface IHomeServData {
 
 //* component Interfaces
 
+// ? Setting:
+export interface ISettServData {
+    identifier: string;
+    nbOfPassw: number;
+}
 // ? Forms login/register:
 export interface FormsProps {
     title: string;
@@ -163,4 +168,9 @@ export interface MenuContainProps {
 // ? SweetAlert:
 export interface ErrOfPW extends AxiosError {
     data: { err: string };
+}
+// ? Settings:
+export interface ParamProps {
+    toClosed: () => void;
+    onLogOut: () => void;
 }

@@ -14,7 +14,7 @@ import { useData } from '../Utils/contexte';
 
 // Début du style -------------->
 const CardDiv = styled.div`
-    background-color: ${({ theme }) => theme.tercary};
+    background-color: ${({ theme }) => theme.darkBackground};
     display: grid;
     height: 17.7vw;
     width: 17vw;
@@ -55,7 +55,7 @@ const MdpContainer = styled.div`
 const MdpWshow = styled.div<{ $toLong?: boolean }>`
     display: flex;
     flex-direction: row;
-    background-color: ${({ theme }) => theme.selected};
+    background-color: ${({ theme }) => theme.background};
     border-radius: 20vw;
     height: 1.7vw;
     ${(props) => props.$toLong && `height: 3vw;`}
@@ -65,11 +65,12 @@ const MdpWshow = styled.div<{ $toLong?: boolean }>`
     position: relative;
     z-index: 0;
     overflow: hidden;
+    justify-content: space-between;
 `;
 const EmailContainer = styled.div`
     display: flex;
     align-items: center;
-    background-color: ${({ theme }) => theme.selected};
+    background-color: ${({ theme }) => theme.background};
     border-radius: 20vw;
     height: 3.2vh;
     margin: 1vh 0 0 2vw; // haut droite bas gauche
@@ -79,6 +80,7 @@ const EmailContainer = styled.div`
 const StyledAttrib = styled.button<{ $toLong?: boolean; $id?: boolean }>(
     (props) =>
         `
+    margin-right: 1px;
     font-size: 1.1vw;
     ${
         props.$id &&
@@ -104,7 +106,7 @@ const ShowImage = styled.img`
 const StyledDelete = styled.button`
     justify-self: end;
     align-self: end;
-    background-color: ${({ theme }) => theme.tercary};
+    background: none;
     margin: 0 0.8vw 1.6vh 0; //haut droite bas gauche
 `;
 const CopySucces = styled.span`
@@ -118,7 +120,7 @@ const CopySucces = styled.span`
     border-radius: 1vw;
     padding: 1vw 0 0 1.4vw; //haut droite bas gauche
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    opacity: 0.9;
+    z-index: 10;
 `;
 // Fin du style --------------//
 
@@ -126,7 +128,7 @@ export function PasswCard({ aPassw, toDelete, nouvCateg }: PasswCardProps) {
     const [isCopied, setIsCopied] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
     const [locPassw, setLocPassw] = useState(aPassw);
-    const [hidenmdp, setHidenmdp] = useState('**************');
+    const [hidenmdp, setHidenmdp] = useState('**********');
     const [isShow, setIsShow] = useState(false);
     const [isToLong, setIsToLong] = useState(false);
 
@@ -159,9 +161,9 @@ export function PasswCard({ aPassw, toDelete, nouvCateg }: PasswCardProps) {
         setIsShow((prev) => !prev);
         setIsToLong(locPassw.mdp.length > 12);
         setHidenmdp((prev) =>
-            prev === '**************' ? locPassw.mdp : '**************'
+            prev === '**********' ? locPassw.mdp : '**********'
         );
-        if (hidenmdp !== '**************') setIsToLong(false);
+        if (hidenmdp !== '**********') setIsToLong(false);
     };
     function getAdress() {
         if (/^www\./.test(locPassw.siteAddress)) {

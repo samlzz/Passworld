@@ -20,13 +20,13 @@ import { useData } from '../Utils/contexte';
 const FolderDiv = styled.div<FoldDivProps>`
     background-color: ${({ theme, $isClick }) =>
         $isClick ? theme.selected : theme.tercary};
-    border-radius: 1.5vh;
+    border-radius: 0.6vw;
     display: flex;
     flex-direction: row;
     align-items: center;
-    height: 4.5vh;
-    margin-bottom: 1.5vh;
-    margin-top: 2vh;
+    height: 2.3vw;
+    margin-bottom: 0.5vw;
+    margin-top: 0.7vw;
     width: 100%;S
     ${({ $isAll }) => !$isAll && `margin-left: 0vw; width: 99%;`}
     margin-left: 0.3vw;
@@ -40,7 +40,7 @@ const ElemPassw = styled.button<ElemProps>`
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin-top: 1vh;
+    margin-top: 0.2vh;
     margin-left: 1vw;
     height: 4vh;
     ${(props) =>
@@ -52,7 +52,7 @@ const ElemPassw = styled.button<ElemProps>`
         width: 100%;
         position: relative;
         `
-            : `    background-color: ${props.theme.tercary};`}
+            : `background-color: ${props.theme.tercary};`}
 `;
 const LitleLogo = styled.img<LitleLogoProps>`
     margin-left: 1vw;

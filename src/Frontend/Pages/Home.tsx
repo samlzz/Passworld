@@ -10,7 +10,7 @@ import { SearchBar } from '../Components/SearchBar';
 import { PasswCard } from '../Components/PasswCard';
 import { CreatePassw } from '../Components/Password';
 
-import pp from '../assets/Icones/ProfilePic.png';
+import setting from '../assets/svgShape/Setting.svg';
 import logo from '../assets/logoPW/logoPassWorld.png';
 import plusButt from '../assets/svgShape/plusButton.svg';
 import plus from '../assets/svgShape/+PlusIco.png';
@@ -19,6 +19,7 @@ import { IPassw, HomeProps, IHomeServData, ICateg } from '../Utils/type';
 import { AddCategPopup } from '../Components/Material_Ui/PopUp';
 import { useData } from '../Utils/contexte';
 import { CatchErrorAlert, GoodAlert } from '../Components/SweetAlert';
+import { ParamsWindow } from '../Components/Setting';
 
 // Début du style -------------->
 const PageHome = styled.div`
@@ -28,7 +29,7 @@ const PageHome = styled.div`
     margin: 0;
 `;
 const TabContainer = styled.div`
-    background-color: ${({ theme }) => theme.darkBackground};
+    background-color: ${({ theme }) => theme.darkTercary};
     width: 23vw;
     z-index: 0;
     position: absolute;
@@ -40,24 +41,27 @@ const LogoPassWorld = styled.img`
     width: 18vw;
     margin-top: 3vh;
     margin-left: 2vh;
-    z-index: 100;
+    z-index: 1;
 `;
-
-const ProfilButton = styled.button`
-    position: absolute;
-    top: 3vh;
-    right: 3vw;
+const ABar = styled.div`
+    position: fixed;
+    bottom: 4.5vw;
+    height: 0.15vw;
+    width: 23vw;
+    background-color: ${({ theme }) => theme.lightBackground};
+`;
+const SettingButton = styled.button`
+    position: fixed;
+    bottom: 0.65vw;
     height: 6vh;
     width: 11vw;
     border-radius: 1vw;
-    padding-right: 3vw;
     font-size: 1.2vw;
-    color: ${({ theme }) => theme.white};
-    background-color: ${({ theme }) => theme.primary};
-    background-image: url(${pp});
+    padding-left: 3vw;
+    background-image: url(${setting});
     background-repeat: no-repeat;
     background-size: 25% 80%;
-    background-position: 90% 50%;
+    background-position: 10% 50%;
 `;
 
 const CardContainer = styled.div`
@@ -82,10 +86,11 @@ const AddCategButt = styled.button`
     gap: 0.7vw;
     background: ${({ theme }) => theme.tercary};
     border-radius: 2vw;
-    height: 2vw;
+    height: 2.5vw;
     padding-left: 1vw;
-    margin-left: 12.7vw;
+    margin-left: 12.3vw;
     font-size: 1.1vw;
+    margin-bottom: 1.2vw;
 `;
 const AddCategImg = styled.img`
     width: 1.2vw;
@@ -108,6 +113,7 @@ export function Home({ isRendered }: HomeProps) {
     const [isSearching, setIsSearching] = useState(false);
     const [isCreate, setIsCreate] = useState(false);
     const [isAddCateg, setIsAddCateg] = useState(false);
+    const [isSetting, setIsSetting] = useState(false);
     const [selectFolder, setSelectFold] = useState<IPassw[] | null>(null);
 
     const plusAnchor = useRef<HTMLButtonElement | null>(null);
@@ -147,7 +153,6 @@ export function Home({ isRendered }: HomeProps) {
         axios
             .get('http://localhost:3000/home')
             .then((resp) => {
-                console.log(resp);
                 if (resp.status === 200) {
                     const { allPassw, categPassw }: IHomeServData = resp.data;
                     const searchCateg: ICateg = {
@@ -261,9 +266,12 @@ export function Home({ isRendered }: HomeProps) {
                             />
                         )
                 )}
+                <ABar />
+                <SettingButton onClick={() => setIsSetting((prev) => !prev)}>
+                    Settings
+                </SettingButton>
             </TabContainer>
 
-            <ProfilButton onClick={handleLogOut}> Log Out </ProfilButton>
             <SearchBar
                 allPassw={getPswListByName(folderOpen)}
                 openFolder={folderOpen}
@@ -305,10 +313,16 @@ export function Home({ isRendered }: HomeProps) {
             ) : null}
 
             <AddPassw onClick={() => setIsCreate(true)}>
-                <AddShape src={plusButt} alt="plus button" />
+                <AddShape src={plusButt} alt="add password" />
             </AddPassw>
 
-            {isCreate ? (
+            {isSetting && (
+                <ParamsWindow
+                    toClosed={() => setIsSetting((prev) => !prev)}
+                    onLogOut={handleLogOut}
+                />
+            )}
+            {isCreate && (
                 <CreatePassw
                     newPassw={(newPssw) => addPassw(newPssw)}
                     closed={(toClose) => setIsCreate(!toClose)}
@@ -316,7 +330,7 @@ export function Home({ isRendered }: HomeProps) {
                         addNewCateg(newCtgNm, makeCategArr(pswByCateg))
                     }
                 />
-            ) : null}
+            )}
         </PageHome>
     );
 }

@@ -199,7 +199,6 @@ export function DataProvider({ children }: ProviderProps) {
                 { headers: { 'Content-Type': 'application/json' } }
             )
             .then((resp) => {
-                console.log(resp);
                 if (resp.status === 200) {
                     GoodAlert(resp.data.msg);
                     const allPswUpdated = allPsw.map((psw) => {

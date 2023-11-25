@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -36,7 +36,7 @@ const InputContainer = styled.div`
     position: relative;
 `;
 const StyledInput = styled.input`
-    background-color: ${(props) => props.theme.secondary};
+    background-color: ${(props) => props.theme.background};
     border: none;
     outline: none;
     border-radius: 2vh;
@@ -79,6 +79,7 @@ const StyledSubmit = styled.input<ForRegisterProps>`
     text-align: center;
     padding-right: 50px;
     z-index: 2;
+    opacity: 0.9;
 `;
 // Fin du style --------------//
 
@@ -124,7 +125,7 @@ export function BegginForms({ title, noAccount }: FormsProps) {
                     navigate('/home');
                 }
             })
-            .catch((error: AxiosError) => CatchErrorAlert(error));
+            .catch((error) => CatchErrorAlert(error));
     };
 
     const handleGetLetter = (e: React.ChangeEvent<HTMLInputElement>) => {
