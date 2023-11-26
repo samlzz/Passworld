@@ -34,7 +34,7 @@ router.put('/editUser', authentified, editUserEmailOrPsw); //! need?: newEmail, 
 router.post('/addPsw', authentified, addPassword); //! need: newPassw  --> pswId
 router.post('/delPsw', authentified, deletePassword); //! need: pswId, categName  --> deletedPsw
 router.put('/editPsw', authentified, replaceAPsw); //! need: editedPsw
-router.post('/addMultPsw', authentified, addMultiplePsw);
+router.post('/addMultPsw', authentified, addMultiplePsw); //! need: newpswList
 
 // ? For category Request
 router.post('/addCateg', authentified, addCategory); //! need: categName  --> addedCateg (:_id)

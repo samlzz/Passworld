@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -9,8 +9,9 @@ import edit from '../assets/Icones/PasswCard/edit.svg';
 import logOut from '../assets/svgShape/LogOutRedIco.svg';
 import cross from '../assets/Icones/crossWhite.svg';
 import valid from '../assets/Icones/Valid.svg';
-import { ParamProps } from '../Utils/type';
-import { CatchErrorAlert, GoodAlert } from './SweetAlert';
+import defaultIco from '../assets/logoPW/defaultIcoDark.png';
+import { IPassw, ParamProps } from '../Utils/type';
+import { BadAlert, CatchErrorAlert, GoodAlert } from './SweetAlert';
 
 // Début du style -------------->
 const Backgrnd = styled.button`
@@ -214,6 +215,9 @@ const TheCount = styled.p`
     right: 7vw;
     font-weight: 700;
 `;
+const HiddenInput = styled.input`
+    display: none;
+`;
 const StyledButt = styled.button<{ $isDel?: boolean }>(
     ({ theme, $isDel }) => `
     background-color: ${$isDel ? theme.redExit : theme.primary};
@@ -231,6 +235,8 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
     const [email, setEmail] = useState('');
     const [emailEdited, setEmailEdited] = useState(false);
     const [pswCount, setPswCount] = useState(0);
+
+    const refFileInput = useRef<HTMLInputElement | null>(null);
 
     const navigate = useNavigate();
 
@@ -261,7 +267,7 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
             setEmail(e.target.value);
         }
     };
-    const handleEdit = () => {
+    const handleEditEmail = () => {
         setEmailEdited((prev) => !prev);
         if (emailEdited === true) {
             axios
@@ -278,6 +284,52 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
                     CatchErrorAlert(err);
                     navigate('/home');
                 });
+        }
+    };
+    const handleImportPsw = () => {
+        if (refFileInput.current) refFileInput.current.click();
+    };
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        try {
+            if (event.target.files) {
+                const file = event.target.files[0];
+                if (event.target.files.length > 1)
+                    BadAlert(
+                        'Only the content of the first files will be import'
+                    );
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const text = e?.target?.result as string;
+                    if (text) {
+                        const lines = text.split('\n');
+                        const newpswList: IPassw[] = [];
+                        lines.forEach((line) => {
+                            const valu = line.split(',');
+                            const passw: IPassw = {
+                                _id: '',
+                                mdp: valu[0],
+                                identifier: valu[1],
+                                categName: 'All passwords',
+                                siteAddress: valu[2],
+                                titre: valu[2].split('.')[1],
+                                icoLink: defaultIco,
+                            };
+                            newpswList.push(passw);
+                        });
+                        axios
+                            .post('http://localhost:3000/addMultPsw', {
+                                newpswList,
+                            })
+                            .then((resp) => GoodAlert(resp.data.msg))
+                            .catch(() => {
+                                throw new Error();
+                            });
+                    }
+                };
+                reader.readAsText(file);
+            } else throw new Error();
+        } catch {
+            BadAlert('Error when file import');
         }
     };
 
@@ -321,7 +373,7 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
                             />
                             <FieldEdit
                                 $isEdit={emailEdited}
-                                onClick={handleEdit}
+                                onClick={handleEditEmail}
                             />
                         </StyledField>
                         <FadeTitles> Password: </FadeTitles>
@@ -358,7 +410,15 @@ PSW, IDENTIFIER, SITELINK"
                             *
                         </CSVInfoBulle>
                         <StyledField $multPsw>
-                            <StyledButt>Import</StyledButt>
+                            <HiddenInput
+                                type="file"
+                                accept=".csv"
+                                ref={refFileInput}
+                                onChange={handleFileChange}
+                            />
+                            <StyledButt onClick={handleImportPsw}>
+                                Import
+                            </StyledButt>
                             <StyledButt>Export</StyledButt>
                             <StyledButt $isDel>Delete</StyledButt>
                         </StyledField>
