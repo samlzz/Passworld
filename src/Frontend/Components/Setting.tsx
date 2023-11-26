@@ -10,7 +10,7 @@ import logOut from '../assets/svgShape/LogOutRedIco.svg';
 import cross from '../assets/Icones/crossWhite.svg';
 import valid from '../assets/Icones/Valid.svg';
 import { ParamProps } from '../Utils/type';
-import { CatchErrorAlert } from './SweetAlert';
+import { CatchErrorAlert, GoodAlert } from './SweetAlert';
 
 // Début du style -------------->
 const Backgrnd = styled.button`
@@ -248,9 +248,7 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
                             'Data of the user cannot be upload correctly'
                         );
                 }
-                if (resp.status === 401) {
-                    navigate('/');
-                }
+                if (resp.status === 401) navigate('/');
             })
             .catch((err) => {
                 CatchErrorAlert(err);
@@ -261,6 +259,25 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
     const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (emailEdited === true) {
             setEmail(e.target.value);
+        }
+    };
+    const handleEdit = () => {
+        setEmailEdited((prev) => !prev);
+        if (emailEdited === true) {
+            axios
+                .put('http://localhost:3000/editUser', { newEmail: email })
+                .then((resp) => {
+                    console.log(resp);
+                    if (resp.status === 200) {
+                        GoodAlert(resp.data.msg);
+                    }
+                    if (resp.status === 401) navigate('/');
+                })
+                .catch((err) => {
+                    console.log(err);
+                    CatchErrorAlert(err);
+                    navigate('/home');
+                });
         }
     };
 
@@ -304,7 +321,7 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
                             />
                             <FieldEdit
                                 $isEdit={emailEdited}
-                                onClick={() => setEmailEdited((prev) => !prev)}
+                                onClick={handleEdit}
                             />
                         </StyledField>
                         <FadeTitles> Password: </FadeTitles>

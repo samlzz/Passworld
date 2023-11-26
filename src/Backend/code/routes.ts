@@ -4,6 +4,7 @@ import {
     checkIdAndCreate,
     checkIdAndMdp,
     deleteCookies,
+    editUserEmailOrPsw,
 } from './controllers/user.js';
 import { returnForSetting, returnPasswList } from './controllers/home.js';
 import {
@@ -26,6 +27,8 @@ router.post('/login', checkIdAndMdp); //! need : email, mdp  --> cookie(userId, 
 router.delete('/resetCookies', authentified, deleteCookies);
 router.get('/home', authentified, returnPasswList); //! --> allPassw, categPassw
 router.get('/setting', authentified, returnForSetting); //! --> identifier, nbOfPassw
+
+router.put('/editUser', authentified, editUserEmailOrPsw); //! need?: newEmail, newMdp, oldMdp
 
 // ? For password Request
 router.post('/addPsw', authentified, addPassword); //! need: newPassw  --> pswId

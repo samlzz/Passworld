@@ -130,3 +130,46 @@ export const deleteCookies = (req: exp.Request, res: exp.Response) => {
         useError(res, err);
     }
 };
+
+export const editUserEmailOrPsw = (req: exp.Request, res: exp.Response) => {
+    const { userId } = req.auth;
+    User.findById(userId)
+        .then((user) => {
+            if (!user) useError(res, { err: "User don't found" });
+            const updatedUser = user;
+            if (req.body?.newEmail) {
+                updatedUser.email = req.body.newEmail;
+            }
+            if (req.body?.newMdp) {
+                compare(user.motDePasse, req.body.oldMdp)
+                    .then((valid) => {
+                        if (!valid)
+                            useError(
+                                res,
+                                { err: 'Email or password are wrong' },
+                                401
+                            );
+                        hash(req.body.newMdp, 10)
+                            .then((hashedMdp) => {
+                                updatedUser.motDePasse = hashedMdp;
+                                updatedUser
+                                    .save()
+                                    .then(() =>
+                                        useReturn(
+                                            res,
+                                            'User was correctly edited'
+                                        )
+                                    )
+                                    .catch((e) => useError(res, e));
+                            })
+                            .catch((e) => useError(res, e));
+                    })
+                    .catch((e) => useError(res, e));
+            }
+            updatedUser
+                .save()
+                .then(() => useReturn(res, 'User was correctly edited'))
+                .catch((e) => useError(res, e));
+        })
+        .catch((e) => useError(res, e));
+};

@@ -99,3 +99,40 @@ export var deleteCookies = function (req, res) {
         useError(res, err);
     }
 };
+export var editUserEmailOrPsw = function (req, res) {
+    var userId = req.auth.userId;
+    User.findById(userId)
+        .then(function (user) {
+        var _a, _b;
+        if (!user)
+            useError(res, { err: "User don't found" });
+        var updatedUser = user;
+        if ((_a = req.body) === null || _a === void 0 ? void 0 : _a.newEmail) {
+            updatedUser.email = req.body.newEmail;
+        }
+        if ((_b = req.body) === null || _b === void 0 ? void 0 : _b.newMdp) {
+            compare(user.motDePasse, req.body.oldMdp)
+                .then(function (valid) {
+                if (!valid)
+                    useError(res, { err: 'Email or password are wrong' }, 401);
+                hash(req.body.newMdp, 10)
+                    .then(function (hashedMdp) {
+                    updatedUser.motDePasse = hashedMdp;
+                    updatedUser
+                        .save()
+                        .then(function () {
+                        return useReturn(res, 'User was correctly edited');
+                    })
+                        .catch(function (e) { return useError(res, e); });
+                })
+                    .catch(function (e) { return useError(res, e); });
+            })
+                .catch(function (e) { return useError(res, e); });
+        }
+        updatedUser
+            .save()
+            .then(function () { return useReturn(res, 'User was correctly edited'); })
+            .catch(function (e) { return useError(res, e); });
+    })
+        .catch(function (e) { return useError(res, e); });
+};
