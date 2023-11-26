@@ -212,3 +212,27 @@ export var addMultiplePsw = function (req, res) {
     })
         .catch(function (e) { return useError(res, e); });
 };
+export var deleteAllPswAndCateg = function (req, res) {
+    var userId = req.auth.userId;
+    User.findById(userId)
+        .then(function (user) {
+        if (!user)
+            useError(res, { err: 'Do not find user' });
+        var resetedUser = user;
+        resetedUser.allPassw = [];
+        resetedUser.pswByCateg = [
+            {
+                _id: new Types.ObjectId(),
+                name: 'SearchContent',
+                passwords: [],
+            },
+        ];
+        resetedUser
+            .save()
+            .then(function () {
+            return useReturn(res, 'Passwords and category was succesfully deleted');
+        })
+            .catch(function (e) { return useError(res, e); });
+    })
+        .catch(function (e) { return useError(res, e); });
+};

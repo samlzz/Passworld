@@ -190,3 +190,30 @@ export const addMultiplePsw = (req: exp.Request, res: exp.Response) => {
         })
         .catch((e) => useError(res, e));
 };
+
+export const deleteAllPswAndCateg = (req: exp.Request, res: exp.Response) => {
+    const { userId } = req.auth;
+    User.findById(userId)
+        .then((user) => {
+            if (!user) useError(res, { err: 'Do not find user' });
+            const resetedUser = user;
+            resetedUser.allPassw = [];
+            resetedUser.pswByCateg = [
+                {
+                    _id: new Types.ObjectId(),
+                    name: 'SearchContent',
+                    passwords: [],
+                },
+            ] as ICateg[];
+            resetedUser
+                .save()
+                .then(() =>
+                    useReturn(
+                        res,
+                        'Passwords and category was succesfully deleted'
+                    )
+                )
+                .catch((e) => useError(res, e));
+        })
+        .catch((e) => useError(res, e));
+};

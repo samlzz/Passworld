@@ -173,3 +173,24 @@ export const editUserEmailOrPsw = (req: exp.Request, res: exp.Response) => {
         })
         .catch((e) => useError(res, e));
 };
+
+export const resetMdpOfAUser = (req: exp.Request, res: exp.Response) => {
+    const { email, newMDP } = req.body;
+    User.findOne({ identifier: email })
+        .then((user) => {
+            if (!user) useError(res, { err: "Don't find user" });
+            const updatedUser = user;
+            hash(newMDP, 10)
+                .then((chiffred) => {
+                    updatedUser.motDePasse = chiffred;
+                    updatedUser
+                        .save()
+                        .then(() =>
+                            useReturn(res, 'Password was correctly reset')
+                        )
+                        .catch((e) => useError(res, e));
+                })
+                .catch((e) => useError(res, e));
+        })
+        .catch((e) => useError(res, e));
+};

@@ -11,7 +11,12 @@ import cross from '../assets/Icones/crossWhite.svg';
 import valid from '../assets/Icones/Valid.svg';
 import defaultIco from '../assets/logoPW/defaultIcoDark.png';
 import { IPassw, ParamProps } from '../Utils/type';
-import { BadAlert, CatchErrorAlert, GoodAlert } from './SweetAlert';
+import {
+    BadAlert,
+    CatchErrorAlert,
+    GoodAlert,
+    ResetAlerte,
+} from './SweetAlert';
 
 // Début du style -------------->
 const Backgrnd = styled.button`
@@ -332,6 +337,10 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
             BadAlert('Error when file import');
         }
     };
+    const handleReset = () => {
+        const result = ResetAlerte();
+        if (result) navigate('/home');
+    };
 
     return (
         <>
@@ -420,7 +429,9 @@ PSW, IDENTIFIER, SITELINK"
                                 Import
                             </StyledButt>
                             <StyledButt>Export</StyledButt>
-                            <StyledButt $isDel>Delete</StyledButt>
+                            <StyledButt $isDel onClick={handleReset}>
+                                Reset
+                            </StyledButt>
                         </StyledField>
                     </FieldContainer>
                 )}

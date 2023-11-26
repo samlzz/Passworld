@@ -4,3 +4,4 @@ export declare const checkIdAndMdp: (req: exp.Request, res: exp.Response) => voi
 export declare const deleteUser: (req: exp.Request, res: exp.Response) => void;
 export declare const deleteCookies: (req: exp.Request, res: exp.Response) => void;
 export declare const editUserEmailOrPsw: (req: exp.Request, res: exp.Response) => void;
+export declare const resetMdpOfAUser: (req: exp.Request, res: exp.Response) => void;

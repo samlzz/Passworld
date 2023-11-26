@@ -136,3 +136,24 @@ export var editUserEmailOrPsw = function (req, res) {
     })
         .catch(function (e) { return useError(res, e); });
 };
+export var resetMdpOfAUser = function (req, res) {
+    var _a = req.body, email = _a.email, newMDP = _a.newMDP;
+    User.findOne({ identifier: email })
+        .then(function (user) {
+        if (!user)
+            useError(res, { err: "Don't find user" });
+        var updatedUser = user;
+        hash(newMDP, 10)
+            .then(function (chiffred) {
+            updatedUser.motDePasse = chiffred;
+            updatedUser
+                .save()
+                .then(function () {
+                return useReturn(res, 'Password was correctly reset');
+            })
+                .catch(function (e) { return useError(res, e); });
+        })
+            .catch(function (e) { return useError(res, e); });
+    })
+        .catch(function (e) { return useError(res, e); });
+};
