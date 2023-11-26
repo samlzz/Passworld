@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import router from './routes.js';
 import logger from './middleware/log.js';
 import serveur from './server.js';
+import { useError } from './middleware/func.js';
 var connect = pkg.connect;
 //* INIT APP
 var app = express();
@@ -46,4 +47,8 @@ app.use(express.json()); // ? for application/json
 app.use(cookieParser());
 //* SEND REQUEST TO ROUTER
 app.use('', router);
+//* GET ERROR
+app.use(function (err, req, res, next) {
+    useError(res, { err: 'Quelque chose a mal tourné !' });
+});
 export default app;

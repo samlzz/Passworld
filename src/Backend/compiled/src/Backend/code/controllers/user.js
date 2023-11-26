@@ -99,6 +99,22 @@ export var deleteCookies = function (req, res) {
         useError(res, err);
     }
 };
+export var checkMdp = function (req, res) {
+    var userId = req.auth.userId;
+    var mdpToCheck = req.body.mdpToCheck;
+    User.findById(userId)
+        .then(function (user) {
+        compare(mdpToCheck, user.motDePasse)
+            .then(function (valid) {
+            if (!valid)
+                useError(res, { err: 'Email or password are wrong' }, 401);
+            else
+                useReturn(res, 'Good');
+        })
+            .catch(function (e) { return useError(res, e); });
+    })
+        .catch(function (e) { return useError(res, e); });
+};
 export var editUserEmailOrPsw = function (req, res) {
     var userId = req.auth.userId;
     User.findById(userId)
@@ -111,28 +127,30 @@ export var editUserEmailOrPsw = function (req, res) {
             updatedUser.email = req.body.newEmail;
         }
         if ((_b = req.body) === null || _b === void 0 ? void 0 : _b.newMdp) {
-            compare(user.motDePasse, req.body.oldMdp)
+            compare(req.body.oldMdp, user.motDePasse)
                 .then(function (valid) {
                 if (!valid)
                     useError(res, { err: 'Email or password are wrong' }, 401);
-                hash(req.body.newMdp, 10)
-                    .then(function (hashedMdp) {
-                    updatedUser.motDePasse = hashedMdp;
-                    updatedUser
-                        .save()
-                        .then(function () {
-                        return useReturn(res, 'User was correctly edited');
+                else
+                    hash(req.body.newMdp, 10)
+                        .then(function (hashedMdp) {
+                        updatedUser.motDePasse = hashedMdp;
+                        updatedUser
+                            .save()
+                            .then(function () {
+                            return useReturn(res, 'User was correctly edited');
+                        })
+                            .catch(function (e) { return useError(res, e); });
                     })
                         .catch(function (e) { return useError(res, e); });
-                })
-                    .catch(function (e) { return useError(res, e); });
             })
                 .catch(function (e) { return useError(res, e); });
         }
-        updatedUser
-            .save()
-            .then(function () { return useReturn(res, 'User was correctly edited'); })
-            .catch(function (e) { return useError(res, e); });
+        else
+            updatedUser
+                .save()
+                .then(function () { return useReturn(res, 'User was correctly edited'); })
+                .catch(function (e) { return useError(res, e); });
     })
         .catch(function (e) { return useError(res, e); });
 };

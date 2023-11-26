@@ -3,6 +3,7 @@ import express from 'express';
 import {
     checkIdAndCreate,
     checkIdAndMdp,
+    checkMdp,
     deleteCookies,
     editUserEmailOrPsw,
 } from './controllers/user.js';
@@ -30,6 +31,7 @@ router.delete('/resetCookies', authentified, deleteCookies);
 router.get('/home', authentified, returnPasswList); //! --> allPassw, categPassw
 router.get('/setting', authentified, returnForSetting); //! --> identifier, nbOfPassw
 
+router.post('/verifMdp', authentified, checkMdp); //! need?: mdpToCheck
 router.put('/editUser', authentified, editUserEmailOrPsw); //! need?: newEmail, newMdp, oldMdp
 
 // ? For password Request

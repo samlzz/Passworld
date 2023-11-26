@@ -131,6 +131,26 @@ export const deleteCookies = (req: exp.Request, res: exp.Response) => {
     }
 };
 
+export const checkMdp = (req: exp.Request, res: exp.Response) => {
+    const { userId } = req.auth;
+    const { mdpToCheck } = req.body;
+    User.findById(userId)
+        .then((user) => {
+            compare(mdpToCheck, user.motDePasse)
+                .then((valid) => {
+                    if (!valid)
+                        useError(
+                            res,
+                            { err: 'Email or password are wrong' },
+                            401
+                        );
+                    else useReturn(res, 'Good');
+                })
+                .catch((e) => useError(res, e));
+        })
+        .catch((e) => useError(res, e));
+};
+
 export const editUserEmailOrPsw = (req: exp.Request, res: exp.Response) => {
     const { userId } = req.auth;
     User.findById(userId)
@@ -141,7 +161,7 @@ export const editUserEmailOrPsw = (req: exp.Request, res: exp.Response) => {
                 updatedUser.email = req.body.newEmail;
             }
             if (req.body?.newMdp) {
-                compare(user.motDePasse, req.body.oldMdp)
+                compare(req.body.oldMdp, user.motDePasse)
                     .then((valid) => {
                         if (!valid)
                             useError(
@@ -149,27 +169,28 @@ export const editUserEmailOrPsw = (req: exp.Request, res: exp.Response) => {
                                 { err: 'Email or password are wrong' },
                                 401
                             );
-                        hash(req.body.newMdp, 10)
-                            .then((hashedMdp) => {
-                                updatedUser.motDePasse = hashedMdp;
-                                updatedUser
-                                    .save()
-                                    .then(() =>
-                                        useReturn(
-                                            res,
-                                            'User was correctly edited'
+                        else
+                            hash(req.body.newMdp, 10)
+                                .then((hashedMdp) => {
+                                    updatedUser.motDePasse = hashedMdp;
+                                    updatedUser
+                                        .save()
+                                        .then(() =>
+                                            useReturn(
+                                                res,
+                                                'User was correctly edited'
+                                            )
                                         )
-                                    )
-                                    .catch((e) => useError(res, e));
-                            })
-                            .catch((e) => useError(res, e));
+                                        .catch((e) => useError(res, e));
+                                })
+                                .catch((e) => useError(res, e));
                     })
                     .catch((e) => useError(res, e));
-            }
-            updatedUser
-                .save()
-                .then(() => useReturn(res, 'User was correctly edited'))
-                .catch((e) => useError(res, e));
+            } else
+                updatedUser
+                    .save()
+                    .then(() => useReturn(res, 'User was correctly edited'))
+                    .catch((e) => useError(res, e));
         })
         .catch((e) => useError(res, e));
 };

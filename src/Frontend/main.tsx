@@ -12,6 +12,7 @@ import { LogIn } from './Pages/LogIn';
 import { Register } from './Pages/Register';
 import { Home } from './Pages/Home';
 import { DataProvider } from './Utils/contexte';
+import { EditMdp } from './Pages/EditMdp';
 
 axios.defaults.withCredentials = true;
 
@@ -40,6 +41,7 @@ function App() {
                                     />
                                 }
                             />
+                            <Route path="/editMdp" element={<EditMdp />} />
                         </Routes>
                     </ColorProvider>
                 </DataProvider>

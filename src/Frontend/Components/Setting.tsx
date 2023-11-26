@@ -242,6 +242,7 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
     const [pswCount, setPswCount] = useState(0);
 
     const refFileInput = useRef<HTMLInputElement | null>(null);
+    const prevEmail = useRef('');
 
     const navigate = useNavigate();
 
@@ -275,21 +276,22 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
     const handleEditEmail = () => {
         setEmailEdited((prev) => !prev);
         if (emailEdited === true) {
-            axios
-                .put('http://localhost:3000/editUser', { newEmail: email })
-                .then((resp) => {
-                    console.log(resp);
-                    if (resp.status === 200) {
-                        GoodAlert(resp.data.msg);
-                    }
-                    if (resp.status === 401) navigate('/');
-                })
-                .catch((err) => {
-                    console.log(err);
-                    CatchErrorAlert(err);
-                    navigate('/home');
-                });
-        }
+            if (email !== prevEmail.current) {
+                axios
+                    .put('http://localhost:3000/editUser', { newEmail: email })
+                    .then((resp) => {
+                        if (resp.status === 200) {
+                            GoodAlert(resp.data.msg);
+                        }
+                        if (resp.status === 401) navigate('/');
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        CatchErrorAlert(err);
+                        navigate('/home');
+                    });
+            }
+        } else prevEmail.current = email;
     };
     const handleImportPsw = () => {
         if (refFileInput.current) refFileInput.current.click();
@@ -388,7 +390,7 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
                         <FadeTitles> Password: </FadeTitles>
                         <StyledField>
                             <FieldInput defaultValue="**********" />
-                            <FieldEdit />
+                            <FieldEdit onClick={() => navigate('/editMdp')} />
                         </StyledField>
                         <StyledLogOut
                             type="button"
