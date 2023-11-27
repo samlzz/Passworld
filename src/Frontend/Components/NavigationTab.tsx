@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { useDrop } from 'react-dnd/dist/hooks';
+import { useDrag, useDrop } from 'react-dnd/dist/hooks';
 
 import { useState } from 'react';
 import clickedFleche from '../assets/svgShape/Polygon.svg';
@@ -13,6 +13,7 @@ import {
     FolderOfTabProps,
     FoldDivProps,
     Iitem,
+    DropZonProps,
 } from '../Utils/type';
 import { useData } from '../Utils/contexte';
 
@@ -25,8 +26,6 @@ const FolderDiv = styled.div<FoldDivProps>`
     flex-direction: row;
     align-items: center;
     height: 2.3vw;
-    margin-bottom: 0.5vw;
-    margin-top: 0.7vw;
     width: 100%;S
     ${({ $isAll }) => !$isAll && `margin-left: 0vw; width: 99%;`}
     margin-left: 0.3vw;
@@ -112,10 +111,15 @@ export function FolderOfTab({
             }
         },
     }));
+    const [, dragRef] = useDrag(() => ({
+        type: 'Category',
+        item: { id: categId, type: 'Category' },
+    }));
     return (
         <div>
             <FolderDiv $isClick={IsSelect} ref={dropRef} $isAll={isAllPsw}>
                 <ElemPassw
+                    ref={isAllPsw ? undefined : dragRef}
                     onMouseDown={() => {
                         if (IsSelect) {
                             whoIsClick('');
@@ -141,10 +145,27 @@ export function FolderOfTab({
                     </StyledDelete>
                 )}
             </FolderDiv>
+            {IsSelect && <div style={{ height: '0.5vw' }} />}
             {IsSelect &&
                 allPassw.map((mdp, i) => (
                     <ElemOfTab key={`${mdp._id}--${i}`} aPassw={mdp} />
                 ))}
         </div>
     );
+}
+
+const ForDrop = styled.div`
+    height: 0.8vw;
+    width: 100%;
+`;
+
+export function DropZone({ index }: DropZonProps) {
+    const { moveACateg } = useData();
+    const [, dropRef] = useDrop(() => ({
+        accept: 'Category',
+        drop: (item: Iitem) => {
+            if (item.type === 'Category') moveACateg(item.id, index);
+        },
+    }));
+    return <ForDrop ref={dropRef} />;
 }

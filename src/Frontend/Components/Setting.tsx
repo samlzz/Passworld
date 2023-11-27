@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 
 import { useNavigate } from 'react-router';
+import Swal from 'sweetalert2';
 import pp from '../assets/Icones/ProfilePic.png';
 import icoPW from '../assets/logoPW/SubmitLogo.png';
 import edit from '../assets/Icones/PasswCard/edit.svg';
@@ -16,6 +17,7 @@ import {
     CatchErrorAlert,
     GoodAlert,
     ResetAlerte,
+    ResetResp,
 } from './SweetAlert';
 
 // Début du style -------------->
@@ -252,7 +254,7 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
             .then((resp) => {
                 if (resp.status === 200) {
                     const { identifier, nbOfPassw } = resp.data;
-                    if (identifier && nbOfPassw) {
+                    if (identifier && (nbOfPassw || nbOfPassw === 0)) {
                         setEmail(identifier);
                         setPswCount(nbOfPassw);
                     } else
@@ -339,9 +341,30 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
             BadAlert('Error when file import');
         }
     };
+    const handleExport = () => {
+        axios
+            .get('http://localhost:3000/pswFile')
+            .then((resp) => {
+                if (resp.status === 200)
+                    GoodAlert('Password.csv succesfully download');
+            })
+            .catch((e) => CatchErrorAlert(e));
+    };
     const handleReset = () => {
-        const result = ResetAlerte();
-        if (result) navigate('/home');
+        ResetAlerte().then((result) => {
+            if (result.isConfirmed) {
+                axios
+                    .delete('http://localhost:3000/resetUserData')
+                    .then((resp) => {
+                        ResetResp(true, `${resp.data.msg} Refresh for apply.`);
+                        navigate('/home');
+                    })
+                    .catch((e) => CatchErrorAlert(e));
+            }
+            if (result.dismiss === Swal.DismissReason.cancel) {
+                ResetResp();
+            }
+        });
     };
 
     return (
@@ -430,7 +453,9 @@ PSW, IDENTIFIER, SITELINK"
                             <StyledButt onClick={handleImportPsw}>
                                 Import
                             </StyledButt>
-                            <StyledButt>Export</StyledButt>
+                            <StyledButt onClick={handleExport}>
+                                Export
+                            </StyledButt>
                             <StyledButt $isDel onClick={handleReset}>
                                 Reset
                             </StyledButt>

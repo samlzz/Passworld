@@ -58,6 +58,7 @@ export interface IDefaultDataValu {
     editPassw: (editedPsw: IPassw) => void;
     addNewCateg: (newCategNm: string, categNameArr: string[]) => void;
     delCateg: (categIdToDel: string) => void;
+    moveACateg: (categId: string, newIndex: number) => void;
     moveOfCateg: (categId: string, passwId: string) => void;
     rmInCategNotAllPsw: (passwId: string) => void;
 }
@@ -118,6 +119,9 @@ export interface FolderOfTabProps {
 export interface Iitem {
     id: string;
     type: string;
+}
+export interface DropZonProps {
+    index: number;
 }
 // ? Password Card:
 export interface PasswCardProps {

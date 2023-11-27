@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import { Types } from 'mongoose';
 import Cookies from 'js-cookie';
 
-import { FolderOfTab } from '../Components/NavigationTab';
+import { DropZone, FolderOfTab } from '../Components/NavigationTab';
 import { SearchBar } from '../Components/SearchBar';
 import { PasswCard } from '../Components/PasswCard';
 import { CreatePassw } from '../Components/Password';
@@ -250,20 +250,27 @@ export function Home({ isRendered }: HomeProps) {
                     whoIsClick={(categWho) => setFolderOpen(categWho)}
                     IsSelect={folderOpen === 'All passwords'}
                 />
+                <DropZone index={1} />
                 {pswByCateg.map(
                     (categ, i) =>
                         i !== 0 && (
-                            <FolderOfTab
-                                key={categ._id || `${categ.name}-${i}`}
-                                title={categ.name}
-                                allPassw={categ.passwords}
-                                whoIsClick={(folderName) => {
-                                    setFolderOpen(folderName);
-                                }}
-                                IsSelect={folderOpen === categ.name}
-                                isDeleted={() => delCateg(categ._id)}
-                                categId={categ._id}
-                            />
+                            <div key={`div-${categ._id || i}`}>
+                                <FolderOfTab
+                                    key={categ._id || `${categ.name}-${i}`}
+                                    title={categ.name}
+                                    allPassw={categ.passwords}
+                                    whoIsClick={(folderName) => {
+                                        setFolderOpen(folderName);
+                                    }}
+                                    IsSelect={folderOpen === categ.name}
+                                    isDeleted={() => delCateg(categ._id)}
+                                    categId={categ._id}
+                                />
+                                <DropZone
+                                    index={i + 1}
+                                    key={`dropzone-${categ._id || i}`}
+                                />
+                            </div>
                         )
                 )}
                 <ABar />

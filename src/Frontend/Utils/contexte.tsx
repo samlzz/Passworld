@@ -27,6 +27,7 @@ const defaultDataCtxtValu: IDefaultDataValu = {
     moveOfCateg: () => {},
     addNewCateg: () => {},
     delCateg: () => {},
+    moveACateg: () => {},
     rmInCategNotAllPsw: () => {},
 };
 const DataContext = createContext(defaultDataCtxtValu);
@@ -396,6 +397,37 @@ export function DataProvider({ children }: ProviderProps) {
                 }
             });
     };
+    const moveACateg = (categId: string, newIndex: number) => {
+        const indexOfCateg = pswByCateg.findIndex(
+            (categ) => categ._id === categId
+        );
+        if (indexOfCateg === -1) {
+            BadAlert('Category not found');
+            return;
+        }
+        axios
+            .put('http://localhost:3000/moveCateg', {
+                indexOfCateg,
+                newIndex,
+            })
+            .then((resp) => {
+                if (resp.status === 200) {
+                    const movedCategs = pswByCateg;
+                    const [categToMove] = movedCategs.splice(indexOfCateg, 1);
+                    movedCategs.splice(newIndex, 0, categToMove);
+                    setData((prev) => ({
+                        ...prev,
+                        pswByCateg: movedCategs,
+                    }));
+                }
+            })
+            .catch((err) => {
+                BadAlert('Error when try to move categ');
+                if (err.response && err.response.status === 401) {
+                    navigate('/');
+                }
+            });
+    };
 
     const authCtxtValu = useMemo(
         () => ({
@@ -408,6 +440,7 @@ export function DataProvider({ children }: ProviderProps) {
             moveOfCateg,
             addNewCateg,
             delCateg,
+            moveACateg,
             rmInCategNotAllPsw,
         }),
         [data]

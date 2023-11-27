@@ -1,9 +1,10 @@
 import exp from 'express';
 import { Types } from 'mongoose';
 import axios from 'axios';
+import { createObjectCsvWriter as createCsvWriter } from 'csv-writer';
 
 import { User, IPassw, ICateg } from '../models/model_user.js';
-import { encrypt, useError, useReturn } from '../middleware/func.js';
+import { decrypt, encrypt, useError, useReturn } from '../middleware/func.js';
 import logger from '../middleware/log.js';
 
 export const addPassword = (req: exp.Request, res: exp.Response) => {
@@ -213,6 +214,39 @@ export const deleteAllPswAndCateg = (req: exp.Request, res: exp.Response) => {
                         'Passwords and category was succesfully deleted'
                     )
                 )
+                .catch((e) => useError(res, e));
+        })
+        .catch((e) => useError(res, e));
+};
+
+export const returnAllPswInCSV = (req: exp.Request, res: exp.Response) => {
+    const { userId } = req.auth;
+    User.findById(userId)
+        .then((user) => {
+            if (!user) useError(res, { err: 'Do not find user' });
+            const csvWriter = createCsvWriter({
+                path: '../../csvExport/passwords.csv',
+                header: [
+                    { id: 'mdp', title: 'MDP' },
+                    { id: 'email', title: 'EMAIL' },
+                    { id: 'siteLink', title: 'SITELINK' },
+                    { id: 'categName', title: 'CATEGNAME' },
+                ],
+            });
+            const allPswForCSV = [];
+            user.allPassw.forEach((passw) => {
+                allPswForCSV.push({
+                    mdp: decrypt(passw.mdp, user._id.toString()),
+                    email: passw.identifier,
+                    siteLink: passw.siteAddress,
+                    categName: passw.categName,
+                });
+            });
+            csvWriter
+                .writeRecords(allPswForCSV)
+                .then(() => {
+                    res.download('../../csvExport/passwords.csv');
+                })
                 .catch((e) => useError(res, e));
         })
         .catch((e) => useError(res, e));

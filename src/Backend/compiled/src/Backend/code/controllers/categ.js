@@ -18,9 +18,8 @@ export var deleteCategory = function (req, res) {
     var categId = req.body.categId;
     User.findById(req.auth.userId)
         .then(function (user) {
-        if (!user) {
+        if (!user)
             useError(res, { err: 'Category not found' }, 404);
-        }
         var categLess = user;
         categLess.pswByCateg = categLess.pswByCateg.filter(function (categ) {
             if (categ.name === 'SearchContent') {
@@ -34,6 +33,22 @@ export var deleteCategory = function (req, res) {
         categLess
             .save()
             .then(function () { return useReturn(res, 'Category succesfully deleted'); })
+            .catch(function (e) { return useError(res, e); });
+    })
+        .catch(function (e) { return useError(res, e); });
+};
+export var moveACateg = function (req, res) {
+    var userId = req.auth.userId;
+    User.findById(userId)
+        .then(function (user) {
+        if (!user)
+            useError(res, { err: 'Category not found' }, 404);
+        var _a = req.body, indexOfCateg = _a.indexOfCateg, newIndex = _a.newIndex;
+        // ? destruct pour recup la categ car splice->categ[]
+        var categoryToMove = user.pswByCateg.splice(indexOfCateg, 1)[0];
+        user.pswByCateg.splice(newIndex, 0, categoryToMove);
+        user.save()
+            .then(function () { return useReturn(res, 'Category succesfully moved'); })
             .catch(function (e) { return useError(res, e); });
     })
         .catch(function (e) { return useError(res, e); });

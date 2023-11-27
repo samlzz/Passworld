@@ -47,8 +47,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 import { Types } from 'mongoose';
 import axios from 'axios';
+import { createObjectCsvWriter as createCsvWriter } from 'csv-writer';
 import { User } from '../models/model_user.js';
-import { encrypt, useError, useReturn } from '../middleware/func.js';
+import { decrypt, encrypt, useError, useReturn } from '../middleware/func.js';
 import logger from '../middleware/log.js';
 export var addPassword = function (req, res) {
     function fetchIco(url) {
@@ -231,6 +232,39 @@ export var deleteAllPswAndCateg = function (req, res) {
             .save()
             .then(function () {
             return useReturn(res, 'Passwords and category was succesfully deleted');
+        })
+            .catch(function (e) { return useError(res, e); });
+    })
+        .catch(function (e) { return useError(res, e); });
+};
+export var returnAllPswInCSV = function (req, res) {
+    var userId = req.auth.userId;
+    User.findById(userId)
+        .then(function (user) {
+        if (!user)
+            useError(res, { err: 'Do not find user' });
+        var csvWriter = createCsvWriter({
+            path: '../../csvExport/passwords.csv',
+            header: [
+                { id: 'mdp', title: 'MDP' },
+                { id: 'email', title: 'EMAIL' },
+                { id: 'siteLink', title: 'SITELINK' },
+                { id: 'categName', title: 'CATEGNAME' },
+            ],
+        });
+        var allPswForCSV = [];
+        user.allPassw.forEach(function (passw) {
+            allPswForCSV.push({
+                mdp: decrypt(passw.mdp, user._id.toString()),
+                email: passw.identifier,
+                siteLink: passw.siteAddress,
+                categName: passw.categName,
+            });
+        });
+        csvWriter
+            .writeRecords(allPswForCSV)
+            .then(function () {
+            res.download('../../csvExport/passwords.csv');
         })
             .catch(function (e) { return useError(res, e); });
     })

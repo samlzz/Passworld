@@ -27,9 +27,8 @@ export const deleteCategory = (req: exp.Request, res: exp.Response) => {
     const { categId } = req.body;
     User.findById(req.auth.userId)
         .then((user) => {
-            if (!user) {
-                useError(res, { err: 'Category not found' }, 404);
-            }
+            if (!user) useError(res, { err: 'Category not found' }, 404);
+
             const categLess = user;
             categLess.pswByCateg = categLess.pswByCateg.filter((categ) => {
                 if (categ.name === 'SearchContent') {
@@ -43,6 +42,22 @@ export const deleteCategory = (req: exp.Request, res: exp.Response) => {
             categLess
                 .save()
                 .then(() => useReturn(res, 'Category succesfully deleted'))
+                .catch((e) => useError(res, e));
+        })
+        .catch((e) => useError(res, e));
+};
+
+export const moveACateg = (req: exp.Request, res: exp.Response) => {
+    const { userId } = req.auth;
+    User.findById(userId)
+        .then((user) => {
+            if (!user) useError(res, { err: 'Category not found' }, 404);
+            const { indexOfCateg, newIndex } = req.body;
+            // ? destruct pour recup la categ car splice->categ[]
+            const [categoryToMove] = user.pswByCateg.splice(indexOfCateg, 1);
+            user.pswByCateg.splice(newIndex, 0, categoryToMove);
+            user.save()
+                .then(() => useReturn(res, 'Category succesfully moved'))
                 .catch((e) => useError(res, e));
         })
         .catch((e) => useError(res, e));

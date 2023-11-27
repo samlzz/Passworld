@@ -80,8 +80,30 @@ export function BadAlert(title: string) {
     });
 }
 
-export function ResetAlerte() {
-    Swal.fire({
+export function ResetResp(
+    responseIsTrue: boolean = false,
+    validTxt: string = 'Your data is safe :)'
+) {
+    if (responseIsTrue)
+        Swal.fire({
+            title: 'Deleted!',
+            text: validTxt,
+            icon: 'success',
+            background: '#111727',
+            color: '#FFFFFFCC',
+        });
+    else
+        Swal.fire({
+            title: 'Cancelled',
+            text: validTxt,
+            icon: 'info',
+            background: '#111727',
+            color: '#FFFFFFCC',
+        });
+}
+
+export const ResetAlerte = () => {
+    return Swal.fire({
         title: 'Are you sure?',
         text: 'All your passwords and your category will be deleted!',
         icon: 'warning',
@@ -91,28 +113,5 @@ export function ResetAlerte() {
         confirmButtonText: 'Yes, delete it!',
         background: '#111727',
         color: '#FFFFFFCC',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Deleted!',
-                text: 'Your file has been deleted.',
-                icon: 'success',
-                background: '#111727',
-                color: '#FFFFFFCC',
-            });
-            return true;
-        }
-        if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire({
-                title: 'Cancelled',
-                text: 'Your imaginary file is safe :)',
-                icon: 'info',
-                background: '#111727',
-                color: '#FFFFFFCC',
-            });
-            return false;
-        }
-        return false;
     });
-    return false;
-}
+};
