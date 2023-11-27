@@ -298,6 +298,19 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
     const handleImportPsw = () => {
         if (refFileInput.current) refFileInput.current.click();
     };
+    const formateTitle = (linkToFormat: string) => {
+        let withoutPref = linkToFormat;
+        if (withoutPref.startsWith('http://')) {
+            withoutPref = withoutPref.slice(7);
+        }
+        if (withoutPref.startsWith('www.')) {
+            withoutPref = withoutPref.slice(4);
+        }
+        if (withoutPref.includes('.')) {
+            [withoutPref] = withoutPref.split('.');
+        }
+        return withoutPref;
+    };
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         try {
             if (event.target.files) {
@@ -314,16 +327,25 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
                         const newpswList: IPassw[] = [];
                         lines.forEach((line) => {
                             const valu = line.split(',');
-                            const passw: IPassw = {
-                                _id: '',
-                                mdp: valu[0],
-                                identifier: valu[1],
-                                categName: 'All passwords',
-                                siteAddress: valu[2],
-                                titre: valu[2].split('.')[1],
-                                icoLink: defaultIco,
-                            };
-                            newpswList.push(passw);
+                            if (
+                                valu[0] !== 'MDP' &&
+                                valu[0] &&
+                                valu[1] &&
+                                valu[2]
+                            ) {
+                                let categNm = 'All passwords';
+                                if (valu[3]) [, , , categNm] = valu;
+                                const passw: IPassw = {
+                                    _id: '',
+                                    mdp: valu[0],
+                                    identifier: valu[1],
+                                    categName: categNm,
+                                    siteAddress: valu[2],
+                                    titre: formateTitle(valu[2]),
+                                    icoLink: defaultIco,
+                                };
+                                newpswList.push(passw);
+                            }
                         });
                         axios
                             .post('http://localhost:3000/addMultPsw', {
@@ -337,18 +359,21 @@ export function ParamsWindow({ toClosed, onLogOut }: ParamProps) {
                 };
                 reader.readAsText(file);
             } else throw new Error();
-        } catch {
+        } catch (error) {
             BadAlert('Error when file import');
         }
     };
     const handleExport = () => {
-        axios
-            .get('http://localhost:3000/pswFile')
-            .then((resp) => {
-                if (resp.status === 200)
-                    GoodAlert('Password.csv succesfully download');
-            })
-            .catch((e) => CatchErrorAlert(e));
+        const fileDownloadUrl = 'http://localhost:3000/pswFile';
+        window.open(fileDownloadUrl, '_blank');
+        GoodAlert('Password.csv succesfully download');
+        // axios
+        //     .get('http://localhost:3000/pswFile')
+        //     .then((resp) => {
+        //         if (resp.status === 200)
+        //             GoodAlert('Password.csv succesfully download');
+        //     })
+        //     .catch((e) => CatchErrorAlert(e));
     };
     const handleReset = () => {
         ResetAlerte().then((result) => {

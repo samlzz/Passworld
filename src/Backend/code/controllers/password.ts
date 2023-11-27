@@ -175,19 +175,24 @@ export const replaceAPsw = (req: exp.Request, res: exp.Response) => {
 };
 
 export const addMultiplePsw = (req: exp.Request, res: exp.Response) => {
-    const { newpswList }: { newpswList: IPassw[] } = req.body;
-    User.findByIdAndUpdate(
-        req.auth.userId,
-        { $push: { allPsw: { $each: newpswList } } },
-        { new: true, safe: true, upsert: false }
-    )
+    const { newpswList } = req.body;
+    User.findById(req.auth.userId)
         .then((user) => {
             if (!user) useError(res, { err: 'Do not find user' });
-            else
-                useReturn(
-                    res,
-                    `Correctly added ${newpswList.length} passwords`
-                );
+            const forDataBasePsws = newpswList.map((psw) => ({
+                ...psw,
+                mdp: encrypt(psw.mdp, user._id.toHexString()),
+                _id: new Types.ObjectId(),
+            })) as IPassw[];
+            forDataBasePsws.forEach((psw) => user.allPassw.push(psw));
+            user.save()
+                .then(() =>
+                    useReturn(
+                        res,
+                        `Correctly added ${newpswList.length} passwords`
+                    )
+                )
+                .catch((e) => useError(res, e));
         })
         .catch((e) => useError(res, e));
 };
@@ -224,8 +229,17 @@ export const returnAllPswInCSV = (req: exp.Request, res: exp.Response) => {
     User.findById(userId)
         .then((user) => {
             if (!user) useError(res, { err: 'Do not find user' });
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}-${now
+                .getMinutes()
+                .toString()
+                .padStart(2, '0')}-${now
+                .getSeconds()
+                .toString()
+                .padStart(2, '0')}`;
+            const filePath = `./csvExport/passwords${timeStr}.csv`;
             const csvWriter = createCsvWriter({
-                path: '../../csvExport/passwords.csv',
+                path: filePath,
                 header: [
                     { id: 'mdp', title: 'MDP' },
                     { id: 'email', title: 'EMAIL' },
@@ -245,7 +259,11 @@ export const returnAllPswInCSV = (req: exp.Request, res: exp.Response) => {
             csvWriter
                 .writeRecords(allPswForCSV)
                 .then(() => {
-                    res.download('../../csvExport/passwords.csv');
+                    res.download(filePath, (err) => {
+                        if (err) {
+                            useError(res, { err: 'Error when send file' });
+                        }
+                    });
                 })
                 .catch((e) => useError(res, e));
         })

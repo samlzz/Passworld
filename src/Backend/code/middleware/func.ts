@@ -11,6 +11,7 @@ export const useError = (
     error: Error | { err: string },
     statusCode: number = 500
 ) => {
+    console.log(error);
     logger.error(error);
     return res.status(statusCode).json(error);
 };

@@ -14,6 +14,7 @@ import dotenv from 'dotenv';
 import logger from './log.js';
 export var useError = function (res, error, statusCode) {
     if (statusCode === void 0) { statusCode = 500; }
+    console.log(error);
     logger.error(error);
     return res.status(statusCode).json(error);
 };

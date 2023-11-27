@@ -204,12 +204,17 @@ export var replaceAPsw = function (req, res) {
 };
 export var addMultiplePsw = function (req, res) {
     var newpswList = req.body.newpswList;
-    User.findByIdAndUpdate(req.auth.userId, { $push: { allPsw: { $each: newpswList } } }, { new: true, safe: true, upsert: false })
+    User.findById(req.auth.userId)
         .then(function (user) {
         if (!user)
             useError(res, { err: 'Do not find user' });
-        else
-            useReturn(res, "Correctly added ".concat(newpswList.length, " passwords"));
+        var forDataBasePsws = newpswList.map(function (psw) { return (__assign(__assign({}, psw), { mdp: encrypt(psw.mdp, user._id.toHexString()), _id: new Types.ObjectId() })); });
+        forDataBasePsws.forEach(function (psw) { return user.allPassw.push(psw); });
+        user.save()
+            .then(function () {
+            return useReturn(res, "Correctly added ".concat(newpswList.length, " passwords"));
+        })
+            .catch(function (e) { return useError(res, e); });
     })
         .catch(function (e) { return useError(res, e); });
 };
@@ -243,8 +248,17 @@ export var returnAllPswInCSV = function (req, res) {
         .then(function (user) {
         if (!user)
             useError(res, { err: 'Do not find user' });
+        var now = new Date();
+        var timeStr = "".concat(now.getHours().toString().padStart(2, '0'), "-").concat(now
+            .getMinutes()
+            .toString()
+            .padStart(2, '0'), "-").concat(now
+            .getSeconds()
+            .toString()
+            .padStart(2, '0'));
+        var filePath = "./csvExport/passwords".concat(timeStr, ".csv");
         var csvWriter = createCsvWriter({
-            path: '../../csvExport/passwords.csv',
+            path: filePath,
             header: [
                 { id: 'mdp', title: 'MDP' },
                 { id: 'email', title: 'EMAIL' },
@@ -264,7 +278,11 @@ export var returnAllPswInCSV = function (req, res) {
         csvWriter
             .writeRecords(allPswForCSV)
             .then(function () {
-            res.download('../../csvExport/passwords.csv');
+            res.download(filePath, function (err) {
+                if (err) {
+                    useError(res, { err: 'Error when send file' });
+                }
+            });
         })
             .catch(function (e) { return useError(res, e); });
     })
