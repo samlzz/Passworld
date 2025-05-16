@@ -51,7 +51,7 @@ const connectWithRetry = (url: string, maxRetries = 10) => {
         });
 };
 connectWithRetry(
-    'mongodb+srv://sam:zaXMBRLuasccCUKv@cluster0.wpyzmou.mongodb.net/passworld'
+    'mongodb+srv://sam:zMguiORguiascCUKv@cluster69.yxzimougu.mongodb.net/passworld'
 );
 
 //* ALLOW ACCES TO DATA IN .JSON
